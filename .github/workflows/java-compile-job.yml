@@ -9,8 +9,7 @@ on:
       java-tmp-cache-key:
         required: true
         type: string
-    secrets:
-      inherit: true
+    secrets: inherit
 jobs:
   compile:
     name: Compile Services
