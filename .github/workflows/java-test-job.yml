@@ -13,9 +13,9 @@ on:
 jobs:
   test-services:
     runs-on: ubuntu-latest
-    container:
-      image: public.docker.ecsec.de/ecsec/tools/podman-java21:1.0
-      options: --privileged
+    # container:
+    #   image: public.docker.ecsec.de/ecsec/tools/podman-java21:1.0
+    #   options: --privileged
     env:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
       POSTGRES_DB: test
@@ -45,8 +45,8 @@ jobs:
           echo "JAVA_CACHE_KEY=${{ inputs.java-cache-key }}" >> $GITHUB_ENV
           echo "JAVA_TMP_CACHE_KEY=${{ inputs.java-tmp-cache-key }}" >> $GITHUB_ENV
 
-      - name: Start Podman
-        run: /usr/bin/start-podman
+      # - name: Start Podman
+      #   run: /usr/bin/start-podman
 
       - name: Restore Gradle Base Cache
         uses: actions/cache@v4
@@ -96,17 +96,17 @@ jobs:
             **/build/reports/requirements/*.csv
             build/reports/requirements/aggregate.csv
 
-      - name: Export Podman Images
-        run: |
-          mkdir -p .podman/ && cd .podman/
-          images=$(podman image list -q)
-          for image in $images; do
-            podman save --quiet -o "$image.tar" "$image"
-          done
-          cd -
+      # - name: Export Podman Images
+      #   run: |
+      #     mkdir -p .podman/ && cd .podman/
+      #     images=$(podman image list -q)
+      #     for image in $images; do
+      #       podman save --quiet -o "$image.tar" "$image"
+      #     done
+      #     cd -
 
-      - name: Stop Podman
-        run: podman system service stop
+      # - name: Stop Podman
+      #   run: podman system service stop
 
   coverage-report-java:
     needs: test-services
