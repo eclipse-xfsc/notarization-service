@@ -21,7 +21,6 @@ jobs:
           else
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
-        if: github.event_name == 'pull_request'
 
   compile:
     needs: check-draft
