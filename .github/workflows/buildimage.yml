@@ -5,7 +5,6 @@ on:
 
 jobs:
     image-build:
-      needs: compile
       runs-on: ubuntu-latest
       steps:
       - name: Checkout Repository
