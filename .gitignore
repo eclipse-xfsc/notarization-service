@@ -48,7 +48,5 @@ gradle-app.setting
 # node plugin
 .frontend-gradle-plugin/
 .node/
-.gitlab-ci.yml
-ci
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle

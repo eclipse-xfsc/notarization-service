@@ -1,0 +1,65 @@
+.gradle-image-build: &gradle-image-build
+  - export IMAGE_REGISTRY="${HARBOR_HOST}"
+  - export IMAGE_REGISTRY_GROUP="${HARBOR_PROJECT}"
+  - ./gradlew imageBuild
+        -Dquarkus.container-image.tag=$TAG
+        -Dquarkus.container-image.additional-tags=$ADDITIONAL_TAGS
+        -Dquarkus.container-image.push=true
+        -Dquarkus.container-image.username=${HARBOR_USERNAME}
+        -Dquarkus.container-image.password=${HARBOR_PASSWORD}
+        -Dquarkus.container-image.registry=${IMAGE_REGISTRY}
+        -Dquarkus.container-image.group=${IMAGE_REGISTRY_GROUP}
+        -x :services:ssi-issuance:imageBuild
+
+.image-build-cache: &image-build-cache
+  cache:
+    - key: "$JAVA_CACHE_KEY"
+      paths: !reference [ .cache-gradle-base, paths ]
+      policy: pull
+    - key: "$JAVA_TMP_CACHE_KEY"
+      paths: [ .cache-gradle-builds, paths ]
+      policy: pull
+
+build-service-images:
+  extends: .podman-java
+  stage: image-build
+  dependencies: []
+  needs:
+    - compile-services
+  <<: *image-build-cache
+  script:
+    - export TAG=dev-${CI_COMMIT_SHA}
+    - export ADDITIONAL_TAGS=latest-dev
+    - *gradle-image-build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+build-service-images-mr:
+  extends: .podman-java
+  stage: image-build
+  dependencies: []
+  allow_failure: true
+  needs:
+    - compile-services
+  <<: *image-build-cache
+  script:
+    - export TAG=dev-${CI_COMMIT_SHA}
+    - *gradle-image-build
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      when: manual
+
+build-service-images-prod:
+  extends: .podman-java
+  stage: image-build
+  dependencies: []
+  needs:
+    - compile-services
+    - test-services
+  <<: *image-build-cache
+  script:
+    - export TAG=$(echo "${CI_COMMIT_TAG}" | cut -c 2-)
+    - export ADDITIONAL_TAGS=latest
+    - *gradle-image-build
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc.\d+)?$/

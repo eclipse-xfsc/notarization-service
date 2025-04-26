@@ -1,0 +1,35 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_TITLE =~ /^WIP.*$/
+      when: never
+    - if: $CI_MERGE_REQUEST_TITLE =~ /^Draft.*$/
+      when: never
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"
+
+variables:
+  JAVA_CACHE_KEY: "notarization-api-java-cache"
+  JAVA_TMP_CACHE_KEY: "notarization-api-java-cache-$CI_COMMIT_REF_SLUG"
+
+stages:
+  - compile
+  - test
+  - image-build
+  - release
+
+include:
+- '/ci/podman-java.yml'
+- '/ci/java-compile-job.yml'
+- '/ci/java-test-job.yml'
+- '/ci/java-image-job.yml'
+- '/ci/helm-build-job.yml'
+- '/ci/3rd-party-image-job.yml'
+- '/services/ssi-issuance/.gitlab-ci.yml'
+- template: Security/Dependency-Scanning.gitlab-ci.yml

@@ -1,0 +1,16 @@
+compile-services:
+  extends: .podman-java
+  stage: compile
+  cache:
+    - key: "$JAVA_CACHE_KEY"
+      paths: !reference [ .cache-gradle-base, paths ]
+      policy: pull-push
+    - key: "$JAVA_TMP_CACHE_KEY"
+      paths: [ .cache-gradle-builds, paths ]
+      policy: pull-push
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+    - "services/**/deploy/**/openapi.yaml"
+    - "services/**/deploy/**/openapi.json"

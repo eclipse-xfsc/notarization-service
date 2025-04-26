@@ -1,0 +1,67 @@
+.start-podman: &start-podman
+  - /usr/bin/start-podman
+
+.stop-podman: &stop-podman
+  - podman system service stop
+
+.export-podman: &export-podman
+  - |
+    PODMAN_IMAGES=( $(podman image list -q) )
+
+    mkdir -p .podman/ && cd .podman/
+    for IMAGE in ${PODMAN_IMAGES[@]}; do
+        echo "Saving image with ID: $IMAGE"
+        podman save --quiet -o $IMAGE.tar $IMAGE
+    done
+    cd -
+
+.import-podman: &import-podman
+  - |
+    mkdir -p .podman/ && cd .podman/
+
+    for ARCHIVE in *.tar; do
+      if test -f "$ARCHIVE"; then
+        echo "Loading archive into podman: $ARCHIVE"
+        podman load -q -i $ARCHIVE
+      fi
+    done
+    cd -
+
+.cache-gradle-base:
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
+    - .gradle/daemon/
+    - .gradle/native/
+    - .gradle/jdks/
+
+.cache-gradle-builds:
+  paths:
+    - "**/build"
+
+.cache-podman-base:
+  paths:
+    - .podman/
+
+.build-variables: &build-variables
+  variables:
+    GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+
+.podman-java:
+  image: public.docker.ecsec.de/ecsec/tools/podman-java21:1.0
+  tags:
+    - executor:docker
+  <<: *build-variables
+  before_script:
+    - *start-podman
+  after_script:
+    - *stop-podman
+
+.podman-java-cached:
+  extends: .podman-java
+  before_script:
+    - *start-podman
+    - *import-podman
+  after_script:
+    - *export-podman
+    - *stop-podman

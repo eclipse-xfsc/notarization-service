@@ -1,0 +1,46 @@
+include:
+  - project: 'eclipsefdn/it/releng/gitlab-runner-service/gitlab-ci-templates'
+    file: '/jobs/buildkit.gitlab-ci.yml'
+
+ssi-issuance-image:
+  extends: .buildkit
+  tags:
+    - "ctx:medium"
+  stage: image-build
+  variables:
+    GIT_DEPTH: 1
+    CI_REGISTRY: ${HARBOR_HOST}
+    CI_REGISTRY_USER: ${HARBOR_USERNAME}
+    CI_REGISTRY_PASSWORD: ${HARBOR_PASSWORD}
+    CI_REGISTRY_IMAGE: ${HARBOR_HOST}/${HARBOR_PROJECT}/ssi-issuance
+    IMAGE_TAG: latest-dev
+    BUILD_CONTEXT: ${CI_PROJECT_DIR}/services/ssi-issuance
+    DOCKERFILE_NAME: Dockerfile
+    BUILD_ARG: $[[ inputs.docker_args ]]
+  dependencies: []
+  needs: []
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+ssi-issuance-image-mr:
+  extends: .buildkit
+  tags:
+    - "ctx:medium"
+  stage: image-build
+  variables:
+    GIT_DEPTH: 1
+    CI_REGISTRY: ${HARBOR_HOST}
+    CI_REGISTRY_USER: ${HARBOR_USERNAME}
+    CI_REGISTRY_PASSWORD: ${HARBOR_PASSWORD}
+    CI_REGISTRY_IMAGE: ${HARBOR_HOST}/${HARBOR_PROJECT}/ssi-issuance
+    IMAGE_TAG: dev-${CI_COMMIT_SHA}
+    BUILD_CONTEXT: ${CI_PROJECT_DIR}/services/ssi-issuance
+    DOCKERFILE_NAME: Dockerfile
+    BUILD_ARG: $[[ inputs.docker_args ]]
+  dependencies: []
+  needs: []
+  allow_failure: true
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      when: manual
