@@ -23,10 +23,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'  # Anpassen, je nach verwendeter Java-Version
+
       - name: Set JAVA Cache Variables
         run: |
           echo "JAVA_CACHE_KEY=${{ inputs.java-cache-key }}" >> $GITHUB_ENV
           echo "JAVA_TMP_CACHE_KEY=${{ inputs.java-tmp-cache-key }}" >> $GITHUB_ENV
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Build with Gradle
         run: ./gradlew assemble
