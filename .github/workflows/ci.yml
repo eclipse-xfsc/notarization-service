@@ -7,10 +7,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-env:
-  JAVA_CACHE_KEY: notarization-api-java-cache
-  JAVA_TMP_CACHE_KEY: notarization-api-java-cache-${{ github.ref_name }}
-
 jobs:
   check-draft:
     runs-on: ubuntu-latest
@@ -32,8 +28,8 @@ jobs:
     if: needs.check-draft.outputs.should_skip == 'false'
     uses: ./.github/workflows/java-compile-job.yml
     with:
-      java-cache-key: ${{ env.JAVA_CACHE_KEY }}
-      java-tmp-cache-key: ${{ env.JAVA_TMP_CACHE_KEY }}
+      java-cache-key: notarization-api-java-cache
+      java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
     secrets: inherit
 
   # test:
