@@ -164,7 +164,7 @@ dependencyResolutionManagement {
 
         create("libs") {
             library("st4", "org.antlr:ST4:4.3.4")
-            library("jsonld", "com.apicatalog:titanium-json-ld:1.4.0")
+            library("jsonld", "com.apicatalog:titanium-json-ld:1.6.0")
             library("jsonpatch", "com.github.java-json-tools:json-patch:1.13")
             library("parsson", "org.eclipse.parsson:parsson:1.1.5")
             library("jose4j", "org.bitbucket.b_c", "jose4j").version("0.9.6")
