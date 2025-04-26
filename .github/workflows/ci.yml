@@ -1,9 +1,8 @@
 name: CI Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  release:
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -27,16 +26,17 @@ jobs:
     if: needs.check-draft.outputs.should_skip == 'false'
     uses: ./.github/workflows/java-compile-job.yml
     with:
-      java-cache-key: notarization-api-java-cache
-      java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
+        java-cache-key: notarization-api-java-cache
+        java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
     secrets: inherit
 
-  # test:
-  #   needs: compile
-  #   uses: ./.github/workflows/java-test-job.yml
-  #   with:
-  #     java-cache-key: ${{ env.JAVA_CACHE_KEY }}
-  #   secrets: inherit
+  test:
+     needs: compile
+     uses: ./.github/workflows/java-test-job.yml
+     with:
+        java-cache-key: notarization-api-java-cache
+        java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
+     secrets: inherit
 
   # image-build:
   #   needs: test

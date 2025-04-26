@@ -1,0 +1,158 @@
+name: Test and Coverage Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      java-cache-key:
+        required: true
+        type: string
+      java-tmp-cache-key:
+        required: true
+        type: string
+
+jobs:
+  test-services:
+    runs-on: ubuntu-latest
+    container:
+      image: public.docker.ecsec.de/ecsec/tools/podman-java21:1.0
+      options: --privileged
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+      POSTGRES_DB: test
+      POSTGRES_USER: quarkus
+      POSTGRES_PASSWORD: quarkus
+    services:
+      postgres:
+        image: postgres:14.1
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: quarkus
+          POSTGRES_PASSWORD: quarkus
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U $POSTGRES_USER" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set JAVA Cache Variables
+        run: |
+          echo "JAVA_CACHE_KEY=${{ inputs.java-cache-key }}" >> $GITHUB_ENV
+          echo "JAVA_TMP_CACHE_KEY=${{ inputs.java-tmp-cache-key }}" >> $GITHUB_ENV
+
+      - name: Start Podman
+        run: /usr/bin/start-podman
+
+      - name: Restore Gradle Base Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle/caches/
+            .gradle/wrapper/
+            .gradle/daemon/
+            .gradle/native/
+            .gradle/jdks/
+          key: ${{ env.JAVA_CACHE_KEY }}
+          restore-keys: gradle-base-${{ runner.os }}-
+
+      - name: Restore Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: "**/build"
+          key: ${{ env.JAVA_TMP_CACHE_KEY }}
+          restore-keys: gradle-builds-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run Tests
+        run: |
+          IN_CI_ENV=true \
+          QUARKUS_DATASOURCE_DEVSERVICES_ENABLED=false \
+          QUARKUS_DATASOURCE_REACTIVE_URL=postgresql://postgres:5432/test \
+          QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://postgres:5432/test \
+          QUARKUS_DATASOURCE_USERNAME=quarkus \
+          QUARKUS_DATASOURCE_PASSWORD=quarkus \
+          QUARKUS_KEYCLOAK_DEVSERVICES_ENABLED=false \
+          ./gradlew --full-stacktrace -Dtest.ignoreFailures=true check
+
+      - name: Aggregate Requirement Report
+        run: ./scripts/aggregate-requirement-report.sh
+
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            services/**/build/jacoco-report/jacoco.xml
+            services/**/build/test-results/test/TEST-*.xml
+            libs/**/build/jacoco-report/jacoco.xml
+            libs/**/build/test-results/test/TEST-*.xml
+            **/build/reports/requirements/*.csv
+            build/reports/requirements/aggregate.csv
+
+      - name: Export Podman Images
+        run: |
+          mkdir -p .podman/ && cd .podman/
+          images=$(podman image list -q)
+          for image in $images; do
+            podman save --quiet -o "$image.tar" "$image"
+          done
+          cd -
+
+      - name: Stop Podman
+        run: podman system service stop
+
+  coverage-report-java:
+    needs: test-services
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.10
+    continue-on-error: true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Test Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: test-reports
+
+      - name: Convert JaCoCo to Cobertura for Services
+        run: |
+          cd services/
+
+          for SERVICE in *; do
+            if test -d $SERVICE/build/jacoco-report/; then
+              if test -d $SERVICE/src/main/java; then
+                ROOT_SOURCE=$SERVICE/src/main/java/
+              else
+                ROOT_SOURCE=$SERVICE/src/main/kotlin/
+              fi
+              python /opt/cover2cover.py $SERVICE/build/jacoco-report/jacoco.xml $ROOT_SOURCE > $SERVICE/build/jacoco-report/cobertura.xml
+            fi
+          done
+
+          cd ../libs/
+
+          for LIBRARY in *; do
+            if test -d $LIBRARY/build/reports/jacoco/test; then
+              if test -d $LIBRARY/src/main/java; then
+                ROOT_SOURCE=$LIBRARY/src/main/java/
+              else
+                ROOT_SOURCE=$LIBRARY/src/main/kotlin/
+              fi
+              python /opt/cover2cover.py $LIBRARY/build/reports/jacoco/test/jacocoTestReport.xml $ROOT_SOURCE > $LIBRARY/build/reports/cobertura.xml
+            fi
+          done
+
+      - name: Upload Coverage Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-reports
+          path: "**/build/**/cobertura.xml"
