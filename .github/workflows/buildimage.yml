@@ -4,16 +4,12 @@ on:
   workflow_dispatch:
 
 jobs:
-    compile:
-      uses: ./.github/workflows/java-compile-job.yml
-      with:
-          java-cache-key: notarization-api-java-cache
-          java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
-      secrets: inherit
     image-build:
       needs: compile
       runs-on: ubuntu-latest
       steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Build and Push Container Image
         env:
           IMAGE_REGISTRY: ${{ secrets.HARBOR_HOST }}
