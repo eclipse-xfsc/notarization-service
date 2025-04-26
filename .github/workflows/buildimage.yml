@@ -11,6 +11,7 @@ jobs:
           java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
       secrets: inherit
     image-build:
+      needs: compile
       runs-on: ubuntu-latest
       steps:
       - name: Build and Push Container Image
