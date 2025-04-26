@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Build and Test
 
 on:
   workflow_dispatch:
@@ -51,9 +51,4 @@ jobs:
   # build-3rd-party:
   #   needs: release
   #   uses: ./.github/workflows/3rd-party-image-job.yml
-  #   secrets: inherit
-
-  # ssi-issuance:
-  #   needs: build-3rd-party
-  #   uses: ./.github/workflows/ssi-issuance.yml
   #   secrets: inherit

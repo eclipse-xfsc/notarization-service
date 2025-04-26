@@ -1,0 +1,35 @@
+name: Build Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+    compile:
+      uses: ./.github/workflows/java-compile-job.yml
+      with:
+          java-cache-key: notarization-api-java-cache
+          java-tmp-cache-key: notarization-api-java-cache-${{ github.ref_name }}
+      secrets: inherit
+    image-build:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Build and Push Container Image
+        env:
+          IMAGE_REGISTRY: ${{ secrets.HARBOR_HOST }}
+          IMAGE_REGISTRY_GROUP: ${{ secrets.HARBOR_PROJECT }}
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+          TAG: ${{ github.sha }}
+          ADDITIONAL_TAGS: latest
+        run: |
+          echo "Building image for registry $IMAGE_REGISTRY/$IMAGE_REGISTRY_GROUP"
+          
+          ./gradlew imageBuild \
+            -Dquarkus.container-image.tag=$TAG \
+            -Dquarkus.container-image.additional-tags=$ADDITIONAL_TAGS \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.username=$HARBOR_USERNAME \
+            -Dquarkus.container-image.password=$HARBOR_PASSWORD \
+            -Dquarkus.container-image.registry=$IMAGE_REGISTRY \
+            -Dquarkus.container-image.group=$IMAGE_REGISTRY_GROUP \
+            -x :services:ssi-issuance:imageBuild
