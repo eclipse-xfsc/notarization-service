@@ -194,7 +194,7 @@ dependencyResolutionManagement {
             library("vcJava", "com.danubetech", "verifiable-credentials-java-ec").version("1.10-SNAPSHOT")
 
             library("ironVc", "com.apicatalog", "iron-verifiable-credentials").version("0.14.0")
-            library("wiremock", "org.wiremock:wiremock:3.4.2")
+            library("wiremock", "org.wiremock:wiremock:3.13.0")
 //            library("wiremock", "com.github.tomakehurst:wiremock-jre8:2.35.2")
         }
 
