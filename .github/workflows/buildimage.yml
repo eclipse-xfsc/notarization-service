@@ -9,6 +9,8 @@ jobs:
       steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: Build and Push Container Image
         env:
           IMAGE_REGISTRY: ${{ secrets.HARBOR_HOST }}
