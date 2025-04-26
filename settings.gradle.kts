@@ -146,7 +146,7 @@ dependencyResolutionManagement {
             library("junit", qgroup, "quarkus-junit5").withoutVersion()
             library("jacoco", qgroup, "quarkus-jacoco").withoutVersion()
             library("junit-pioneer", "org.junit-pioneer:junit-pioneer:2.3.0")
-            library("junit-platform-reporting", "org.junit.platform:junit-platform-reporting:1.12.0")
+            library("junit-platform-reporting", "org.junit.platform:junit-platform-reporting:1.12.2")
             bundle("test-basics", listOf("junit", "jacoco", "junit-pioneer", "junit-platform-reporting"))
 
             library("mockito-junit", qgroup, "quarkus-junit5-mockito").withoutVersion()
