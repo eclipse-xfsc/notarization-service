@@ -1,0 +1,344 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "oid4vp-task API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8093",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8093",
+    "description" : "Auto generated value"
+  } ],
+  "paths" : {
+    "/" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "failure",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "success",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskName",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AnyType"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BeginTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/oid4vp-task" : {
+      "post" : {
+        "tags" : [ "Task" ],
+        "parameters" : [ {
+          "name" : "failure",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "success",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskName",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AnyType"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BeginTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/oid4vp-task/begin" : {
+      "post" : {
+        "tags" : [ "Task" ],
+        "parameters" : [ {
+          "name" : "failure",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "success",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskName",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AnyType"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BeginTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/oid4vp-task/cancel" : {
+      "get" : {
+        "tags" : [ "Task" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/oid4vp/auth-request" : {
+      "get" : {
+        "tags" : [ "Oid 4 Vp Impl" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/oauth-authz-req+jwt" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vp/auth-response" : {
+      "post" : {
+        "tags" : [ "Oid 4 Vp Impl" ],
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "vp_token" : {
+                    "$ref" : "#/components/schemas/AnyType"
+                  },
+                  "presentation_submission" : {
+                    "$ref" : "#/components/schemas/PresentationSubmission"
+                  },
+                  "state" : {
+                    "type" : "string",
+                    "nullable" : true
+                  },
+                  "iss" : {
+                    "type" : "string",
+                    "nullable" : true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthResponseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AnyType" : {
+        "type" : "object"
+      },
+      "AuthResponseResponse" : {
+        "type" : "object",
+        "properties" : {
+          "redirect_uri" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "BeginTaskResponse" : {
+        "type" : "object",
+        "properties" : {
+          "redirect" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "cancel" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "DescriptorMapObject" : {
+        "required" : [ "id", "format" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "format" : {
+            "$ref" : "#/components/schemas/VpFormatType"
+          }
+        }
+      },
+      "PresentationSubmission" : {
+        "required" : [ "id", "definition_id", "descriptor_map" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "definition_id" : {
+            "type" : "string"
+          },
+          "descriptor_map" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DescriptorMapObject"
+            }
+          }
+        }
+      },
+      "VpFormatType" : {
+        "enum" : [ "jwt_vp_json", "ldp_vp", "ac_vp", "mso_mdoc" ],
+        "type" : "string"
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

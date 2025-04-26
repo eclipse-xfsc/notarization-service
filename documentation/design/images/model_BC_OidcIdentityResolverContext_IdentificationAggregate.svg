@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="345px" preserveAspectRatio="none" style="width:584px;height:345px;background:#FFFFFF;" version="1.1" viewBox="0 0 584 345" width="584px" zoomAndPan="magnify"><defs><filter height="300%" id="f6xd2spu97k98" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[d0e32cbaee00960990a33aebe6dad3fb]
+cluster 'IdentificationAggregate' Aggregate--><rect fill="#FFFFFF" filter="url(#f6xd2spu97k98)" height="326" style="stroke:#000000;stroke-width:1.5;" width="565" x="7" y="7"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="281" x="149" y="21.9951">'IdentificationAggregate' Aggregate</text><!--MD5=[2ca1536628238a7dc78c5d90808014f9]
+class Session--><rect codeLine="5" fill="#FEFECE" filter="url(#f6xd2spu97k98)" height="117.9609" id="Session" style="stroke:#A80036;stroke-width:1.5;" width="141" x="414.5" y="42"/><ellipse cx="429.5" cy="60.9688" fill="#FFFAB8" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M429.6094,56.3125 L428.4531,61.3906 L430.7813,61.3906 L429.6094,56.3125 Z M428.125,54.0781 L431.1094,54.0781 L434.4688,66.4688 L432.0156,66.4688 L431.25,63.4063 L427.9688,63.4063 L427.2188,66.4688 L424.7813,66.4688 L428.125,54.0781 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="113" x="441.5" y="58.1387">«Aggregate Root»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="49" x="473.5" y="72.1074">Session</text><line style="stroke:#A80036;stroke-width:1.5;" x1="415.5" x2="554.5" y1="79.9375" y2="79.9375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="41" x="420.5" y="94.1479">UUID id</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="90" x="420.5" y="106.9526">URL successURI</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="60" x="420.5" y="119.7573">URL failURI</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="420.5" y="132.562">String loginNonce</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="109" x="420.5" y="145.3667">String cancelNonce</text><line style="stroke:#A80036;stroke-width:1.5;" x1="415.5" x2="554.5" y1="151.9609" y2="151.9609"/><!--MD5=[8241b432b59abc877149999dff31ac1f]
+class BeginResponse--><rect codeLine="12" fill="#FEFECE" filter="url(#f6xd2spu97k98)" height="79.5469" id="BeginResponse" style="stroke:#A80036;stroke-width:1.5;" width="129" x="136.5" y="237"/><ellipse cx="151.5" cy="255.9688" fill="#8FBC8F" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M151.6094,260.4219 L153.7969,250.0781 L156.2656,250.0781 L153.3125,262.4688 L149.9219,262.4688 L146.9688,250.0781 L149.4375,250.0781 L151.6094,260.4219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="92" x="168" y="253.1387">«Value Object»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="97" x="165.5" y="267.1074">BeginResponse</text><line style="stroke:#A80036;stroke-width:1.5;" x1="137.5" x2="264.5" y1="274.9375" y2="274.9375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="69" x="142.5" y="289.1479">URL redirect</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="61" x="142.5" y="301.9526">URL cancel</text><line style="stroke:#A80036;stroke-width:1.5;" x1="137.5" x2="264.5" y1="308.5469" y2="308.5469"/><!--MD5=[0b4afc289dcbc72719972729db13d78e]
+class IdentityResource--><rect codeLine="16" fill="#FEFECE" filter="url(#f6xd2spu97k98)" height="92.3516" id="IdentityResource" style="stroke:#A80036;stroke-width:1.5;" width="356" x="23" y="55"/><ellipse cx="144.25" cy="73.9688" fill="#8FBC8F" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M143.7344,74.5313 Q141.875,73.8281 141.2188,73.0625 Q140.5781,72.2813 140.5781,70.9688 Q140.5781,69.2813 141.6563,68.3125 Q142.7344,67.3438 144.6094,67.3438 Q145.4688,67.3438 146.3125,67.5469 Q147.1719,67.7344 148.0156,68.125 L148.0156,70.5156 Q147.2344,69.9531 146.4063,69.6719 Q145.5938,69.375 144.7969,69.375 Q143.9219,69.375 143.4375,69.7344 Q142.9688,70.0938 142.9688,70.75 Q142.9688,71.2656 143.3125,71.6094 Q143.6563,71.9375 144.75,72.3438 L145.8125,72.75 Q147.2969,73.2969 148,74.2031 Q148.7188,75.1094 148.7188,76.4844 Q148.7188,78.3594 147.6094,79.2813 Q146.5,80.2031 144.25,80.2031 Q143.3281,80.2031 142.4063,79.9844 Q141.4844,79.7656 140.625,79.3438 L140.625,76.8125 Q141.5938,77.5 142.5156,77.8438 Q143.4375,78.1875 144.3281,78.1875 Q145.2344,78.1875 145.7344,77.7813 Q146.2344,77.3594 146.2344,76.625 Q146.2344,76.0625 145.8906,75.6563 Q145.5625,75.2344 144.9375,74.9844 L143.7344,74.5313 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="59" x="187.75" y="71.1387">«Service»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="105" x="164.75" y="85.1074">IdentityResource</text><line style="stroke:#A80036;stroke-width:1.5;" x1="24" x2="378" y1="92.9375" y2="92.9375"/><line style="stroke:#A80036;stroke-width:1.5;" x1="24" x2="378" y1="100.9375" y2="100.9375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="344" x="29" y="115.1479">BeginResponse beginIdentification(URL success, URL failure)</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="215" x="29" y="127.9526">Redirect startLogin(String loginNonce)</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="252" x="29" y="140.7573">void cancelIdentification(String cancelNonce)</text><!--MD5=[05aab0edffa8e69a00a20e36d7ea8f71]
+link IdentityResource to BeginResponse--><path codeLine="22" d="M201,147.26 C201,173.32 201,205.92 201,231.79 " fill="none" id="IdentityResource-to-BeginResponse" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="201,236.87,205,227.87,201,231.87,197,227.87,201,236.87" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="116" x="202" y="203.0669">beginIdentification</text><!--MD5=[8d7e1b5b8d0eea6fa20544f349b36508]
+@startuml
+
+skinparam componentStyle uml2
+
+package "'IdentificationAggregate' Aggregate" <<Rectangle>> {
+	class Session <<(A,#fffab8) Aggregate Root>> {
+		UUID id
+		URL successURI
+		URL failURI
+		String loginNonce
+		String cancelNonce
+	}
+	class BeginResponse <<(V,DarkSeaGreen) Value Object>> {
+		URL redirect
+		URL cancel
+	}
+	class IdentityResource <<(S,DarkSeaGreen) Service>> {
+		BeginResponse beginIdentification(URL success, URL failure)
+		Redirect startLogin(String loginNonce)
+		void cancelIdentification(String cancelNonce)
+	}
+}
+IdentityResource - -> BeginResponse : beginIdentification
+
+
+@enduml
+
+PlantUML version 1.2022.0(Tue Jan 11 17:16:42 CET 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

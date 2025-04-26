@@ -1,0 +1,17 @@
+# Ignore everything
+*
+
+# Except for these files
+!*.ts
+*.d.ts
+
+# .. also in subdirectories
+!*/
+
+# ... in these ones
+!src/*
+
+# Explicitly ignore these locations
+node_modules
+dist
+src/infrastructure/modules/acapy/types/acapy.ts

@@ -1,0 +1,224 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "train-enrollment API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8091",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8091",
+    "description" : "Auto generated value"
+  } ],
+  "paths" : {
+    "/" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "failure",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "success",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskName",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AnyType"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BeginTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/begin" : {
+      "post" : {
+        "tags" : [ "Begin Notarization Task Resource" ],
+        "summary" : "Begin a train enrollment task",
+        "description" : "Begins train enrollment task",
+        "parameters" : [ {
+          "name" : "failure",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "success",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskName",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AnyType"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BeginTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/{nonce}/cancel" : {
+      "delete" : {
+        "tags" : [ "Train Enrollment Api" ],
+        "summary" : "Cancel a train enrollment task",
+        "description" : "Cancels a train enrollment task",
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/task/{nonce}/enrollment" : {
+      "post" : {
+        "tags" : [ "Train Enrollment Api" ],
+        "summary" : "Start train enrollment by creating a TSP",
+        "description" : "Starts train enrollment by creating a TSP",
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StartEnrollmentRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AnyType" : {
+        "type" : "object"
+      },
+      "BeginTaskResponse" : {
+        "type" : "object",
+        "properties" : {
+          "redirect" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "cancel" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "StartEnrollmentRequest" : {
+        "required" : [ "tspJson" ],
+        "type" : "object",
+        "properties" : {
+          "tspJson" : {
+            "description" : "The TRAIN Service Provider Entry",
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/AnyType"
+            } ]
+          },
+          "trustListEndpoint" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "frameworkName" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      }
+    }
+  }
+}

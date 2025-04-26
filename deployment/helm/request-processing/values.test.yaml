@@ -1,0 +1,5 @@
+
+envConfig:
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_SERVICE_NAME: "skidentity-ident"
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_NAMES: "Skidentity-eIDAS-Identification"
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_LOCATION: "https://oidc-identity-resolver.ecsec.services/session/"

@@ -1,0 +1,20 @@
+---
+replicaCount: 1
+
+image:
+  tag: "latest-dev"
+
+config:
+  datasourceUsername: CHANGEME
+  datasourceJdbcUrl: CHANGEME
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  issuance2ServiceUrl: CHANGEME
+  otelConnectorUrl: CHANGEME
+  restClientRevocationApiUrl: CHANGEME
+  restClientProfileApiUrl: CHANGEME
+  restClientOfferApiUrl: CHANGEME
+  restClientAcapyApiUrl: CHANGEME
+
+envConfig:
+  QUARKUS_LOG_LEVEL: INFO

@@ -1,0 +1,23 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS net.sourceforge.plantuml:plantuml:1.2022.0
+
+import net.sourceforge.plantuml.Run;
+
+import net.sourceforge.plantuml.code.NoPlantumlCompressionException;
+
+import java.io.IOException;
+
+class plantuml {
+
+    public static void main(String... args) throws NoPlantumlCompressionException, IOException, InterruptedException {
+        /**
+         * APOLOGY:
+         * The Java code from PlantUML-CLI cannot be directly used in another Java application because:
+         * - the class "Run" explicitly calls "System.exit(int)",
+         * - the removal of these calls require a non-small re-write of the class "Run",
+         * - there is no obvious alternative to the class "Run" to call the PlantUML functionality.
+         */
+        Run.main(args);
+    }
+
+}

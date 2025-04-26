@@ -1,0 +1,29 @@
+
+image:
+  tag: "latest-dev"
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - host: CHANGEME
+      paths:
+        - path: "/auto-notary/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-not-accept
+     hosts:
+       - CHANGEME
+
+config:
+  augmentation:
+    enabled: true
+    decryptionExistingSecret: 'notarization-credentials'
+    decryptionSecretKey: 'auto-notary-decryption-key'
+    claims: 'given_name,family_name,birthdate,sub'
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "auto-notary-client-secret"
+  oidcGrantExistingSecret: "notarization-credentials"
+  oidcGrantSecretKey: "auto-notary-oidc-password"
+  notarizationProcessingInternalUrl: CHANGEME

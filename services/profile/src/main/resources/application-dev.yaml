@@ -1,0 +1,200 @@
+gaia-x:
+    profile:
+        config:
+            - name: Simple VC
+              aip: "2.0"
+              id: simple-4b5a59b1-d02b-44d9-a3c1-e310dd2f07fb
+              description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                    # Public and private key:
+                    # {
+                    #     "kty": "EC",
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    #     "use": "enc",
+                    #     "crv": "P-384",
+                    #     "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                    #     "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                    #     "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                    #     "alg": "ECDH-ES+A256KW"
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        }
+                    ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://www.w3.org/2018/credentials/examples/v1"
+                  ],
+                  "type": ["VerifiableCredential", "AlumniCredential"],
+                  "credentialSubject": {
+                    "alumniOf": {
+                      "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                      "name": "Mars University"
+                    }
+                  }
+                }
+
+            - name: VC with eIDAS Proof
+              aip: "2.0"
+              id: vc_eid-4b5a59b1-d02b-44d9-a3c1-e310dd2f07fb
+              description: The VC must add the eIDAS Proof into the credential. There is no chained root VC. As we want an organizational credential, the VC subject should be https://schema.org/Organization.
+              notaries:
+                    # Public and private key:
+                    # {
+                    #     "kty": "EC",
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    #     "use": "enc",
+                    #     "crv": "P-384",
+                    #     "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                    #     "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                    #     "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                    #     "alg": "ECDH-ES+A256KW"
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        },
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://www.w3.org/2018/credentials/examples/v1"
+                  ],
+                  "type": ["VerifiableCredential", "AlumniCredential"],
+                  "credentialSubject": {
+                    "alumniOf": {
+                      "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                      "name": "Mars University"
+                    }
+                  }
+                }
+            - name: VC with chained eIDAS based VC
+              aip: "2.0"
+              id: vc_vc-4b5a59b1-d02b-44d9-a3c1-e310dd2f07fb
+              description: The VC will have a chained proof (according to Aries RfC 104) to the organisation credential. As it describes an employee, the https://schema.org/Person should be used.
+              notaries:
+                    # Public and private key:
+                    # {
+                    #     "kty": "EC",
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    #     "use": "enc",
+                    #     "crv": "P-384",
+                    #     "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                    #     "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                    #     "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                    #     "alg": "ECDH-ES+A256KW"
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              task-descriptions: >
+                    [
+                        {
+                            "name": "VC-Validation",
+                            "type": "vcIdentificationTask",
+                            "description": "Identification via a VC."
+                        },
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {
+                  "taskName" : "VC-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://www.w3.org/2018/credentials/examples/v1"
+                  ],
+                  "type": ["VerifiableCredential", "AlumniCredential"],
+                  "credentialSubject": {
+                    "alumniOf": {
+                      "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                      "name": "Mars University"
+                    }
+                  }
+                }
+quarkus:
+    log:
+        level: DEBUG
+
+    otel:
+        enabled: true
+        exporter:
+            otlp:
+                traces:
+                    endpoint: http://localhost:4317
+
+    rest-client:
+        ssi-issuance-api:
+            url: http://ssi-issuance:8080/

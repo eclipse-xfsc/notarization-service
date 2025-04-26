@@ -1,0 +1,34 @@
+---
+replicaCount: 1
+
+image:
+  tag: "dev-latest"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: oidc-identity-resolver.ecsec.services
+      paths:
+        - path: "/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-oidc-identity-resolver.ecsec.services
+     hosts:
+       - oidc-identity-resolver.ecsec.services
+
+config:
+  demoIdentityOIDCExternalUrl: "https://oidc-identity-resolver.ecsec.services"
+  datasourceJdbcUrl: "jdbc:postgresql://postgres-postgresql.not-accept.svc.cluster.local:5432/test_oidc_identity_resolver_skid"
+  datasourceReactiveUrl: "postgresql://postgres-postgresql.not-accept.svc.cluster.local:5432/test_oidc_identity_resolver_skid"
+  datasourceUsername: "not_api"
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  oidcAuthServerUrl: "https://service.skidentity-test.de/fs/oidc"
+  oidcClientId: "389428f6-54b6-4c66-a840-c6e53b1200f5"
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "skid-oidc-secret"
+  oidcIdentityResolverExternalUrl: "https://oidc-identity-resolver.ecsec.services"
+  redirectLoginFailureUrl: "https://skid-vc.ecsec.services/error"
+  redirectLoginSuccessUrl: "https://skid-vc.ecsec.services/success"

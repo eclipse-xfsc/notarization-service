@@ -1,0 +1,9 @@
+version: "3.8"
+
+include:
+  - acapy.yml
+  - acapy-holder.yml
+  - services.yml
+  - compliance.yml
+  - train.yml
+  - tsa-policy.yml

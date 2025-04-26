@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssi-issuance2-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_DB_KIND: postgresql
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_DATASOURCE_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_LOG_LEVEL: "WARN"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  ISSUANCE2_SERVICE_URL: "{{ .Values.config.issuance2ServiceUrl }}"
+  QUARKUS_REST_CLIENT_REVOCATION_SERVICE_URL: "{{ .Values.config.restClientRevocationApiUrl }}"
+  QUARKUS_REST_CLIENT_PROFILE_API_URL: "{{ .Values.config.restClientProfileApiUrl }}"
+  QUARKUS_REST_CLIENT_OFFER_API_URL: "{{ .Values.config.restClientOfferApiUrl }}"
+  QUARKUS_REST_CLIENT_ACAPY_JSON_URL: "{{ .Values.config.restClientAcapyApiUrl }}"
+  GAIA_X_KEYMANAGER_LOCAL_JWK: '{"alg":"A256GCM","k":"ohqtC5643zRspDvmuHu39cXZqHvBr95QBdqfiAmMWPQ","key_ops":["encrypt","decrypt"],"kty":"oct"}'

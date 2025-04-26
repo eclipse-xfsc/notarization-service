@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: profile-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_REACTIVE_URL: "{{ .Values.config.datasourceReactiveUrl }}"
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_LOG_LEVEL: "WARN"
+  QUARKUS_OIDC_AUTH_SERVER_URL: "{{ .Values.config.oidcAuthServerUrl }}"
+  QUARKUS_OIDC_CLIENT_ID: "{{ .Values.config.oidcClientId }}"
+  QUARKUS_OIDC_DISCOVERY_ENABLED: "false"
+  QUARKUS_OIDC_INTROSPECTION_PATH: "{{ .Values.config.oidcIntrospectionPath }}"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  QUARKUS_REST_CLIENT_REVOCATION_API_URL: "{{ .Values.config.restClientRevocationApiUrl }}"
+  QUARKUS_REST_CLIENT_SSI_ISSUANCE_V1_API_URL: "{{ .Values.config.restClientSsiIssuanceV1ApiUrl }}"
+  QUARKUS_REST_CLIENT_SSI_ISSUANCE_V2_API_URL: "{{ .Values.config.restClientSsiIssuanceV2ApiUrl }}"

@@ -1,0 +1,59 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: notarization-system
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: eid-bridge-stage-not.gxfs.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: oidc-identity-resolver
+            port:
+              number: 80
+        pathType: Prefix
+        path: /.*
+  - host: request-stage-not.gxfs.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: request-processing
+            port:
+              number: 80
+        pathType: Prefix
+        path: /api/v1/(document|finishNotarizationRequest|finishtask|session|profiles)(/.*)?
+      - backend:
+          service:
+            name: revocation
+            port:
+              number: 80
+        pathType: Prefix
+        path: /status/.*
+  - host: notary-stage-not.gxfs.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: request-processing
+            port:
+              number: 80
+        pathType: Prefix
+        path: /api/v1/(requests|revoke)
+      - backend:
+          service:
+            name: request-processing
+            port:
+              number: 80
+        pathType: Prefix
+        path: /api/v1/profiles(/.*)?
+  tls:
+  - hosts:
+    - request-stage-not.gxfs.dev
+    - notary-stage-not.gxfs.dev
+    - eid-bridge-stage-not.gxfs.dev
+    secretName: wildcard-gxfs-dev

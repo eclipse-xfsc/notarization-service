@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  DEMO_IDENTITY_OIDC_EXTERNAL_URL: "{{ .Values.config.demoIdentityOIDCExternalUrl }}"
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  OIDC_IDENTITY_RESOLVER_EXTERNAL_URL: "{{ .Values.config.oidcIdentityResolverExternalUrl }}"
+  QUARKUS_DATASOURCE_REACTIVE_URL: "{{ .Values.config.datasourceReactiveUrl }}"
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_HTTP_PROXY_ENABLE_FORWARDED_PREFIX: "true"
+  QUARKUS_HTTP_PROXY_PROXY_ADDRESS_FORWARDING: "true"
+  QUARKUS_OIDC_AUTH_SERVER_URL: "{{ .Values.config.oidcAuthServerUrl }}"
+  QUARKUS_OIDC_CLIENT_ID: "{{ .Values.config.oidcClientId }}"
+  # https://github.com/quarkusio/quarkus/issues/12254
+  QUARKUS_OIDC_TOKEN_STATE_MANAGER_SPLIT_TOKENS: "true"
+  QUARKUS_HTTP_PROXY_ALLOW_FORWARDED: "false"
+  QUARKUS_HTTP_PROXY_ENABLE_FORWARDED_HOST: "true"
+  REDIRECT_LOGIN_FAILURE_URL: "{{ .Values.config.redirectLoginFailureUrl }}"
+  REDIRECT_LOGIN_SUCCESS_URL: "{{ .Values.config.redirectLoginSuccessUrl }}"

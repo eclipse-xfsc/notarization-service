@@ -1,0 +1,40 @@
+/****************************************************************************
+ * Copyright 2022 ecsec GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package eu.gaiax.notarization.request_processing.matcher
+
+import org.hamcrest.Description
+import org.hamcrest.TypeSafeMatcher
+
+/**
+ *
+ * @author Neil Crossley
+ */
+class IsAnnotationPresent<T : Annotation?> internal constructor(private val given: Class<T>) :
+    TypeSafeMatcher<Class<*>>() {
+    override fun matchesSafely(t: Class<*>): Boolean {
+        return t.isAnnotationPresent(given)
+    }
+
+    override fun describeTo(description: Description) {
+        description.appendText("is annotation present ").appendValue(given)
+    }
+
+    companion object {
+        fun <T : Annotation?> isAnnotationPresent(annotation: Class<T>): IsAnnotationPresent<T> {
+            return IsAnnotationPresent(annotation)
+        }
+    }
+}

@@ -1,0 +1,13 @@
+---
+global:
+  postgresql:
+    auth:
+      existingSecret: "notarization-credentials"
+      secretKeys:
+        adminPasswordKey: "postgresql-admin-password"
+
+# Default are 100 and 128MB
+Primary:
+extendedConfiguration: |-
+  max_connections = 300
+  shared_buffers = 384MB

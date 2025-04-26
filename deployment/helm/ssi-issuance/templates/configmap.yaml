@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssi-issuance-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  ACAPY_API_URL: "{{ .Values.config.acapyApiUrl }}"
+  ACAPY_WEBHOOKS_PATH: "{{ .Values.config.acapyWebhooksPath }}"
+  HTTP_HOST: "{{ .Values.config.httpHost }}"
+  HTTP_PORT: "{{ .Values.service.port }}"
+  LOG_BUFFER_INITIAL: "true"
+  NODE_ENV: "production"
+  PROFILE_SERVICE_URL: "{{ .Values.config.restClientProfileApiUrl }}"
+  REVOCATION_SERVICE_URL: "{{ .Values.config.restClientRevocationApiUrl }}"
+  SSI_SERVICE_URL: "{{ .Values.config.restClientSsiIssuanceApiUrl }}"

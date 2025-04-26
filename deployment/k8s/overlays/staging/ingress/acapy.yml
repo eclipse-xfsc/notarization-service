@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: not-acapy
+  labels:
+    app.kubernetes.io/name: acapy
+    app.kubernetes.io/instance: not-acapy
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - wallet-lt-stage.gxfs.dev
+      secretName: wildcard-gxfs-dev
+  rules:
+    - host: "wallet-stage-not.gxfs.dev"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: not-acapy
+                port:
+                  number: 8030

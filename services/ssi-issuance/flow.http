@@ -1,0 +1,103 @@
+# Create an invitation
+# @name invitation
+POST http://localhost:30080/connections/create-invitation?auto_accept=true
+content-type: application/json
+
+{}
+
+###
+
+# Create did:sov
+# @name createDidSov
+POST http://localhost:30080/wallet/did/create
+content-type: application/json
+
+{
+  "method": "sov",
+  "options": {
+    "key_type": "ed25519"
+  }
+}
+
+###
+
+# Issue a AIP 1.0 credential
+# @name aip10Credential
+@didSov = {{createDidSov.response.body.result.did}}
+
+POST http://localhost:9080/credential/start-issuance
+content-type: application/json
+
+{
+  "profileID": "demo-aip10",
+  "holderDID": "did:sov:{{didSov}}",
+  "subjectData": {"givenName": "Max", "familyName": "Mustermann", "birthDate": "1970-01-01T00:00:00Z" },
+  "issuanceTimestamp": "2022-07-31T17:32:57.625Z",
+  "invitationURL": "{{invitationURL}}",
+  "documents": [],
+  "successURL": "http://example.com/success",
+  "failureURL": "http://example.com/failure"
+}
+
+###
+
+# Get credentials
+# @name w3cCredentials
+@didSov = {{createDidSov.response.body.result.did}}
+
+GET http://localhost:30080/credentials
+content-type: application/json
+
+###
+
+# Create did:key
+# @name createDidKey
+POST http://localhost:30080/wallet/did/create
+content-type: application/json
+
+{
+  "method": "key",
+  "options": {
+    "key_type": "ed25519"
+  }
+}
+
+###
+
+# Issue a AIP 2.0 credential
+# @name aip20Credential
+@didKey = {{createDidKey.response.body.result.did}}
+@invitationURL = {{invitation.response.body.invitation_url}}
+
+POST http://localhost:9080/credential/start-issuance
+content-type: application/json
+
+{
+  "profileID": "demo-vc-issuance-01-simple",
+  "holderDID": "{{didKey}}",
+  "subjectData": {
+    "givenName": "Max",
+    "familyName": "Mustermann",
+    "birthDate": "1970-01-01T00:00:00Z"
+  },
+  "issuanceTimestamp": "2022-07-31T17:32:57.625Z",
+  "invitationURL": "{{invitationURL}}",
+  "documents": [
+    {}
+  ],
+  "successURL": "http://example.com/success",
+  "failureURL": "http://example.com/failure"
+}
+
+###
+
+# Get W3C credentials
+# @name w3cCredentials
+@didKey = {{createDidKey.response.body.result.did}}
+
+POST http://localhost:30080/credentials/w3c
+content-type: application/json
+
+{
+  "subject_ids": ["{{didKey}}"]
+}

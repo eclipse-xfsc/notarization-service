@@ -1,0 +1,31 @@
+version: "3"
+
+# See here for more information: https://gitlab.com/gaia-x/lab/compliance/gx-compliance/-/tree/development?ref_type=heads
+
+services:
+
+  compliance:
+    image: registry.gitlab.com/gaia-x/lab/compliance/gx-compliance:main
+    container_name: compliance
+    ports:
+      - "8091:3000"
+    restart: on-failure
+    env_file:
+    - path: ./compliance/bdd-tests.env
+      required: true
+    networks:
+      default:
+        aliases:
+          - compliance
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+  compliance-db:
+    image: memgraph/memgraph:latest
+    ports:
+      - "7687:7687"

@@ -1,0 +1,68 @@
+---
+replicaCount: 1
+
+auth:
+  username: CHANGEME
+  passwordHash: CHANGEME
+
+extraSecrets:
+  load-definition:
+    load_definition.json: |
+      {
+        "bindings": [],
+        "exchanges": [],
+        "global_parameters": [],
+        "parameters": [],
+        "permissions": [
+          {
+            "configure": ".*",
+            "read": ".*",
+            "user": "{{ .Values.auth.username }}",
+            "vhost": "/",
+            "write": ".*"
+          }
+        ],
+        "users": [
+          {
+            "name": "{{ .Values.auth.username }}",
+            "password_hash": "{{ .Values.auth.passwordHash }}",
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "tags": "administrator"
+          }
+        ],
+        "vhosts": [
+          {
+            "name": "/"
+          }
+        ]
+      }
+
+loadDefinition:
+  enabled: true
+  existingSecret: load-definition
+
+extraConfiguration: |
+  load_definitions = /app/load_definition.json
+  auth_backends.1 = internal
+
+  stomp.listeners.tcp.1 = 0.0.0.0:61613
+
+  auth_mechanisms.1 = PLAIN
+  auth_mechanisms.2 = AMQPLAIN
+  auth_mechanisms.3 = EXTERNAL
+
+  loopback_users.guest = false
+
+extraPlugins: "rabbitmq_prometheus rabbitmq_stomp rabbitmq_web_stomp rabbitmq_auth_backend_oauth2 rabbitmq_auth_backend_cache rabbitmq_amqp1_0"
+
+ingress:
+  enabled: true
+  hostname: CHANGEME
+  path: "/rabbitmq/(.*)"
+  tls: true
+  certManager: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1

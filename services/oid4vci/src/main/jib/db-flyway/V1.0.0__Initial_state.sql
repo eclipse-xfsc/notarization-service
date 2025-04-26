@@ -1,0 +1,12 @@
+CREATE TABLE ActiveNonce (
+    exp TIMESTAMP WITH TIME ZONE,
+    atJti VARCHAR(255) NOT NULL,
+    nonce VARCHAR(255),
+    PRIMARY KEY (atJti)
+);
+
+CREATE TABLE JtiBlocklist (
+    exp TIMESTAMP WITH TIME ZONE,
+    jti VARCHAR(255) NOT NULL,
+    PRIMARY KEY (jti)
+);

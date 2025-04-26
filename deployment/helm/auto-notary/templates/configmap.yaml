@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auto-notary-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_LOG_LEVEL: "WARN"
+  QUARKUS_OIDC_CLIENT_AUTH_SERVER_URL: "{{ .Values.config.oidcAuthServerUrl }}"
+  QUARKUS_OIDC_CLIENT_CLIENT_ID: "{{ .Values.config.oidcClientId }}"
+  QUARKUS_REST_CLIENT_REQUESTPROCESSING_API_URL: "{{ .Values.config.notarizationProcessingInternalUrl }}"
+  QUARKUS_OIDC_CLIENT_GRANT_TYPE: "password"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  QUARKUS_OIDC_CLIENT_GRANT_OPTIONS_PASSWORD_USERNAME: "{{ .Values.config.oidcUsername }}"
+{{- if .Values.autoscaling.enabled }}
+  GAIA_X_PROFILE_AUGMENTATION_ENABLED: "false"
+  GAIA_X_PROFILE_AUGMENTATION_CLAIMS: "{{ .Values.config.augmentation.claims }}"
+{{- else }}
+  GAIA_X_PROFILE_AUGMENTATION_ENABLED: {{ .Values.config.augmentation.enabled | quote }}
+  GAIA_X_PROFILE_AUGMENTATION_CLAIMS: {{ .Values.config.augmentation.claims | quote }}
+{{- end }}
+{{- if .Values.envConfig }}
+{{- toYaml .Values.envConfig | nindent 2 }}
+{{- end }}

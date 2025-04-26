@@ -1,0 +1,5 @@
+config:
+  augmentation:
+    enabled: true
+    decryptionExistingSecret: 'auto-notary-client-secret'
+    decryptionSecretKey: 'decryption-key'

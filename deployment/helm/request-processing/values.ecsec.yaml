@@ -1,0 +1,55 @@
+replicaCount: 1
+
+image:
+  tag: "latest-dev"
+
+envConfig:
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_SERVICE_NAME: "skidentity-ident"
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_NAMES: "Skidentity-eIDAS-Identification"
+  GAIA_X_EXTENSIONS_TASKS_SKIDENTITYOIDC_LOCATION: "https://not-accept.not-api.skidentity-test.de/oidc-identity-resolver/session/"
+  AMQP_USERNAME: CHANGEME
+  QUARKUS_LOG_LEVEL: INFO
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: not-accept.not-api.skidentity-test.de
+      paths:
+        - path: "/request-processing/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-not-accept
+     hosts:
+       - not-accept.not-api.skidentity-test.de
+
+config:
+  datasourceJdbcUrl: CHANGEME
+  datasourceReactiveUrl: CHANGEME
+  datasourceUsername: CHANGEME
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  notarizationProcessingInternalUrl: CHANGEME
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "notarization-oidc-secret"
+  oidcAuthServerUrl: CHANGEME
+  oidcClientId: CHANGEME
+  oidcIntrospectionPath: CHANGEME
+  amqpHost: CHANGEME
+  amqpPort: "5672"
+  amqpExistingSecret: "notarization-credentials"
+  amqpSecretKey: "rabbitmq-password"
+  otelConnectorUrl: CHANGEME
+  restClientDssApiUrl: CHANGEME
+  restClientRevocationApiUrl: CHANGEME
+  restClientProfileApiUrl: CHANGEME
+  # restClientSsiIssuanceV1ApiUrl: "http://ssi-issuance.not-accept.svc.cluster.local:8088"
+  restClientSsiIssuanceV2ApiUrl: CHANGEME
+  browserIdentificationUrl: CHANGEME
+  vcIdentificationUrl: CHANGEME
+  mpMessagingOutgoingRequestorAddress: CHANGEME
+  mpMessagingOutgoingOperatorAddress: CHANGEME
+  gaiaxTasksOidcIdentifyLocation: CHANGEME
+  gaiaxTasksComplianceLocation: CHANGEME
+  # gaiaxActionsTrainEnrollmentLocation: "https://test-not.xfsc.dev/train-enrollment"

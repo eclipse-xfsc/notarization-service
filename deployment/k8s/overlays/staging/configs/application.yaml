@@ -1,0 +1,83 @@
+gaia-x:
+    profile:
+        config:
+            - name: GAIA-X Employee Credential
+              aip: "1.0"
+              id: demo-gaia-x-employee-credential-v1
+              description: This credential represents a GAIA-X 
+              valid-for: P1Y
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                    "attributes": [
+                            "FedName",
+                            "PrcId",
+                            "FedId",
+                            "PrcEmail",
+                            "PrcFName",
+                            "PrcLName",
+                            "Claims"
+                    ]
+                }
+            - name: Stricter GAIA-X Employee Credential
+              aip: "1.0"
+              id: demo-strict-gaia-x-employee-credential-v2
+              description: "Demo: a credential supported by documents."
+              valid-for: P1Y
+              notaries:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        },
+                        {
+                            "name": "VC-Validation",
+                            "type": "vcIdentificationTask",
+                            "description": "Identification via presenting proof of VC."
+                        },
+                        {
+                            "name": "upload-evidence",
+                            "type": "fileProvisionTask",
+                            "description": "Upload documents containing evidence of authority and claims."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "upload-evidence"
+                }
+              precondition-tasks: >
+                {
+                  "oneOf": [
+                    { "taskName" : "eID-Validation" },
+                    { "taskName" : "VC-Validation" }
+                  ]
+                }
+              template: >
+                {
+                    "attributes": [
+                            "FedName",
+                            "PrcId",
+                            "FedId",
+                            "PrcEmail",
+                            "PrcFName",
+                            "PrcLName",
+                            "Claims"
+                    ]
+                }

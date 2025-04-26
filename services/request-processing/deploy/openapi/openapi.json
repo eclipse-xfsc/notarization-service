@@ -1,0 +1,3315 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "Notarization Request Processing API",
+    "description" : "This micro-service processes the submission and management of notarization requests.",
+    "contact" : {
+      "name" : "GAIA-X",
+      "url" : "https://www.gaia-x.eu/"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "https://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "0.1.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8084",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8084",
+    "description" : "Auto generated value"
+  } ],
+  "tags" : [ {
+    "name" : "submission",
+    "description" : "Notarization request submission operations, as required for a requestor of a credential."
+  }, {
+    "name" : "management",
+    "description" : "Notarization request management operations, as required for a notary."
+  }, {
+    "name" : "document"
+  }, {
+    "name" : "finishNotarizationRequest"
+  }, {
+    "name" : "finishTask"
+  }, {
+    "name" : "routines"
+  } ],
+  "paths" : {
+    "/api/v1/document/{sessionId}/{documentId}" : {
+      "get" : {
+        "tags" : [ "submission", "document" ],
+        "summary" : "Fetch document",
+        "description" : "Gets the document description for the identified document.",
+        "parameters" : [ {
+          "name" : "documentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DocumentView"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      },
+      "delete" : {
+        "tags" : [ "submission", "document" ],
+        "summary" : "Delete document",
+        "description" : "Delete the identified document.",
+        "parameters" : [ {
+          "name" : "documentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/document/{sessionId}/{taskId}/finishTask" : {
+      "post" : {
+        "tags" : [ "submission", "document" ],
+        "summary" : "Finish uploading",
+        "description" : "Mark uploading of documents as finished.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/document/{sessionId}/{taskId}/upload" : {
+      "post" : {
+        "tags" : [ "submission", "document" ],
+        "summary" : "Upload document",
+        "description" : "Upload a document for the identified notarization request.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DocumentUpload"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Invalid file",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/document/{sessionId}/{taskId}/uploadByLink" : {
+      "post" : {
+        "tags" : [ "submission", "document" ],
+        "summary" : "Upload document by providing link",
+        "description" : "Upload a document for the identified notarization request by providing a link to it.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DocumentUploadByLink"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/finishAction/{nonce}/fail" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The action-specific payload upon failure, if any.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The task failure was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/finishAction/{nonce}/success" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The action-specific payload upon success. For example, for a train enrolment action, this might be the enrolment data.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The action completion was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/finishNotarizationRequest/{nonce}/fail" : {
+      "post" : {
+        "tags" : [ "finishNotarizationRequest" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The issuance status was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/finishNotarizationRequest/{nonce}/success" : {
+      "post" : {
+        "tags" : [ "finishNotarizationRequest" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The issuance status was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/finishTask/{nonce}/fail" : {
+      "post" : {
+        "tags" : [ "finishTask" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The task-specific payload upon failure, if any.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The task failure was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/finishTask/{nonce}/success" : {
+      "post" : {
+        "tags" : [ "finishTask" ],
+        "parameters" : [ {
+          "name" : "nonce",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The task-specific payload upon success. For example, for an identification task, this would be the identity of the requestor.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The task completion was successfully processed."
+          }
+        }
+      }
+    },
+    "/api/v1/profiles" : {
+      "get" : {
+        "tags" : [ "submission", "management" ],
+        "summary" : "List profiles",
+        "description" : "Fetches a paged result of the available profiles.",
+        "parameters" : [ {
+          "name" : "index",
+          "in" : "query",
+          "schema" : {
+            "format" : "int32",
+            "minimum" : 0,
+            "type" : "integer",
+            "nullable" : true
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "schema" : {
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "type" : "integer",
+            "nullable" : true
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/SortDirection"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A list of all profiles.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Profile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}" : {
+      "get" : {
+        "tags" : [ "management" ],
+        "summary" : "Fetch available notarization request",
+        "description" : "Fetches the available notarization request (not claimed by any notary operator).",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A notarization request.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotarizationRequestView"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "management" ],
+        "summary" : "Delete the notarization request",
+        "description" : "Deletes the notarization request in its current state.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully deleted."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/accept" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "summary" : "Accept the notarization request",
+        "description" : "Accepts and approves the notarization request.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully accepted."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/actions" : {
+      "get" : {
+        "tags" : [ "management" ],
+        "summary" : "List actions",
+        "description" : "Lists the current actions.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of the current actions.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInstance"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "management" ],
+        "summary" : "Start action",
+        "description" : "Starts a action and returns information how to fulfill it.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Information on how to fulfill the action.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInstance"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "management" ],
+        "summary" : "Cancel action",
+        "description" : "Cancels an action.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The action was successfully cancelled."
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/claim" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "summary" : "Claim available notarization request",
+        "description" : "Claims a notarization request current available (not claimed) by any notary operator.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The request was successfully claimed."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/credentialAugmentation" : {
+      "put" : {
+        "tags" : [ "management" ],
+        "summary" : "Assign a credential augmentation to the request",
+        "description" : "Replace or set the structure that shall augment the requested credentials.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The payload to augment the requsted credential. The result of the augmentation must still conform to the schema of the credential. The augmentation and validation occur as a part of the issuing process.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The payload was accepted."
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/document/{documentId}" : {
+      "get" : {
+        "tags" : [ "management" ],
+        "summary" : "Fetch document",
+        "description" : "Fetches an available document.",
+        "parameters" : [ {
+          "name" : "documentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/DocumentId"
+          }
+        }, {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A document.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DocumentFull"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/identity" : {
+      "get" : {
+        "tags" : [ "management" ],
+        "summary" : "Fetch the identity assigned to the notarization request",
+        "description" : "Fetches the encrypted identity assigned to the notarization request.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "An identity.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IdentityView"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/profiles/{profileId}/requests/{notarizationRequestId}/reject" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "summary" : "Reject the notarization request",
+        "description" : "Rejects the notarization request in its current state. This does not delete the request. The business owner may alter and resubmit in cases where only details lead to rejection.",
+        "parameters" : [ {
+          "name" : "notarizationRequestId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          }
+        }, {
+          "name" : "profileId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RejectRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully rejected."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/requests" : {
+      "get" : {
+        "tags" : [ "management" ],
+        "summary" : "Query notarization requests",
+        "description" : "Querys the available notarization requests. This operation will page the resuls and supports filtering.",
+        "parameters" : [ {
+          "name" : "filter",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/RequestFilter"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "schema" : {
+            "format" : "int32",
+            "minimum" : 1,
+            "type" : "integer",
+            "nullable" : true
+          }
+        }, {
+          "name" : "offset",
+          "in" : "query",
+          "schema" : {
+            "format" : "int32",
+            "default" : 0,
+            "minimum" : 0,
+            "type" : "integer",
+            "nullable" : true
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A result list of notarization requests.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedNotarizationRequestSummary"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/revoke" : {
+      "post" : {
+        "tags" : [ "management" ],
+        "summary" : "Revoke the given credential",
+        "description" : "Revokes the given credential.",
+        "requestBody" : {
+          "description" : "The credential to be revoked. Must be issued with the fields 'statusListCredential' and 'statusListIndex'",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The credential was successfully revoked."
+          }
+        },
+        "security" : [ {
+          "notary" : [ "notary", "**" ]
+        } ]
+      }
+    },
+    "/api/v1/routines/auditLogs/clean" : {
+      "post" : {
+        "tags" : [ "routines" ],
+        "summary" : "Prune audit logs",
+        "description" : "Will delete http audit logs after a given retention period.",
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/routines/deleteSubmitTimeout" : {
+      "post" : {
+        "tags" : [ "routines" ],
+        "summary" : "Prune terminated Sessions",
+        "description" : "Will delete sessions without submissions after timeout completely.",
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/routines/deleteTerminated" : {
+      "post" : {
+        "tags" : [ "routines" ],
+        "summary" : "Prune terminated/issued sessions",
+        "description" : "Will delete terminated sessions and sessions which were completed succesfully completely.",
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/routines/deleteTimeout" : {
+      "post" : {
+        "tags" : [ "routines" ],
+        "summary" : "Prune timed out sessions",
+        "description" : "Will delete timed out sessions completely.",
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session" : {
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Create a new session",
+        "description" : "Creates a new session for submitting a new notarization request.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SessionSubmission"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Details of the new session.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionInfoResponse"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/triggerIssuance/{releaseToken}" : {
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Trigger issuance",
+        "description" : "Triggers the issuance of an accepted notarization request.",
+        "parameters" : [ {
+          "name" : "releaseToken",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The manual release was successfully triggered."
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}" : {
+      "get" : {
+        "tags" : [ "submission" ],
+        "summary" : "Fetch the session",
+        "description" : "Fetches the identified session.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A summary of the session.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionSummary"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/submission" : {
+      "get" : {
+        "tags" : [ "submission" ],
+        "summary" : "Fetch notarization request",
+        "description" : "Fetches the information of the identified notarization request.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Information about the current request associated with the identified session.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotarizationRequestView"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      },
+      "put" : {
+        "tags" : [ "submission" ],
+        "summary" : "Update notarization request",
+        "description" : "Updates the notarization request, replacing previous information.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "The proposed content of the credential to be issued.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JsonNode"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully updated."
+          },
+          "400" : {
+            "description" : "Invalid JSON-LD",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidJsonLdDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      },
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Submit a new notarization request",
+        "description" : "Adds the submitted notarization request to the identified session.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SubmitNotarizationRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Information about the submission.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SubmissionResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "$ref" : "#/components/responses/CannotReuseToken"
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      },
+      "delete" : {
+        "tags" : [ "submission" ],
+        "summary" : "Revoke notarization request",
+        "description" : "Revokes the identified notarization request.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully revoked."
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/submission/did-holder" : {
+      "put" : {
+        "tags" : [ "submission" ],
+        "summary" : "Assign DID holder",
+        "description" : "Assigns the DID holder to the identified notarization request.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "didHolder",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "description" : "The target holder of the credential to be issued",
+            "type" : "string"
+          }
+        }, {
+          "name" : "invitation",
+          "in" : "query",
+          "schema" : {
+            "description" : "An invitation URL of the holder",
+            "type" : "string",
+            "nullable" : true
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The holder information was successfully updated."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/submission/ready" : {
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Mark ready",
+        "description" : "Marks the identified notarization request as ready for notarization. If 'manualRelease' is true, an URL to release an accepted credential is returned.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "manualRelease",
+          "in" : "query",
+          "schema" : {
+            "default" : false,
+            "type" : "boolean",
+            "nullable" : true
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "URL allowing to release the credential after acceptance by the notary if 'manualRelease' was set to true.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MarkReadyResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/submission/ssiInviteUrl" : {
+      "get" : {
+        "tags" : [ "submission" ],
+        "summary" : "Get ssi generated invite url(s)",
+        "description" : "Gets ssi generated invite url - will be empty if invite was given at start of the process by requestor.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Inviation URL for the issued credential.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvitationUrlResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/submission/unready" : {
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Mark unready",
+        "description" : "Marks the identified notarization request as unready.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The status was successfully updated."
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/task" : {
+      "post" : {
+        "tags" : [ "submission" ],
+        "summary" : "Start task",
+        "description" : "Starts a task and returns information how to fullfill it.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VcTaskStart"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Information on how to fulfill the task.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInstance"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      },
+      "delete" : {
+        "tags" : [ "submission" ],
+        "summary" : "Cancel task",
+        "description" : "Cancels a task.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The task was successfully cancelled."
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/v1/session/{sessionId}/updateContact" : {
+      "put" : {
+        "tags" : [ "submission" ],
+        "summary" : "Update contact",
+        "description" : "Updates contact information for receiving notifications.",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionId"
+          }
+        }, {
+          "name" : "token",
+          "in" : "header",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "text/plain" : {
+              "schema" : {
+                "type" : "string",
+                "nullable" : true
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "The notarization request was successfully updated."
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Notarization Request State",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvalidRequestStateProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AccessToken" : {
+        "description" : "A unique access token is generated for each notarization session. The requestor authenticates thier notarization request-specific REST API calls by setting the header 'token' with the value of the access token for that request.",
+        "type" : "string"
+      },
+      "AipVersion" : {
+        "description" : "The Aries Interop Profile (AIP) version.",
+        "enum" : [ "1.0", "2.0" ],
+        "type" : "string",
+        "deprecated" : true
+      },
+      "ApiVersion" : {
+        "description" : "The version of the SSI Issuance service used within the Notarization-AP.",
+        "enum" : [ "v1", "v2" ],
+        "type" : "string"
+      },
+      "CredentialKind" : {
+        "description" : "Kind of credential specified for creation.",
+        "enum" : [ "AnonCred", "JSON-LD", "SD-JWT" ],
+        "type" : "string"
+      },
+      "CredentialType" : {
+        "description" : "The credential types.",
+        "enum" : [ "JsonLD", "AnonCreds" ],
+        "type" : "string"
+      },
+      "Date" : {
+        "format" : "date",
+        "type" : "string",
+        "example" : "2022-03-10"
+      },
+      "DistributedIdentity" : {
+        "format" : "URI",
+        "pattern" : "did:\\S+",
+        "type" : "string"
+      },
+      "DocumentFull" : {
+        "required" : [ "id", "title", "content", "verificationReport", "hash" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/DocumentId"
+          },
+          "verificationReport" : {
+            "$ref" : "#/components/schemas/VerificationReport"
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "shortDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "longDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "mimetype" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "extension" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "content" : {
+            "format" : "binary",
+            "type" : "string",
+            "nullable" : true
+          },
+          "hash" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "DocumentHash" : {
+        "type" : "string"
+      },
+      "DocumentId" : {
+        "format" : "uuid",
+        "description" : "The identifier of a document. A document is assessed by a notary when reviewing a notarization request.",
+        "type" : "string"
+      },
+      "DocumentUpload" : {
+        "required" : [ "id", "content" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/DocumentId"
+          },
+          "content" : {
+            "$ref" : "#/components/schemas/FileUpload"
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "shortDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "longDescription" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "DocumentUploadByLink" : {
+        "required" : [ "id", "location" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/DocumentId"
+          },
+          "location" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "mimetype" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "extension" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "shortDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "longDescription" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "DocumentView" : {
+        "required" : [ "id", "title" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/DocumentId"
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "shortDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "longDescription" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "mimetype" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "extension" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "EncryptedData" : {
+        "format" : "byte",
+        "type" : "string"
+      },
+      "IdentityView" : {
+        "required" : [ "data", "algorithm", "createdAt" ],
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/EncryptedData"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "algorithm" : {
+            "description" : "The algorithm used to encrypt the identity.",
+            "type" : "string",
+            "nullable" : true
+          },
+          "encryption" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "jwk" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "InvalidJsonLdDetails" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "status" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "detail" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "instance" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "InvalidRequestStateProblemDetails" : {
+        "required" : [ "expected", "actual" ],
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "status" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "detail" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "instance" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "expected" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NotarizationRequestState"
+            }
+          },
+          "actual" : {
+            "$ref" : "#/components/schemas/NotarizationRequestState"
+          }
+        }
+      },
+      "InvitationUrlResponse" : {
+        "required" : [ "issuerVersion" ],
+        "type" : "object",
+        "properties" : {
+          "inviteUrl" : {
+            "format" : "uri",
+            "description" : "The invitation URL is present if the issuer began issuing the credential, but an invitation URL from the holder was not provided.",
+            "type" : "string",
+            "nullable" : true
+          },
+          "issuerVersion" : {
+            "type" : "string"
+          }
+        }
+      },
+      "IssuanceAction" : {
+        "description" : "A description for an action that is performed before or after the issuance of a verifiable credential, by the notary operator.",
+        "required" : [ "name" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "serviceName" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "serviceLocation" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "encryptAtRest" : {
+            "type" : "boolean",
+            "nullable" : true
+          }
+        },
+        "example" : {
+          "name" : "train-enrollment",
+          "serviceName" : "train-enrollment-proxy"
+        }
+      },
+      "JsonNode" : {
+        "type" : "object",
+        "properties" : {
+          "empty" : {
+            "type" : "boolean"
+          },
+          "valueNode" : {
+            "type" : "boolean"
+          },
+          "containerNode" : {
+            "type" : "boolean"
+          },
+          "missingNode" : {
+            "type" : "boolean"
+          },
+          "array" : {
+            "type" : "boolean"
+          },
+          "object" : {
+            "type" : "boolean"
+          },
+          "nodeType" : {
+            "$ref" : "#/components/schemas/JsonNodeType"
+          },
+          "pojo" : {
+            "type" : "boolean"
+          },
+          "number" : {
+            "type" : "boolean"
+          },
+          "integralNumber" : {
+            "type" : "boolean"
+          },
+          "floatingPointNumber" : {
+            "type" : "boolean"
+          },
+          "short" : {
+            "type" : "boolean"
+          },
+          "int" : {
+            "type" : "boolean"
+          },
+          "long" : {
+            "type" : "boolean"
+          },
+          "float" : {
+            "type" : "boolean"
+          },
+          "double" : {
+            "type" : "boolean"
+          },
+          "bigDecimal" : {
+            "type" : "boolean"
+          },
+          "bigInteger" : {
+            "type" : "boolean"
+          },
+          "textual" : {
+            "type" : "boolean"
+          },
+          "boolean" : {
+            "type" : "boolean"
+          },
+          "null" : {
+            "type" : "boolean"
+          },
+          "binary" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "JsonNodeType" : {
+        "enum" : [ "ARRAY", "BINARY", "BOOLEAN", "MISSING", "NULL", "NUMBER", "OBJECT", "POJO", "STRING" ],
+        "type" : "string"
+      },
+      "Key" : {
+        "type" : "object",
+        "properties" : {
+          "algorithm" : {
+            "type" : "string"
+          },
+          "format" : {
+            "type" : "string"
+          },
+          "encoded" : {
+            "format" : "binary",
+            "type" : "string"
+          }
+        }
+      },
+      "KeyType" : {
+        "description" : "Kind of key specified for creation.",
+        "enum" : [ "RSA", "secp256k1", "Bls48581G1", "Bls48581G2", "Bls48581G1", "Bls48581G2", "Ed25519", "X25519", "P-256", "P-384", "P-521" ],
+        "type" : "string"
+      },
+      "MarkReadyResponse" : {
+        "type" : "object",
+        "properties" : {
+          "releaseUrl" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "NodeAllOf" : {
+        "description" : "This represents a node satisfied only when every single child node is fulfilled.",
+        "required" : [ "allOf" ],
+        "type" : "object",
+        "properties" : {
+          "allOf" : {
+            "description" : "The array of child nodes.",
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskTreeNode"
+            },
+            "nullable" : true
+          }
+        },
+        "example" : {
+          "allOf" : [ {
+            "taskName" : "eID"
+          }, {
+            "taskName" : "signedFormUpload"
+          } ]
+        }
+      },
+      "NodeEmpty" : {
+        "description" : "This represents an empty node. There is no work to be done.",
+        "type" : "object",
+        "example" : { }
+      },
+      "NodeOneOf" : {
+        "description" : "This represents a node satisfied when any single child node is fulfilled.",
+        "required" : [ "oneOf" ],
+        "type" : "object",
+        "properties" : {
+          "oneOf" : {
+            "description" : "The array of child nodes.",
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskTreeNode"
+            },
+            "nullable" : true
+          }
+        },
+        "example" : {
+          "oneOf" : [ {
+            "taskName" : "vcIdentification"
+          }, {
+            "taskName" : "eID"
+          } ]
+        }
+      },
+      "NodeTask" : {
+        "description" : "This represents a node satisfied when the named work (a task or actions) is fulfilled.",
+        "required" : [ "taskName" ],
+        "type" : "object",
+        "properties" : {
+          "taskName" : {
+            "description" : "The name of the work to be performed and satisfied.",
+            "type" : "string",
+            "nullable" : true
+          }
+        },
+        "example" : {
+          "taskName" : "eID"
+        }
+      },
+      "NotarizationRequestId" : {
+        "format" : "uuid",
+        "type" : "string"
+      },
+      "NotarizationRequestState" : {
+        "description" : "\n      The states of a notarization request.\n        * `created` - Created. Pre-condition tasks must be performed.\n        * `submittable` - Proposed credential information must be submitted. All tasks may be performed.\n        * `submittable` - Request must be marked ready. All tasks may be performed. Different credentials may be re-submitted.\n        * `readyForReview` - Request must be claimed by a notary. Readiness may be removed.\n        * `workInProgress` - Request is claimed and under review by a notary. Must be approved, rejected or deleted.\n        * `preAccepted` - Request was accepted by a notary. Configured services must process the request before issuance may begin.\n        * `accepted` - Request was accepted by a notary. The issuance process has been started.\n        * `pendingDID` - Request was accepted by a notary. Missing credential holder details must be submitted to proceed.\n        * `pendingRequestorRelease` - Request was accepted by a notary. Manual release trigger must be performed by requestor.\n        * `issued` - The credentials have been issued. The request processing is terminated. Submitted data and files are deleted.\n        * `terminated` - The request processing is terminated. Submitted data and files are deleted.\n\n    ",
+        "enum" : [ "created", "submittable", "editable", "readyForReview", "workInProgress", "preAccepted", "accepted", "pendingDID", "terminated", "issued", "pendingRequestorRelease" ],
+        "type" : "string",
+        "readOnly" : true
+      },
+      "NotarizationRequestSummary" : {
+        "description" : "The overview of the notarization request",
+        "required" : [ "id", "profileId", "createdAt", "lastModified", "requestState", "data" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "lastModified" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "requestState" : {
+            "$ref" : "#/components/schemas/NotarizationRequestState"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "holder" : {
+            "$ref" : "#/components/schemas/DistributedIdentity"
+          },
+          "profileId" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "totalDocuments" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "rejectComment" : {
+            "description" : "The notarization request may be rejected by a notary. This is the given reason.",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "NotarizationRequestView" : {
+        "description" : "The overview of the notarization request",
+        "required" : [ "id", "createdAt", "lastModified", "requestState", "data" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/NotarizationRequestId"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "lastModified" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "requestState" : {
+            "$ref" : "#/components/schemas/NotarizationRequestState"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "holder" : {
+            "$ref" : "#/components/schemas/DistributedIdentity"
+          },
+          "credentialAugmentation" : {
+            "$ref" : "#/components/schemas/ObjectNode"
+          },
+          "profileId" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "documents" : {
+            "description" : "Summary of uploaded evidence documents.",
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DocumentView"
+            },
+            "nullable" : true
+          },
+          "rejectComment" : {
+            "description" : "The notarization request may be rejected by a notary. This is the given reason.",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "NotaryAccess" : {
+        "required" : [ "algorithm", "key" ],
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "$ref" : "#/components/schemas/PublicJsonWebKey"
+          },
+          "algorithm" : {
+            "description" : "The encryption algorithm used when persisting encrypting identities to be read by a notary.",
+            "type" : "string",
+            "example" : "A256GCM"
+          }
+        }
+      },
+      "ObjectNode" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/JsonNode"
+        }
+      },
+      "OffsetDateTime" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T12:15:50-04:00"
+      },
+      "PagedNotarizationRequestSummary" : {
+        "required" : [ "pageCount", "requestCount", "notarizationRequests" ],
+        "type" : "object",
+        "properties" : {
+          "pageCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "requestCount" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "notarizationRequests" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NotarizationRequestSummary"
+            },
+            "nullable" : true
+          }
+        }
+      },
+      "Period" : {
+        "format" : "duration",
+        "type" : "string",
+        "example" : "P1D"
+      },
+      "Principal" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PrivateKey" : {
+        "type" : "object",
+        "properties" : {
+          "algorithm" : {
+            "type" : "string"
+          },
+          "format" : {
+            "type" : "string"
+          },
+          "encoded" : {
+            "format" : "binary",
+            "type" : "string"
+          },
+          "destroyed" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ProblemDetails" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "title" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "status" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "detail" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "instance" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "Profile" : {
+        "description" : "A notarization profile specifies a single notarization submission process and the resulting credential type.",
+        "required" : [ "id", "name", "description", "notaryRoles", "encryption", "notaries", "template", "taskDescriptions", "tasks", "preconditionTasks", "preIssuanceActions", "postIssuanceActions", "actionDescriptions" ],
+        "type" : "object",
+        "properties" : {
+          "aip" : {
+            "$ref" : "#/components/schemas/AipVersion"
+          },
+          "kind" : {
+            "$ref" : "#/components/schemas/CredentialKind"
+          },
+          "validFor" : {
+            "$ref" : "#/components/schemas/Period"
+          },
+          "id" : {
+            "description" : "The unique identifier of the profile.",
+            "type" : "string"
+          },
+          "name" : {
+            "description" : "A human readable name of the profile",
+            "type" : "string"
+          },
+          "description" : {
+            "description" : "A human readable description of the profile",
+            "type" : "string"
+          },
+          "notaryRoles" : {
+            "description" : "A range of OIDC roles required to access notarization requests related for this profile via REST. A single role is sufficient to grant access.",
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "encryption" : {
+            "description" : "This value specifies the fallback encryption algorithm if not defined in a NotaryAccess.",
+            "type" : "string"
+          },
+          "notaries" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NotaryAccess"
+            }
+          },
+          "isRevocable" : {
+            "type" : "boolean"
+          },
+          "template" : {
+            "description" : "This value is the should contain the fixed content of the VC to be issued."
+          },
+          "documentTemplate" : {
+            "description" : "A template that is applied to the evidence documents. The result is merged into the issued credential. The specification is StringTemplate (https://www.stringtemplate.org/).",
+            "type" : "string",
+            "nullable" : true
+          },
+          "taskDescriptions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskDescription"
+            }
+          },
+          "tasks" : {
+            "$ref" : "#/components/schemas/TaskTreeNode"
+          },
+          "preconditionTasks" : {
+            "$ref" : "#/components/schemas/TaskTreeNode"
+          },
+          "preIssuanceActions" : {
+            "$ref" : "#/components/schemas/TaskTreeNode"
+          },
+          "postIssuanceActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "actionDescriptions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/IssuanceAction"
+            }
+          },
+          "extensions" : { },
+          "revocable" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ProfileId" : {
+        "description" : "The profile identifier. The profile determines the tasks available and required to submit a notarization request, as well as the type of credential to be issued.",
+        "type" : "string"
+      },
+      "PublicJsonWebKey" : {
+        "type" : "object",
+        "properties" : {
+          "use" : {
+            "type" : "string"
+          },
+          "keyId" : {
+            "type" : "string"
+          },
+          "algorithm" : {
+            "type" : "string"
+          },
+          "keyOps" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "otherParameters" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          },
+          "key" : {
+            "$ref" : "#/components/schemas/Key"
+          },
+          "keyType" : {
+            "type" : "string"
+          },
+          "writeOutPrivateKeyToJson" : {
+            "type" : "boolean"
+          },
+          "privateKey" : {
+            "$ref" : "#/components/schemas/PrivateKey"
+          },
+          "jcaProvider" : {
+            "type" : "string"
+          },
+          "certificateChain" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/X509Certificate"
+            }
+          },
+          "x5t" : {
+            "type" : "string"
+          },
+          "x5tS256" : {
+            "type" : "string"
+          },
+          "x5u" : {
+            "type" : "string"
+          },
+          "publicKey" : {
+            "$ref" : "#/components/schemas/PublicKey"
+          },
+          "leafCertificate" : {
+            "$ref" : "#/components/schemas/X509Certificate"
+          },
+          "x509CertificateSha1Thumbprint" : {
+            "type" : "string"
+          },
+          "x509CertificateSha256Thumbprint" : {
+            "type" : "string"
+          },
+          "x509Url" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PublicKey" : {
+        "type" : "object",
+        "properties" : {
+          "algorithm" : {
+            "type" : "string"
+          },
+          "format" : {
+            "type" : "string"
+          },
+          "encoded" : {
+            "format" : "binary",
+            "type" : "string"
+          }
+        }
+      },
+      "RejectRequest" : {
+        "required" : [ "reason" ],
+        "type" : "object",
+        "properties" : {
+          "reason" : {
+            "description" : "The reason that the notarization request is rejected",
+            "type" : "string"
+          }
+        }
+      },
+      "RequestFilter" : {
+        "description" : "The filter types.",
+        "enum" : [ "available", "allClaimed", "ownClaimed" ],
+        "type" : "string"
+      },
+      "SessionId" : {
+        "description" : "The unique identifier of a request notification session.",
+        "type" : "string"
+      },
+      "SessionInfoResponse" : {
+        "type" : "object",
+        "properties" : {
+          "sessionId" : {
+            "$ref" : "#/components/schemas/SessionId"
+          },
+          "token" : {
+            "$ref" : "#/components/schemas/AccessToken"
+          }
+        }
+      },
+      "SessionSubmission" : {
+        "required" : [ "profileId" ],
+        "type" : "object",
+        "properties" : {
+          "profileId" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "SessionSummary" : {
+        "required" : [ "sessionId", "profileId", "state", "tasks", "preconditionTaskTree", "taskTree" ],
+        "type" : "object",
+        "properties" : {
+          "sessionId" : {
+            "$ref" : "#/components/schemas/SessionId"
+          },
+          "state" : {
+            "$ref" : "#/components/schemas/NotarizationRequestState"
+          },
+          "profileId" : {
+            "type" : "string",
+            "readOnly" : true
+          },
+          "tasks" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SessionTaskSummary"
+            }
+          },
+          "preconditionTaskTree" : {
+            "$ref" : "#/components/schemas/SessionTaskTree"
+          },
+          "taskTree" : {
+            "$ref" : "#/components/schemas/SessionTaskTree"
+          },
+          "preconditionTasksFulfilled" : {
+            "type" : "boolean"
+          },
+          "tasksFulfilled" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "SessionTaskSummary" : {
+        "type" : "object",
+        "properties" : {
+          "taskId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/TaskType"
+          },
+          "name" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "fulfilled" : {
+            "type" : "boolean"
+          },
+          "running" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "SessionTaskTree" : {
+        "required" : [ "allOf", "oneOf" ],
+        "type" : "object",
+        "properties" : {
+          "task" : {
+            "$ref" : "#/components/schemas/SessionTaskSummary"
+          },
+          "allOf" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SessionTaskTree"
+            }
+          },
+          "oneOf" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SessionTaskTree"
+            }
+          }
+        }
+      },
+      "SignatureType" : {
+        "description" : "Kind of signature algorithm specified for creation.",
+        "enum" : [ "Ed25519Signature2018", "Ed25519Signature2020", "RsaSignature2018", "JcsEd25519Signature2020", "EcdsaSecp256k1Signature2019", "EcdsaKoblitzSignature2016", "JcsEcdsaSecp256k1Signature2019", "JsonWebSignature2020", "BbsBlsSignature2020", "BbsBlsSignatureProof2020", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "ES256K", "EdDSA" ],
+        "type" : "string"
+      },
+      "SortDirection" : {
+        "description" : "The sort direction.",
+        "enum" : [ "Ascending", "Descending" ],
+        "type" : "string"
+      },
+      "SubmissionResponse" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }
+      },
+      "SubmitNotarizationRequest" : {
+        "required" : [ "data" ],
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "holder" : {
+            "$ref" : "#/components/schemas/DistributedIdentity"
+          },
+          "invitation" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "TaskDescription" : {
+        "description" : "A description for a task that is performed before or during the submission process, by the requester.",
+        "required" : [ "name" ],
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/TaskType"
+          },
+          "name" : {
+            "description" : "The identifier of the task or action. It must be unique within a given profile.",
+            "type" : "string"
+          },
+          "description" : {
+            "description" : "A human readable description of the task or action.",
+            "type" : "string",
+            "nullable" : true
+          },
+          "serviceName" : {
+            "description" : "The identifier of the extension service that executes this task or action.\n\nThis is optional when the request-processing service has a configured association for the task/action name with a known extension service.",
+            "type" : "string",
+            "nullable" : true
+          },
+          "serviceLocation" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "encryptAtRest" : {
+            "type" : "boolean",
+            "nullable" : true
+          }
+        },
+        "additionalProperties" : true,
+        "example" : {
+          "name" : "train-enrollment",
+          "serviceName" : "train-enrollment-proxy"
+        }
+      },
+      "TaskId" : {
+        "description" : "The identifier of a task. The task description is found in the profile of a notarization request.",
+        "type" : "string"
+      },
+      "TaskInstance" : {
+        "type" : "string"
+      },
+      "TaskTreeNode" : {
+        "type" : "object",
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/NodeEmpty"
+        }, {
+          "$ref" : "#/components/schemas/NodeAllOf"
+        }, {
+          "$ref" : "#/components/schemas/NodeOneOf"
+        }, {
+          "$ref" : "#/components/schemas/NodeTask"
+        } ]
+      },
+      "TaskType" : {
+        "description" : "The task types.",
+        "enum" : [ "browserIdentificationTask", "fileProvisionTask", "vcIdentificationTask" ],
+        "type" : "string"
+      },
+      "TaskType1" : {
+        "description" : "The task types.",
+        "enum" : [ "browserIdentificationTask", "fileProvisionTask", "vcIdentificationTask" ],
+        "type" : "string"
+      },
+      "UUID" : {
+        "format" : "uuid",
+        "pattern" : "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
+        "type" : "string"
+      },
+      "VcTaskStart" : {
+        "required" : [ "invitationURL", "holderDID" ],
+        "type" : "object",
+        "properties" : {
+          "invitationURL" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "holderDID" : {
+            "pattern" : "\\S",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "VerificationReport" : {
+        "type" : "string"
+      },
+      "WorkType" : {
+        "description" : "The types of work performed by extension services.",
+        "enum" : [ "Task", "Action" ],
+        "type" : "string"
+      },
+      "X509Certificate" : {
+        "type" : "object",
+        "properties" : {
+          "issuerDN" : {
+            "$ref" : "#/components/schemas/Principal"
+          },
+          "subjectDN" : {
+            "$ref" : "#/components/schemas/Principal"
+          },
+          "criticalExtensionOIDs" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "nonCriticalExtensionOIDs" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "encoded" : {
+            "format" : "binary",
+            "type" : "string"
+          },
+          "publicKey" : {
+            "$ref" : "#/components/schemas/PublicKey"
+          },
+          "version" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "serialNumber" : {
+            "type" : "integer"
+          },
+          "notBefore" : {
+            "$ref" : "#/components/schemas/Date"
+          },
+          "notAfter" : {
+            "$ref" : "#/components/schemas/Date"
+          },
+          "tBSCertificate" : {
+            "format" : "binary",
+            "type" : "string"
+          },
+          "signature" : {
+            "format" : "binary",
+            "type" : "string"
+          },
+          "sigAlgName" : {
+            "type" : "string"
+          },
+          "sigAlgOID" : {
+            "type" : "string"
+          },
+          "sigAlgParams" : {
+            "format" : "binary",
+            "type" : "string"
+          },
+          "issuerUniqueID" : {
+            "type" : "array",
+            "items" : {
+              "type" : "boolean"
+            }
+          },
+          "subjectUniqueID" : {
+            "type" : "array",
+            "items" : {
+              "type" : "boolean"
+            }
+          },
+          "keyUsage" : {
+            "type" : "array",
+            "items" : {
+              "type" : "boolean"
+            }
+          },
+          "extendedKeyUsage" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "basicConstraints" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "subjectAlternativeNames" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : { }
+            }
+          },
+          "issuerAlternativeNames" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : { }
+            }
+          }
+        }
+      }
+    },
+    "responses" : {
+      "CannotReuseToken" : {
+        "description" : "Cannot Re-use Token",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/ProblemDetails"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "openIdConnect",
+        "description" : "Authentication",
+        "openIdConnectUrl" : "http://identitymanager.localhost/.well-known/openid-configuration"
+      },
+      "notary" : {
+        "type" : "oauth2",
+        "flows" : {
+          "authorizationCode" : {
+            "authorizationUrl" : "https://example.com/api/oauth/dialog",
+            "tokenUrl" : "https://example.com/api/oauth/token",
+            "scopes" : {
+              "**" : "** role"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+---
+openapi: 3.0.3
+info:
+  title: compliance-task API
+  version: 1.0.0-SNAPSHOT
+servers:
+- url: http://localhost:8090
+  description: Auto generated value
+- url: http://0.0.0.0:8090
+  description: Auto generated value
+paths:
+  /task/begin:
+    post:
+      tags:
+      - Compliance Task Api
+      summary: Begin a compliance task
+      description: Begins a new compliance task
+      parameters:
+      - name: failure
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/URI'
+      - name: success
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/URI'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginResponse'
+  /task/{nonce}/cancel:
+    delete:
+      tags:
+      - Compliance Task Api
+      summary: Cancel a compliance task
+      description: Cancels a compliance task
+      parameters:
+      - name: nonce
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+  /task/{nonce}/vp/submit:
+    post:
+      tags:
+      - Compliance Task Api
+      summary: Submit a verifiable presentation for compliance check
+      description: Accepts a verifiable presentation which is submitted to the Gaia-X
+        compliance service
+      parameters:
+      - name: nonce
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnyType'
+      responses:
+        "201":
+          description: Created
+components:
+  schemas:
+    AnyType:
+      type: object
+    BeginResponse:
+      required:
+      - redirect
+      - cancel
+      type: object
+      properties:
+        redirect:
+          format: uri
+          type: string
+        cancel:
+          format: uri
+          type: string
+    URI:
+      format: uri
+      type: string

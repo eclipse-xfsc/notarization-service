@@ -1,0 +1,1 @@
+create table Session (created timestamp(6) with time zone, issuanceTimestamp timestamp(6) with time zone, id uuid not null, holderDid varchar(255), profileId varchar(255), token varchar(255), credentialData jsonb, failureURL bytea, successURL bytea, primary key (id));

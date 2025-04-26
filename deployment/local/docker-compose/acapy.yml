@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  acapy-db:
+    image: postgres:${POSTGRES_VERSION:-14}
+    restart: always
+    container_name: acapy-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '25432:5432'
+
+# Seed: 000000000000000000000000Steward1
+# DID: Th7MpTaRZVRYnPiabds81Y
+# Verkey: ~7TYfekw4GUagBnBVCqPjiC
+
+  acapy:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12.0rc2
+    container_name: acapy
+    depends_on:
+      - acapy-db
+    restart: on-failure
+    ports:
+      - '28030:8030'
+      - '20080:80'
+      - '25678:5678'
+    networks:
+      default:
+      indy:
+        ipv4_address: 10.0.0.4
+    command:
+      - start
+      - --admin
+      - '0.0.0.0'
+      - '80'
+      - --admin-insecure-mode
+      - --auto-provision
+      - --auto-ping-connection
+      - --auto-respond-credential-offer
+      - --auto-respond-credential-proposal
+      - --auto-respond-credential-request
+      - --auto-respond-presentation-proposal
+      - --auto-respond-presentation-request
+      - --auto-store-credential
+      - --debug-connections
+      - --debug-credentials
+      - --debug-presentations
+      - --endpoint
+      - http://acapy:8030
+      - --genesis-url
+      - http://ledger-browser:8000/genesis
+      - --inbound-transport
+      - http
+      - '0.0.0.0'
+      - '8030'
+      - --label
+      - Issuer
+      - --log-level
+      - debug
+      - --outbound-transport
+      - http
+      - --seed
+      - "000000000000000000000000Steward1"
+      - --wallet-key
+      - "123"
+      - --wallet-name
+      - 'issuer'
+      - --wallet-storage-config
+      - '{"url":"acapy-db:5432","max_connections":5,"wallet_scheme":"MultiWalletSingleTable"}'
+      - --wallet-storage-creds
+      - '{"account":"postgres","password":"postgres","admin_account":"postgres","admin_password":"postgres"}'
+      - --wallet-storage-type
+      - 'postgres_storage'
+      - --wallet-type
+      - askar
+      - --webhook-url
+      - ${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}${ACAPY_WEBHOOKS_PATH:-/acapy/webhooks}
+networks:
+  indy:
+    name: ledger_network
+    external: true

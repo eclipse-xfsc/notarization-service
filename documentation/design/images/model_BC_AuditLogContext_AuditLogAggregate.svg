@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="800px" preserveAspectRatio="none" style="width:566px;height:800px;background:#FFFFFF;" version="1.1" viewBox="0 0 566 800" width="566px" zoomAndPan="magnify"><defs><filter height="300%" id="fc5h7euiuitnr" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4961fd5e1748d8a5c99b38be9d44f795]
+cluster 'AuditLogAggregate' Aggregate--><rect fill="#FFFFFF" filter="url(#fc5h7euiuitnr)" height="781" style="stroke:#000000;stroke-width:1.5;" width="547" x="7" y="7"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="249" x="156" y="21.9951">'AuditLogAggregate' Aggregate</text><!--MD5=[9cd6b3db2863651e0087189774684193]
+class HttpNotarizationRequestAudit--><rect codeLine="5" fill="#FEFECE" filter="url(#fc5h7euiuitnr)" height="194.7891" id="HttpNotarizationRequestAudit" style="stroke:#A80036;stroke-width:1.5;" width="218" x="320" y="42"/><ellipse cx="335" cy="60.9688" fill="#FFFAB8" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M335.1094,56.3125 L333.9531,61.3906 L336.2813,61.3906 L335.1094,56.3125 Z M333.625,54.0781 L336.6094,54.0781 L339.9688,66.4688 L337.5156,66.4688 L336.75,63.4063 L333.4688,63.4063 L332.7188,66.4688 L330.2813,66.4688 L333.625,54.0781 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="113" x="385.5" y="58.1387">«Aggregate Root»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="186" x="349" y="72.1074">HttpNotarizationRequestAudit</text><line style="stroke:#A80036;stroke-width:1.5;" x1="321" x2="537" y1="79.9375" y2="79.9375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="114" x="326" y="94.1479">String notarizationId</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="98" x="326" y="106.9526">String requestUri</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="93" x="326" y="119.7573">String sessionId</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="326" y="132.562">String ipAddress</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="127" x="326" y="145.3667">Timestamp receivedAt</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="122" x="326" y="158.1714">Timestamp createdAt</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="185" x="326" y="170.9761">NotarizationRequestAction action</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="97" x="326" y="183.7808">String httpStatus</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="69" x="326" y="196.5854">String caller</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="126" x="326" y="209.3901">String requestContent</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="326" y="222.1948">String taskName</text><line style="stroke:#A80036;stroke-width:1.5;" x1="321" x2="537" y1="228.7891" y2="228.7891"/><!--MD5=[66aa19c79cf4efde202c331460c15b15]
+class OnAuditableEvent--><rect codeLine="18" fill="#FEFECE" filter="url(#fc5h7euiuitnr)" height="194.7891" id="OnAuditableEvent" style="stroke:#A80036;stroke-width:1.5;" width="261" x="23.5" y="42"/><ellipse cx="94.25" cy="60.9688" fill="#FF9F4B" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M98.3594,66.9688 L90.6406,66.9688 L90.6406,54.5781 L98.3594,54.5781 L98.3594,56.7344 L93.0938,56.7344 L93.0938,59.4063 L97.8594,59.4063 L97.8594,61.5625 L93.0938,61.5625 L93.0938,64.8125 L98.3594,64.8125 L98.3594,66.9688 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="100" x="120.25" y="58.1387">«Domain Event»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="111" x="114.75" y="72.1074">OnAuditableEvent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="24.5" x2="283.5" y1="79.9375" y2="79.9375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="41" x="29.5" y="94.1479">UUID id</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="82" x="29.5" y="106.9526">URI requestUri</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="115" x="29.5" y="119.7573">SessionId sessionId</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="29.5" y="132.562">String ipAddress</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="127" x="29.5" y="145.3667">Timestamp receivedAt</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="126" x="29.5" y="158.1714">String requestContent</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="77" x="29.5" y="170.9761">int httpStatus</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="69" x="29.5" y="183.7808">String caller</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="29.5" y="196.5854">String taskName</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="249" x="29.5" y="209.3901">NotarizationRequestId notarizationRequestId</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="185" x="29.5" y="222.1948">NotarizationRequestAction action</text><line style="stroke:#A80036;stroke-width:1.5;" x1="24.5" x2="283.5" y1="228.7891" y2="228.7891"/><!--MD5=[e5dce6e80de7280160d8cf3e5e1b6f22]
+class NotarizationRequestId--><rect codeLine="31" fill="#FEFECE" filter="url(#fc5h7euiuitnr)" height="66.7422" id="NotarizationRequestId" style="stroke:#A80036;stroke-width:1.5;" width="170" x="46" y="509.5"/><ellipse cx="61" cy="528.4688" fill="#8FBC8F" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M61.1094,532.9219 L63.2969,522.5781 L65.7656,522.5781 L62.8125,534.9688 L59.4219,534.9688 L56.4688,522.5781 L58.9375,522.5781 L61.1094,532.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="92" x="98" y="525.6387">«Value Object»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="138" x="75" y="539.6074">NotarizationRequestId</text><line style="stroke:#A80036;stroke-width:1.5;" x1="47" x2="215" y1="547.4375" y2="547.4375"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="41" x="52" y="561.6479">UUID id</text><line style="stroke:#A80036;stroke-width:1.5;" x1="47" x2="215" y1="568.2422" y2="568.2422"/><!--MD5=[239a352bec7d2b6229d5c759de8967ab]
+class NotarizationRequestAction--><rect codeLine="34" fill="#FEFECE" filter="url(#fc5h7euiuitnr)" height="457.75" id="NotarizationRequestAction" style="stroke:#A80036;stroke-width:1.5;" width="242" x="251" y="314"/><ellipse cx="285.8" cy="330" fill="#EB937F" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M289.9094,336 L282.1906,336 L282.1906,323.6094 L289.9094,323.6094 L289.9094,325.7656 L284.6438,325.7656 L284.6438,328.4375 L289.4094,328.4375 L289.4094,330.5938 L284.6438,330.5938 L284.6438,333.8438 L289.9094,333.8438 L289.9094,336 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="166" x="304.2" y="334.1543">NotarizationRequestAction</text><line style="stroke:#A80036;stroke-width:1.5;" x1="252" x2="492" y1="346" y2="346"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="257" y="360.2104">CREATE_SESSION</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="104" x="257" y="373.0151">UPDATE_CONTACT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="257" y="385.8198">FETCH</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="50" x="257" y="398.6245">TIMEOUT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="43" x="257" y="411.4292">SUBMIT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="115" x="257" y="424.2339">UPLOAD_DOCUMENT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="106" x="257" y="437.0386">FETCH_DOCUMENT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="112" x="257" y="449.8433">DELETE_DOCUMENT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="44" x="257" y="462.6479">UPDATE</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="68" x="257" y="475.4526">ASSIGN_DID</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="72" x="257" y="488.2573">MARK_READY</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="88" x="257" y="501.062">MARK_UNREADY</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="44" x="257" y="513.8667">REVOKE</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="33" x="257" y="526.6714">CLAIM</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="44" x="257" y="539.4761">ACCEPT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="39" x="257" y="552.2808">REJECT</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="71" x="257" y="565.0854">TASK_START</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="79" x="257" y="577.8901">TASK_CANCEL</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="132" x="257" y="590.6948">TASK_FINISH_SUCCESS</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="99" x="257" y="603.4995">TASK_FINISH_FAIL</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="257" y="616.3042">MANUAL_RELEASE</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="92" x="257" y="629.1089">FETCH_IDENTITY</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="112" x="257" y="641.9136">NOTARY_FETCH_ALL</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="116" x="257" y="654.7183">NOTARY_FETCH_REQ</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="118" x="257" y="667.5229">NOTARY_FETCH_DOC</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="93" x="257" y="680.3276">NOTARY_DELETE</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="257" y="693.1323">NOTARY_REVOKE</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="178" x="257" y="705.937">PRUNE_TERMINATED_SESSIONS</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="158" x="257" y="718.7417">PRUNE_TIMEOUT_SESSIONS</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="230" x="257" y="731.5464">PRUNE_SUBMISSIONTIMEOUT_SESSIONS</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="160" x="257" y="744.3511">ISSUANCE_FINISH_SUCCESS</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="127" x="257" y="757.1558">ISSUANCE_FINISH_FAIL</text><line style="stroke:#A80036;stroke-width:1.5;" x1="252" x2="492" y1="763.75" y2="763.75"/><!--MD5=[649d1f163d6dc7a0ca824cea16d9a679]
+link OnAuditableEvent to NotarizationRequestId--><path codeLine="69" d="M148.46,237.18 C143.56,322.77 136.66,443.25 133.18,503.92 " fill="none" id="OnAuditableEvent-to-NotarizationRequestId" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="132.88,509.25,137.3884,500.4936,133.1661,504.2582,129.4015,500.0359,132.88,509.25" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="139" x="148" y="280.0669">notarizationRequestId</text><!--MD5=[553e90c91885410855401a03ddf52542]
+link OnAuditableEvent to NotarizationRequestAction--><path codeLine="70" d="M273.8,237.06 C282,246.61 289.55,256.63 296,267 C304.3,280.34 311.7,294.6 318.32,309.34 " fill="none" id="OnAuditableEvent-to-NotarizationRequestAction" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="320.34,313.93,320.3715,304.0812,318.3239,309.3545,313.0506,307.3069,320.34,313.93" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="39" x="304" y="280.0669">action</text><!--MD5=[39d8747546685a965ac1aecb55cc04ea]
+@startuml
+
+skinparam componentStyle uml2
+
+package "'AuditLogAggregate' Aggregate" <<Rectangle>> {
+	class HttpNotarizationRequestAudit <<(A,#fffab8) Aggregate Root>> {
+		String notarizationId
+		String requestUri
+		String sessionId
+		String ipAddress
+		Timestamp receivedAt
+		Timestamp createdAt
+		NotarizationRequestAction action
+		String httpStatus
+		String caller
+		String requestContent
+		String taskName
+	}
+	class OnAuditableEvent <<(E,#ff9f4b) Domain Event>> {
+		UUID id
+		URI requestUri
+		SessionId sessionId
+		String ipAddress
+		Timestamp receivedAt
+		String requestContent
+		int httpStatus
+		String caller
+		String taskName
+		NotarizationRequestId notarizationRequestId
+		NotarizationRequestAction action
+	}
+	class NotarizationRequestId <<(V,DarkSeaGreen) Value Object>> {
+		UUID id
+	}
+	enum NotarizationRequestAction {
+		CREATE_SESSION
+		UPDATE_CONTACT
+		FETCH
+		TIMEOUT
+		SUBMIT
+		UPLOAD_DOCUMENT
+		FETCH_DOCUMENT
+		DELETE_DOCUMENT
+		UPDATE
+		ASSIGN_DID
+		MARK_READY
+		MARK_UNREADY
+		REVOKE
+		CLAIM
+		ACCEPT
+		REJECT
+		TASK_START
+		TASK_CANCEL
+		TASK_FINISH_SUCCESS
+		TASK_FINISH_FAIL
+		MANUAL_RELEASE
+		FETCH_IDENTITY
+		NOTARY_FETCH_ALL
+		NOTARY_FETCH_REQ
+		NOTARY_FETCH_DOC
+		NOTARY_DELETE
+		NOTARY_REVOKE
+		PRUNE_TERMINATED_SESSIONS
+		PRUNE_TIMEOUT_SESSIONS
+		PRUNE_SUBMISSIONTIMEOUT_SESSIONS
+		ISSUANCE_FINISH_SUCCESS
+		ISSUANCE_FINISH_FAIL
+	}
+}
+OnAuditableEvent - -> NotarizationRequestId : notarizationRequestId
+OnAuditableEvent - -> NotarizationRequestAction : action
+
+
+@enduml
+
+PlantUML version 1.2022.0(Tue Jan 11 17:16:42 CET 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

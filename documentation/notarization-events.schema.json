@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not/documentation/notarization-events.schema.json",
+  "title": "Notarization-API Event",
+  "description": "A event that notifies of a change in the Notarization-API system.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "A unique identifier of the event context. If the event is for consumption by the requestor, this is the sessoin id. If this event is consumed by the notary, the notarization request id.",
+      "type": "string"
+    },
+    "msg": {
+      "description": "The discriminator type of the event.",
+      "type": "string"
+    },
+    "payload": {
+      "description": "An optional payload with an event-specific value.",
+      "type": "string"
+    }
+  },
+  "required": [ "id", "msg" ]
+}

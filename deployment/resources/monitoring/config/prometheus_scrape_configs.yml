@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 10s
+  external_labels:
+    system: notarization-api
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: profile
+    metrics_path: /q/metrics
+    honor_labels: true
+    static_configs:
+      - targets: ['profile:80']
+        labels:
+          app: profile
+          application: profile-service
+          system: notarization-api
+
+  - job_name: request-processing
+    metrics_path: /q/metrics
+    honor_labels: true
+    static_configs:
+      - targets: ['request-processing:8083']
+        labels:
+          app: request-processing
+          application: request-processing-service
+          system: notarization-api
+

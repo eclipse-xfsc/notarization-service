@@ -1,0 +1,37 @@
+---
+replicaCount: 2
+
+fullnameOverride: "otel-collector"
+
+# https://opentelemetry.io/docs/kubernetes/helm/collector/
+mode: deployment
+
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: ${env:MY_POD_IP}:4317
+    otlp/2:
+      protocols:
+        grpc:
+          endpoint: ${env:MY_POD_IP}:55680
+
+  exporters:
+    # jaeger is deprecated
+    otlp:
+      endpoint: jaeger-collector.not-accept.svc.cluster.local:4317
+      tls:
+        insecure: true
+
+  service:
+    extensions: [health_check]
+    pipelines:
+      traces:
+        receivers: [otlp, otlp/2]
+        exporters: [otlp]
+      metrics: null
+      logs: null

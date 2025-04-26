@@ -1,0 +1,26 @@
+{
+  "keys": [
+    {
+      "kid": "e_a256",
+      "alg": "A256GCMKW",
+      "k": "WCMnpHHMjWu9tOHLm38O4-399USrZ9a9QdouQIGyf80",
+      "key_ops": [
+        "wrapKey",
+        "encryption"
+      ],
+      "kty": "oct"
+    },
+    {
+      "kid": "e_es256",
+      "alg": "ECDH-ES+A256KW",
+      "crv": "P-521",
+      "key_ops": [
+        "wrapKey",
+        "encryption"
+      ],
+      "kty": "EC",
+      "x": "ARGoarxCkfPuCH-3gtcki0LEQMxObTHvuTOu5azka5tjQyKCebrQ07CCc3OLkEpDgn05lLDSrCPPkmYdcGP-9Aeb",
+      "y": "ACpgxqv-MiDxORWJi742Nm4AQLB5XlyR32Xg0psTU91OT0UVA4til2hqRK496UPdAQ9udi6Dcwjx7WlDz4lNiuQm"
+    }
+  ]
+}

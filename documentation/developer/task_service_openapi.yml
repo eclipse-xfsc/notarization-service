@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Task Service API
+  description: |-
+    This documents the Task Service API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.9.0
+externalDocs:
+  description: Find out more about Notarization-API for developers
+  url: https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not/-/tree/main/documentation/developer
+servers:
+  - url: '{protocol}://{serviceDomain}{servicePath}'
+    variables:
+      protocol:
+        default: https
+        enum:
+          - http
+          - https
+      serviceDomain:
+        description: Domain of the deployed service, as accessible by the Notarization-API
+        default: example.eclipse.dev
+      servicePath:
+        description: Path of the endpoint that implements the Task Service API
+        default: '/example/path'
+tags:
+  - name: task
+paths:
+  /:
+    post:
+      tags:
+        - task
+      summary: Begin a new task
+      description: Begin a new managed task, allocating resources and the cancel endpoint. 
+      operationId: beginTask
+      parameters:
+        - name: profileId
+          in: query
+          description: The identifier of the profile. This may be used by the service to contextually adapt the execution.
+          required: true
+          schema:
+            type: string
+        - name: taskName
+          in: query
+          description: The identifier of the task in the profile that should begin. This is absent when an action should begin.
+          required: false
+          schema:
+            type: string
+        - name: actionName
+          in: query
+          description: The identifier of the action in the profile that should begin. This is absent when an task should begin.
+          required: false
+          schema:
+            type: string
+        - name: notarizationRequestId
+          in: query
+          description: The identifier of the profile. This may be used by the service to contextually adapt the task execution. This is absent when an task should begin.
+          required: false
+          schema:
+            type: string
+        - name: success
+          in: query
+          description: Callback URL to be called once the task completed successfully.
+          required: true
+          schema:
+            type: string
+        - name: failure
+          in: query
+          description: Callback URL to be called once the task completed in a failed state.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Service specific content
+        content:
+          application/json:
+            schema: {}
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginTaskResponse'
+        '400':
+          description: Validation exception
+components:
+  schemas:
+    BeginTaskResponse:
+      type: object
+      properties:
+        cancel:
+          type: string
+        redirect:
+          type: string

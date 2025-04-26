@@ -1,0 +1,289 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oidc-identity-resolver
+spec:
+  template:
+    spec:
+      volumes:
+      - name: migrations
+        emptyDir:
+          medium: Memory
+      initContainers:
+        - name: prepare-migrations
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/oidc-identity-resolver:java21-latest
+          imagePullPolicy: Always
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp /db-flyway/* /sql-migrations" ]
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+        - name: migrate-db
+          image: flyway/flyway:8.5.9
+          imagePullPolicy: Always
+          args:
+            - repair
+            - migrate
+          env:
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/sql-migrations
+            - name: FLYWAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_USERNAME
+                  name:  oidc-identity-resolver-config
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: FLYWAY_JDBC_URL
+                  name:  oidc-identity-resolver-config
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: QUARKUS_DATASOURCE_PASSWORD
+                  name:  oidc-identity-resolver-secrets
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+      containers:
+        - name: oidc-identity-resolver
+          envFrom:
+            - configMapRef:
+                name: oidc-identity-resolver-config
+            - secretRef:
+                name: oidc-identity-resolver-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile
+spec:
+  template:
+    spec:
+      volumes:
+      - name: migrations
+        emptyDir:
+          medium: Memory
+      - name: profiles
+        configMap:
+          defaultMode: 436
+          name: profiles
+          optional: false
+      initContainers:
+        - name: prepare-migrations
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/profile:java21-latest
+          imagePullPolicy: Always
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp /db-flyway/* /sql-migrations" ]
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+        - name: migrate-db
+          image: flyway/flyway:8.5.9
+          imagePullPolicy: Always
+          args:
+            - repair
+            - migrate
+          env:
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/sql-migrations
+            - name: FLYWAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_USERNAME
+                  name:  profile-config
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: FLYWAY_JDBC_URL
+                  name:  profile-config
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: QUARKUS_DATASOURCE_PASSWORD
+                  name:  profile-secrets
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+      containers:
+        - name: profile
+          envFrom:
+            - configMapRef:
+                name: profile-config
+            - secretRef:
+                name: profile-secrets
+          volumeMounts:
+            - name: profiles
+              mountPath: /home/jboss/config/application.yaml
+              subPath: application.yaml
+              readOnly: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: request-processing
+spec:
+  template:
+    spec:
+      volumes:
+      - name: migrations
+        emptyDir:
+          medium: Memory
+      initContainers:
+        - name: prepare-migrations
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/request-processing:java21-latest
+          imagePullPolicy: Always
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp /db-flyway/* /sql-migrations" ]
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+        - name: migrate-db
+          image: flyway/flyway:8.5.9
+          imagePullPolicy: Always
+          args:
+            - repair
+            - migrate
+          env:
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/sql-migrations
+            - name: FLYWAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_USERNAME
+                  name: request-processing-config
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: FLYWAY_JDBC_URL
+                  name: request-processing-config
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: QUARKUS_DATASOURCE_PASSWORD
+                  name: request-processing-secrets
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+      containers:
+        - name: request-processing
+          envFrom:
+            - configMapRef:
+                name: request-processing-config
+            - secretRef:
+                name: request-processing-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: revocation
+spec:
+  template:
+    spec:
+      volumes:
+      - name: migrations
+        emptyDir:
+          medium: Memory
+      initContainers:
+        - name: prepare-migrations
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/revocation:java21-latest
+          imagePullPolicy: Always
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp /db-flyway/* /sql-migrations" ]
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+        - name: migrate-db
+          image: flyway/flyway:8.5.9
+          imagePullPolicy: Always
+          args:
+            - repair
+            - migrate
+          env:
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/sql-migrations
+            - name: FLYWAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_USERNAME
+                  name: revocation-config
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_JDBC_URL
+                  name: revocation-config
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: QUARKUS_DATASOURCE_PASSWORD
+                  name: revocation-secrets
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+      containers:
+        - name: revocation
+          envFrom:
+            - configMapRef:
+                name: revocation-config
+            - secretRef:
+                name: revocation-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+spec:
+  template:
+    spec:
+      volumes:
+      - name: migrations
+        emptyDir:
+          medium: Memory
+      initContainers:
+        - name: prepare-migrations
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/scheduler:java21-latest
+          imagePullPolicy: Always
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp /db-flyway/* /sql-migrations" ]
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+        - name: migrate-db
+          image: flyway/flyway:8.5.9
+          imagePullPolicy: Always
+          args:
+            - repair
+            - migrate
+          env:
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/sql-migrations
+            - name: FLYWAY_BASELINE_ON_MIGRATE
+              value: "true"
+            - name: FLYWAY_TABLE
+              value: flyway_quarkus_history
+            - name: FLYWAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_USERNAME
+                  name: scheduler-config
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: QUARKUS_DATASOURCE_JDBC_URL
+                  name: scheduler-config
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: QUARKUS_DATASOURCE_PASSWORD
+                  name: scheduler-secrets
+          volumeMounts:
+            - name: migrations
+              mountPath: /sql-migrations
+      containers:
+        - name: scheduler
+          envFrom:
+            - configMapRef:
+                name: scheduler-config
+            - secretRef:
+                name: scheduler-secrets

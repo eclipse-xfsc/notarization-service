@@ -1,0 +1,54 @@
+documentation/eidas-bridge/ssi-eidas-bridge
+documentation/eidas-bridge/.env
+documentation/eidas-bridge/payload.json
+src-gen/
+/services/target/
+/libs/reporting/target/
+/services/*/target/
+
+deploy/local/docker-compose/ledger/tmp
+deploy/local/docker-compose/ledger/**/__pycache__
+
+not-acapy.secrets
+
+.vscode/
+.idea/
+*.iml
+
+# Include dev/example environment values
+!deploy/helm/.env
+
+### Gradle ###
+.gradle
+**/build/
+!src/**/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Avoid ignore Gradle wrappper properties
+!gradle-wrapper.properties
+
+# Cache of project
+.gradletasknamecache
+
+# Eclipse Gradle plugin generated files
+# Eclipse Core
+.project
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+### Gradle Patch ###
+# Java heap dump
+*.hprof
+
+# node plugin
+.frontend-gradle-plugin/
+.node/
+.gitlab-ci.yml
+ci
+
+# End of https://www.toptal.com/developers/gitignore/api/gradle

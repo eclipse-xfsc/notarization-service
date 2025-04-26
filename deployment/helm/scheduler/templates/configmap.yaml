@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scheduler-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  CRON_ISSUE_REVOCATION_CREDENTIALS: "0 * * ? * * *"
+  CRON_PROFILE_REQUEST_OUTSTANDING_DIDS: "0 * * ? * * *"
+  CRON_PRUNE_SUBMISSION_TIMEOUT: "*/2 * * ? * * *"
+  CRON_PRUNE_TERMINATED: "*/10 * * ? * * *"
+  CRON_PRUNE_TIMEOUT: "*/5 * * ? * * *"
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_DB_KIND: "postgresql"
+  QUARKUS_DATASOURCE_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_FLYWAY_BASELINE_DESCRIPTION: "Quartz"
+  QUARKUS_FLYWAY_BASELINE_ON_MIGRATE: "true"
+  QUARKUS_FLYWAY_BASELINE_VERSION: "1_0"
+  QUARKUS_FLYWAY_CONNECT_RETRIES: "10"
+  QUARKUS_FLYWAY_MIGRATE_AT_START: "true"
+  QUARKUS_FLYWAY_TABLE: "flyway_quarkus_history"
+  QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: "none"
+  QUARKUS_HIBERNATE_ORM_LOG_SQL: "true"
+  QUARKUS_HIBERNATE_ORM_SQL_LOAD_SCRIPT: "no-file"
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_LOG_LEVEL: "INFO"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  QUARKUS_QUARTZ_CLUSTERED: "true"
+  QUARKUS_QUARTZ_STORE_TYPE: "jdbc-cmt"
+  QUARKUS_REST_CLIENT_PROFILE_API_URL: "{{ .Values.config.restClientProfileApiUrl }}"
+  QUARKUS_REST_CLIENT_REQUESTPROCESSING_API_URL: "{{ .Values.config.restClientRequestProcessingApiUrl }}"
+  QUARKUS_REST_CLIENT_REVOCATION_API_URL: "{{ .Values.config.restClientRevocationApiUrl }}"

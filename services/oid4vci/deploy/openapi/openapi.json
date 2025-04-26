@@ -1,0 +1,810 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "oid4vci API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8088",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8088",
+    "description" : "Auto generated value"
+  } ],
+  "paths" : {
+    "/.well-known/oauth-authorization-server" : {
+      "get" : {
+        "tags" : [ "Well Known Config Api Impl" ],
+        "summary" : "OAuth Configuration",
+        "description" : "Retrieves the OAuth Configuration.",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OauthProviderMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/openid-configuration" : {
+      "get" : {
+        "tags" : [ "Well Known Config Api Impl" ],
+        "summary" : "OIDC Configuration",
+        "description" : "Retrieves the OIDC Configuration.",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OidcProviderMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/openid-credential-issuer" : {
+      "get" : {
+        "tags" : [ "Well Known Config Api Impl" ],
+        "summary" : "OID4VCI Credential Issuer Metadata",
+        "description" : "Retrieves the OID4VCI Credential Issuer Metadata (cf. Sec. 10.2).",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CredentialIssuerMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/oid4vci/offer/credential-offer" : {
+      "post" : {
+        "summary" : "Create OID4VCI Credential Offer",
+        "description" : "Requests credential offer (cf. OID4VCI Sec. 4).",
+        "parameters" : [ {
+          "name" : "callbackUrl",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "issueSession",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "profiles",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "minItems" : 1,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/jwks" : {
+      "get" : {
+        "tags" : [ "Well Known Config Api Impl" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ObjectNode"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/credential" : {
+      "post" : {
+        "tags" : [ "Oidc 4 Vci Impl" ],
+        "summary" : "OID4VCI Credential Endpoint",
+        "description" : "Requests credential retrieval (cf. Sec. 7).",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CredentialRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/oid4vci/token" : {
+      "post" : {
+        "tags" : [ "Oidc 4 Vci Impl" ],
+        "summary" : "OID4VCI Token Endpoint",
+        "description" : "Retrieves the token for the following credential issuance (cf. Sec. 6).",
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "required" : [ "grant_type" ],
+                "type" : "object",
+                "properties" : {
+                  "grant_type" : {
+                    "pattern" : "\\S",
+                    "type" : "string"
+                  },
+                  "code" : {
+                    "type" : "string",
+                    "nullable" : true
+                  },
+                  "redirect_uri" : {
+                    "type" : "string",
+                    "nullable" : true
+                  },
+                  "client_id" : {
+                    "type" : "string",
+                    "nullable" : true
+                  },
+                  "pre-authorized_code" : {
+                    "type" : "string",
+                    "nullable" : true
+                  },
+                  "tx_code" : {
+                    "type" : "string",
+                    "nullable" : true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Oid4VciTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AnyType" : {
+        "type" : "object"
+      },
+      "AuthorizationDetails" : {
+        "required" : [ "type", "credential_identifiers" ],
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "credential_identifiers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "BackgroundImage" : {
+        "required" : [ "uri" ],
+        "type" : "object",
+        "properties" : {
+          "uri" : {
+            "type" : "string"
+          },
+          "text_color" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "CredentialConfigurationSupported" : {
+        "required" : [ "format", "cryptographic_binding_methods_supported", "credential_signing_alg_values_supported", "proof_types_supported", "display" ],
+        "type" : "object",
+        "properties" : {
+          "format" : {
+            "type" : "string"
+          },
+          "scope" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "cryptographic_binding_methods_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "credential_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "proof_types_supported" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/ProofTypesSupported"
+            }
+          },
+          "display" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CredentialDisplay"
+            }
+          }
+        }
+      },
+      "CredentialDisplay" : {
+        "required" : [ "name" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "locale" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "logo" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/Logo"
+            } ],
+            "nullable" : true
+          },
+          "description" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "background_color" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "background_image" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/BackgroundImage"
+            } ],
+            "nullable" : true
+          },
+          "text_color" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "CredentialIssuerMetadata" : {
+        "required" : [ "credential_issuer", "authorization_servers", "credential_endpoint", "display", "credential_configurations_supported" ],
+        "type" : "object",
+        "properties" : {
+          "credential_issuer" : {
+            "type" : "string"
+          },
+          "authorization_servers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "credential_endpoint" : {
+            "type" : "string"
+          },
+          "batch_credential_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "deferred_credential_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "notification_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "credential_response_encryption" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/CredentialResponseEncryptionSupport"
+            } ],
+            "nullable" : true
+          },
+          "credential_identifiers_supported" : {
+            "type" : "boolean"
+          },
+          "signed_metadata" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "display" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/IssuerDisplay"
+            }
+          },
+          "credential_configurations_supported" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/CredentialConfigurationSupported"
+            }
+          }
+        }
+      },
+      "CredentialRequest" : {
+        "type" : "object",
+        "properties" : {
+          "proof" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/Proof"
+            } ],
+            "nullable" : true
+          },
+          "credential_response_encryption" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/CredentialResponseEncryption"
+            } ],
+            "nullable" : true
+          }
+        }
+      },
+      "CredentialResponseEncryption" : {
+        "required" : [ "jwk", "alg", "enc" ],
+        "type" : "object",
+        "properties" : {
+          "jwk" : {
+            "$ref" : "#/components/schemas/ObjectNode"
+          },
+          "alg" : {
+            "type" : "string"
+          },
+          "enc" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CredentialResponseEncryptionSupport" : {
+        "required" : [ "alg_values_supported", "enc_values_supported" ],
+        "type" : "object",
+        "properties" : {
+          "alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "enc_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "encryption_required" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "IssuerDisplay" : {
+        "required" : [ "name" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "locale" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "logo" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/Logo"
+            } ],
+            "nullable" : true
+          }
+        }
+      },
+      "Logo" : {
+        "required" : [ "uri" ],
+        "type" : "object",
+        "properties" : {
+          "uri" : {
+            "type" : "string"
+          },
+          "alt_text" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "OauthProviderMetadata" : {
+        "required" : [ "issuer", "token_endpoint", "jwks_uri", "response_types_supported" ],
+        "type" : "object",
+        "properties" : {
+          "issuer" : {
+            "type" : "string"
+          },
+          "authorization_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "token_endpoint" : {
+            "type" : "string"
+          },
+          "jwks_uri" : {
+            "type" : "string"
+          },
+          "registration_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "scopes_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "response_types_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "response_modes_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "grant_types_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "token_endpoint_auth_methods_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "token_endpoint_auth_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "service_documentation" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "ui_locales_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "op_policy_uri" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "op_tos_uri" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "revocation_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "revocation_endpoint_auth_methods_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "revocation_endpoint_auth_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "introspection_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "introspection_endpoint_auth_methods_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "introspection_endpoint_auth_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "code_challenge_methods_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "pre_authorized_grant_anonymous_access_supported" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "OauthTokenResponse" : {
+        "required" : [ "access_token", "token_type" ],
+        "type" : "object",
+        "properties" : {
+          "access_token" : {
+            "type" : "string"
+          },
+          "token_type" : {
+            "type" : "string"
+          },
+          "expires_in" : {
+            "format" : "int64",
+            "type" : "integer",
+            "nullable" : true
+          },
+          "refresh_token" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "scope" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "ObjectNode" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/AnyType"
+        }
+      },
+      "Oid4VciTokenResponse" : {
+        "required" : [ "oauth_token_response", "authorization_details" ],
+        "type" : "object",
+        "properties" : {
+          "oauth_token_response" : {
+            "$ref" : "#/components/schemas/OauthTokenResponse"
+          },
+          "c_nonce" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "c_nonce_expires_in" : {
+            "format" : "int64",
+            "type" : "integer",
+            "nullable" : true
+          },
+          "authorization_details" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AuthorizationDetails"
+            }
+          }
+        }
+      },
+      "OidcProviderMetadata" : {
+        "required" : [ "oauth_provider_metadata", "subject_types_supported", "id_token_signing_alg_values_supported" ],
+        "type" : "object",
+        "properties" : {
+          "oauth_provider_metadata" : {
+            "$ref" : "#/components/schemas/OauthProviderMetadata"
+          },
+          "userinfo_endpoint" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "acr_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "subject_types_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "id_token_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "id_token_encryption_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "id_token_encryption_enc_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "userinfo_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "userinfo_encryption_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "userinfo_encryption_enc_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "request_object_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "request_object_encryption_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "request_object_encryption_enc_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "display_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "claim_types_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "claims_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "claims_locales_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "nullable" : true
+          },
+          "claims_parameter_supported" : {
+            "type" : "boolean"
+          },
+          "request_parameter_supported" : {
+            "type" : "boolean"
+          },
+          "request_uri_parameter_supported" : {
+            "type" : "boolean"
+          },
+          "require_request_uri_registration" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "Proof" : {
+        "required" : [ "proof_type" ],
+        "type" : "object",
+        "properties" : {
+          "proof_type" : {
+            "$ref" : "#/components/schemas/ProofTypeEnum"
+          }
+        }
+      },
+      "ProofTypeEnum" : {
+        "enum" : [ "jwt", "cwt", "ldp_vp" ],
+        "type" : "string"
+      },
+      "ProofTypesSupported" : {
+        "required" : [ "proof_signing_alg_values_supported" ],
+        "type" : "object",
+        "properties" : {
+          "proof_signing_alg_values_supported" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,122 @@
+---
+replicaCount: 1
+
+image:
+  repository: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oidc-identity-resolver
+  pullPolicy: Always
+  tag: "dev-598dc95e93aa7d7c1d0b4bf2532bd6f73c15a59d"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8085
+
+ingress:
+  enabled: true
+  certManager: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production-http
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  hosts:
+    - host: oidc-identity-resolver.ecsec.services
+      paths:
+        - path: "/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-oidc-identity-resolver.ecsec.services
+     hosts:
+       - oidc-identity-resolver.ecsec.services
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /q/health/live
+    port: 8085
+
+readinessProbe:
+  httpGet:
+    path: /q/health/ready
+    port: 8085
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  demoIdentityOIDCExternalUrl: "https://oidc-identity-resolver.ecsec.services"
+  datasourceJdbcUrl: "jdbc:postgresql://postgres-postgresql.not-api.svc.cluster.local:5432/test_oidc_identity_resolver_skid"
+  datasourceReactiveUrl: "postgresql://postgres-postgresql.not-api.svc.cluster.local:5432/test_oidc_identity_resolver_skid"
+  datasourceUsername: "not_api"
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  oidcAuthServerUrl: "https://service.skidentity-test.de/fs/oidc"
+  oidcClientId: "389428f6-54b6-4c66-a840-c6e53b1200f5"
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "skid-oidc-secret"
+  oidcIdentityResolverExternalUrl: "https://oidc-identity-resolver.ecsec.services"
+  redirectLoginFailureUrl: "https://skid-vc.ecsec.services/error"
+  redirectLoginSuccessUrl: "https://skid-vc.ecsec.services/success"

@@ -1,0 +1,105 @@
+///usr/bin/env jbang --java-options="--add-opens=java.base/java.lang=ALL-UNNAMED" "$0" "$@" ; exit $?
+//DEPS org.contextmapper:context-mapper-cli:6.6.1
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+
+import org.contextmapper.dsl.cml.CMLResource;
+import org.contextmapper.dsl.generator.PlantUMLGenerator;
+import org.contextmapper.dsl.standalone.ContextMapperStandaloneSetup;
+import org.contextmapper.dsl.standalone.StandaloneContextMapperAPI;
+
+import java.io.IOException;
+
+import java.nio.file.Paths;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import java.util.Arrays;
+
+class generate_diagrams {
+
+    private static final String TARGET_DIR = "./src-gen";
+
+    private static final Pattern EMPTY_PLANTUML_DECLARATION = Pattern.compile("^\\w* : $");
+
+    public static void main(String... args) throws IOException, InterruptedException {
+        File directory = new File(TARGET_DIR);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+
+        // Setup and loading CML file:
+        StandaloneContextMapperAPI contextMapper = ContextMapperStandaloneSetup.getStandaloneAPI();
+        CMLResource resource = contextMapper.loadCML("model.cml");
+
+        // Generate the diagrams into 'src-gen'
+        contextMapper.callGenerator(resource, new PlantUMLGenerator());
+
+        // Remove empty declaration of PlantUML entities. The existance of them hinders layouting by PlantUML.
+        cleanEmptyDeclarations();
+
+        // Generate the svg-representations of the PlantUML diagrams
+        ProcessBuilder builder = new ProcessBuilder("./plantuml", "-tsvg", TARGET_DIR + "/*.puml", "-o", "svg/");
+        var process = builder.start();
+        process.waitFor();
+
+        copyImages();
+    }
+
+    private static void copyImages() {
+        var files = Arrays.asList(
+            "model_ContextMap.svg",
+            "model_BC_RequestProcessingContext_NotarizationRequestSubmissionFlow_StateDiagram.svg",
+            "model_BC_RequestProcessingContext_NotarizationRequestCore.svg",
+            "model_BC_RequestProcessingContext_NotarizationRequestSubmissionAggregate.svg",
+            "model_BC_OidcIdentityResolverContext_IdentificationAggregate.svg",
+            "model_BC_AuditLogContext_AuditLogAggregate.svg",
+            "model_BC_SSIIssuanceContext_IssueCredentialAggregate.svg",
+            "model_BC_RequestProcessingContext_NotarizationRequestManagementAggregate.svg",
+            "model_BC_ProfileContext_ProfileAggregate.svg");
+        for (var file : files) {
+            try {
+                Files.copy(Paths.get("src-gen", "svg", file), Paths.get("images", file), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ex) {
+                System.out.println("Could not copy file: " + file);
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static void cleanEmptyDeclarations() throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(TARGET_DIR), "*StateDiagram.puml")) {
+            for (Path entry: stream) {
+                File currentFile = entry.toFile();
+                if (currentFile.isFile()) {
+                    StringBuffer inputBuffer = new StringBuffer();
+                    boolean isChanged = false;
+                    try (BufferedReader bufferedReader = Files.newBufferedReader(entry)) {
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            var matches = EMPTY_PLANTUML_DECLARATION.matcher(line);
+                            if (matches.matches()) {
+                                isChanged = true;
+                            } else {
+                                inputBuffer.append(line);
+                                inputBuffer.append(System.lineSeparator());
+                            }
+                        }
+                    }
+                    if (isChanged) {
+                        try (BufferedWriter bufferWriter = Files.newBufferedWriter(entry)) {
+                            bufferWriter.write(inputBuffer.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

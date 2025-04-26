@@ -1,0 +1,186 @@
+---
+openapi: 3.0.3
+info:
+  title: oidc-identity-resolver API
+  version: 1.0.0-SNAPSHOT
+servers:
+- url: http://localhost:8085
+  description: Auto generated value
+- url: http://0.0.0.0:8085
+  description: Auto generated value
+paths:
+  /:
+    post:
+      parameters:
+      - name: failure
+        in: query
+        required: true
+        schema:
+          format: uri
+          type: string
+      - name: profileId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: success
+        in: query
+        required: true
+        schema:
+          format: uri
+          type: string
+      - name: taskName
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnyType'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginTaskResponse'
+  /continue-login:
+    get:
+      tags:
+      - Identity Resource
+      parameters:
+      - name: nonce
+        in: cookie
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /error:
+    get:
+      tags:
+      - Identity Resource
+      parameters:
+      - name: nonce
+        in: cookie
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+  /login:
+    get:
+      tags:
+      - Identity Resource
+      parameters:
+      - name: nonce
+        in: cookie
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+      security:
+      - oidc: []
+  /session:
+    post:
+      tags:
+      - Begin Task Resource
+      parameters:
+      - name: failure
+        in: query
+        required: true
+        schema:
+          format: uri
+          type: string
+      - name: profileId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: success
+        in: query
+        required: true
+        schema:
+          format: uri
+          type: string
+      - name: taskName
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnyType'
+      responses:
+        "200":
+          description: A redirect and a cancel URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginResponse'
+  /session/{nonce}:
+    delete:
+      tags:
+      - Identity Resource
+      parameters:
+      - name: nonce
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+  /start-login/{nonce}:
+    get:
+      tags:
+      - Identity Resource
+      parameters:
+      - name: nonce
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    AnyType:
+      type: object
+    BeginResponse:
+      type: object
+      properties:
+        redirect:
+          format: uri
+          type: string
+        cancel:
+          format: uri
+          type: string
+    BeginTaskResponse:
+      type: object
+      properties:
+        redirect:
+          format: uri
+          type: string
+          nullable: true
+        cancel:
+          format: uri
+          type: string
+          nullable: true
+  securitySchemes:
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://idp.example.com/auth/realms/custom_realm/.well-known/openid-configuration
+    SecurityScheme:
+      type: openIdConnect
+      description: Authentication

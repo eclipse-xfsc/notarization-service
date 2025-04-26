@@ -1,0 +1,376 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "ssi-issuance2 API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8089",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8089",
+    "description" : "Auto generated value"
+  } ],
+  "paths" : {
+    "/api/v2/issuance/init-service" : {
+      "post" : {
+        "summary" : "Init Issuance Service",
+        "description" : "The service will create needed resources for the given pair of keyType and signatureAlgorithmType and return an issuerDid which will be used for the profile",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ServiceInitRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The request was successfully.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProfileIssuanceSpec"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "The service doesn't provide expected methods."
+          }
+        }
+      }
+    },
+    "/api/v2/issuance/routines/pruneTimeoutSessions" : {
+      "delete" : {
+        "summary" : "Deletes old sessions",
+        "responses" : {
+          "200" : { }
+        }
+      }
+    },
+    "/api/v2/issuance/session" : {
+      "post" : {
+        "summary" : "Init Issuance Session",
+        "description" : "Initiates a new session",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IssuanceInitRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The session was initiated.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IssuanceInitResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/issuance/session/{issuance-token}" : {
+      "delete" : {
+        "summary" : "Cancel Issuance Session",
+        "description" : "Cancels the session",
+        "parameters" : [ {
+          "name" : "issuance-token",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The session was cancelled."
+          }
+        }
+      }
+    },
+    "/api/v2/oid-issuance/{issuance-token}/issue-credential" : {
+      "post" : {
+        "summary" : "Issue Credential",
+        "description" : "Issues a credential for the given profile and key.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IssueCredentialRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The credential was issued.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IssueCredentialSuccess"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The credential has not been issued.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IssueCredentialFailure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/oid-issuance/{issuance-token}/verify-proof" : {
+      "post" : {
+        "summary" : "Verify Proof",
+        "description" : "Verifies the proof of a credential request.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VerifyProofRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The proof was validated.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerifyProofSuccess"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The proof was not validated.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerifyProofFailure"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AnyType" : {
+        "type" : "object"
+      },
+      "Instant" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T16:15:50Z"
+      },
+      "IssuanceInitRequest" : {
+        "required" : [ "profile_id", "credential_data", "issuance_timestamp", "success_url", "failure_url" ],
+        "type" : "object",
+        "properties" : {
+          "profile_id" : {
+            "type" : "string"
+          },
+          "credential_data" : {
+            "$ref" : "#/components/schemas/AnyType"
+          },
+          "issuance_timestamp" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "holder_did" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "invitation_url" : {
+            "format" : "uri",
+            "type" : "string",
+            "nullable" : true
+          },
+          "success_url" : {
+            "format" : "uri",
+            "type" : "string"
+          },
+          "failure_url" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }
+      },
+      "IssuanceInitResponse" : {
+        "required" : [ "offer_url", "cancel_url" ],
+        "type" : "object",
+        "properties" : {
+          "offer_url" : {
+            "format" : "uri",
+            "type" : "string"
+          },
+          "cancel_url" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        }
+      },
+      "IssueCredentialFailure" : {
+        "required" : [ "result" ],
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/IssueCredentialResult"
+          },
+          "description" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "IssueCredentialRequest" : {
+        "required" : [ "profile", "subject_pub_key" ],
+        "type" : "object",
+        "properties" : {
+          "profile" : {
+            "type" : "string"
+          },
+          "subject_pub_key" : {
+            "$ref" : "#/components/schemas/AnyType"
+          }
+        }
+      },
+      "IssueCredentialResult" : {
+        "enum" : [ "INVALID_PROFILE", "INVALID_KEY", "UNKNOWN_ERROR" ],
+        "type" : "string"
+      },
+      "IssueCredentialSuccess" : {
+        "required" : [ "credential" ],
+        "type" : "object",
+        "properties" : {
+          "credential" : {
+            "$ref" : "#/components/schemas/AnyType"
+          }
+        }
+      },
+      "KeyType" : {
+        "description" : "Kind of key specified for creation.",
+        "enum" : [ "RSA", "secp256k1", "Bls48581G1", "Bls48581G2", "Bls48581G1", "Bls48581G2", "Ed25519", "X25519", "P-256", "P-384", "P-521" ],
+        "type" : "string"
+      },
+      "ProfileIssuanceSpec" : {
+        "required" : [ "issuingDid", "signatureType" ],
+        "type" : "object",
+        "properties" : {
+          "issuingDid" : {
+            "type" : "string"
+          },
+          "revocatingDid" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "signatureType" : {
+            "$ref" : "#/components/schemas/SignatureType"
+          }
+        }
+      },
+      "Proof" : {
+        "required" : [ "proof_type" ],
+        "type" : "object",
+        "properties" : {
+          "proof_type" : {
+            "$ref" : "#/components/schemas/ProofTypeEnum"
+          }
+        }
+      },
+      "ProofTypeEnum" : {
+        "enum" : [ "jwt", "cwt", "ldp_vp" ],
+        "type" : "string"
+      },
+      "ProofVerificationResult" : {
+        "enum" : [ "INVALID_PROFILE", "INVALID_PROOF_TYPE", "WRONG_NONCE", "WRONG_KEY", "KEY_UNRESOLVEABLE", "INVALID_SIGNATURE", "UNSUPPORTED_SIGNATURE", "SIGNATURE_SYNTAX_ERROR", "KEY_SYNTAX_ERROR", "UNKNOWN_ERROR" ],
+        "type" : "string"
+      },
+      "ServiceInitRequest" : {
+        "required" : [ "profile_id", "key_type", "signature_type" ],
+        "type" : "object",
+        "properties" : {
+          "profile_id" : {
+            "type" : "string"
+          },
+          "key_type" : {
+            "$ref" : "#/components/schemas/KeyType"
+          },
+          "signature_type" : {
+            "$ref" : "#/components/schemas/SignatureType"
+          }
+        }
+      },
+      "SignatureType" : {
+        "description" : "Kind of signature algorithm specified for creation.",
+        "enum" : [ "Ed25519Signature2018", "Ed25519Signature2020", "RsaSignature2018", "JcsEd25519Signature2020", "EcdsaSecp256k1Signature2019", "EcdsaKoblitzSignature2016", "JcsEcdsaSecp256k1Signature2019", "JsonWebSignature2020", "BbsBlsSignature2020", "BbsBlsSignatureProof2020", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "ES256K", "EdDSA" ],
+        "type" : "string"
+      },
+      "VerifyProofFailure" : {
+        "required" : [ "result" ],
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "$ref" : "#/components/schemas/ProofVerificationResult"
+          },
+          "description" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "VerifyProofRequest" : {
+        "required" : [ "profile", "challenge", "domain", "proof" ],
+        "type" : "object",
+        "properties" : {
+          "profile" : {
+            "type" : "string"
+          },
+          "challenge" : {
+            "type" : "string"
+          },
+          "domain" : {
+            "type" : "string"
+          },
+          "proof" : {
+            "$ref" : "#/components/schemas/Proof"
+          }
+        }
+      },
+      "VerifyProofSuccess" : {
+        "required" : [ "proof_pub_key" ],
+        "type" : "object",
+        "properties" : {
+          "proof_pub_key" : {
+            "$ref" : "#/components/schemas/AnyType"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

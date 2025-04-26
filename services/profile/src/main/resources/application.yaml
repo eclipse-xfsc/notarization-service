@@ -1,0 +1,93 @@
+quarkus:
+    application:
+        name: profile
+
+    http:
+        access-log:
+            exclude-pattern: \/q\/health\/(live|ready)$
+        port: 8083
+        # Assign random port by the OS for tests
+        test-port: 0
+
+        auth:
+            policy:
+                notary-access:
+                    roles-allowed: ${GAIA-X_NOTARY_ROLES:notary}
+
+            permission:
+                permit-notary:
+                    paths: /api/v1/protected/*
+                    policy: notary-access
+
+    jib:
+        # For some reasons, Quarkus does not choose the java-21 runtime image by default
+        base-jvm-image: registry.access.redhat.com/ubi8/openjdk-21-runtime:1.18
+
+    container-image:
+        builder: jib
+        registry: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io
+        group: not
+        tag: latest-dev
+        name: ${quarkus.application.name}
+
+        labels:
+            "org.opencontainers.image.base.name": ${quarkus.jib.base-jvm-image}
+
+    smallrye-openapi:
+        store-schema-directory: deploy/openapi
+
+        security-scheme: oidc
+        oidc-open-id-connect-url: http://identitymanager.localhost/.well-known/openid-configuration
+
+    kubernetes:
+        part-of: notarization-system
+
+    hibernate-orm:
+        database:
+            generation: none
+
+    datasource:
+        jdbc: false
+        db-kind: postgresql
+
+        reactive:
+            max-size: 20
+            reconnect-attempts: 1
+    log:
+        level: WARN
+        category:
+            eu.gaiax.notarization:
+                level: DEBUG
+
+    keycloak:
+        devservices:
+            enabled: false
+
+    index-dependency:
+        jose4j:
+            group-id: org.bitbucket.b_c
+            artifact-id: jose4j
+mp:
+  openapi:
+    filter: eu.gaiax.notarization.profile.infrastructure.rest.openapi.OpenApiCorrection
+
+    rest-client:
+        logging:
+          scope: request-response
+          body-limit: 1024
+
+"%test":
+        quarkus:
+            log:
+                level: DEBUG
+            hibernate-orm:
+                sql-load-script: db-flyway/V1.0.0__Initial_state.sql,db-flyway/V1.1.0__Add_persistant_profile.sql,db-flyway/V1.0.1__Support_partial_did_initialisation.sql,db-flyway/V1.1.1__Add_notary_roles.sql,db-flyway/V1.2.0__Multiple_issuance_support.sql,db-flyway/V1.2.1__Request_did_spec.sql,db-flyway/V1.3.0__Add_profile_extension_field.sql
+                database:
+                    generation: drop
+            #  oidc:
+                # Just a placeholder, must be adjusted if tests that consider OIDC are added
+                # auth-server-url: http://keycloak:8080/realms/master
+
+            otel:
+                sdk:
+                    disabled: true

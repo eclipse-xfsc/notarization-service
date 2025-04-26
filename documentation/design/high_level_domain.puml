@@ -1,0 +1,73 @@
+@startuml
+allow_mixing
+skinparam componentStyle uml2
+skinparam groupInheritance 2
+
+actor LegalEntity
+actor NotarizationOperator
+actor CredentialHolder
+
+class NotarizationCredentials <<(E,DarkSeaGreen) Entity>> {
+}
+class eID <<(V,DarkSeaGreen) Value Object>> {
+}
+class "Encrypted eID" <<(V,DarkSeaGreen) Value Object>> {
+}
+class Profile <<(A,#fffab8) Aggregate Root>> {
+    String name
+    JsonLdSchema jsonLd
+}
+class NotarizationRequest <<(E,DarkSeaGreen) Entity>> {
+    NotarizationRequestState requestState
+}
+class AccessToken <<(E,DarkSeaGreen) Entity>> {
+}
+enum NotarizationRequestState {
+    PENDING_IDENTITY
+    EDITABLE
+    READY_FOR_REVIEW
+    WORK_IN_PROGRESS
+    PENDING_DID
+    ACCEPTED
+    ISSUED
+}
+class AttestationDocument <<(E,DarkSeaGreen) Entity>> {
+    Hash
+    URL location
+    Signature[0..*]
+}
+class VerificationReport <<(E,DarkSeaGreen) Entity>> {
+}
+class IssuedCredential <<(E,DarkSeaGreen) Entity>> {
+}
+class AuditEntry <<(E,DarkSeaGreen) Entity>> {
+    Timestamp timestamp
+    IpAddress source
+    NotarizationRequestState state
+    NotarizationAction action
+    String data
+}
+class DID <<(E,DarkSeaGreen) Entity>> {
+}
+Profile --> "eID Encryption Key" : assigns
+NotarizationOperator -> "eID Decryption Key" : possesses
+NotarizationRequest --> NotarizationRequestState : hasState
+NotarizationRequest --> Profile : processedBy
+LegalEntity "1" *-- "*" NotarizationRequest : submits
+LegalEntity "1" *-- "*" AccessToken : manages: 
+AttestationDocument "1" *-- "1" VerificationReport : verifiedBy
+LegalEntity "1" *-- "*" eID : posseses
+eID "1" *-- "0..1" NotarizationRequest : authorizes
+NotarizationOperator --> NotarizationRequest : approves/rejects
+NotarizationOperator --> "Encrypted eID": decrypts
+NotarizationRequest --> DID : targets
+NotarizationRequest "1" *-- "0..*" AttestationDocument : links
+NotarizationRequest -> IssuedCredential : produces
+NotarizationRequest --> "Encrypted eID": references
+NotarizationRequest "1" *-- "0..*" AuditEntry: causes
+CredentialHolder -> DID : owns
+AccessToken "1" *-- "1" NotarizationRequest: restrictedBy: 
+CredentialHolder "1" *-- "0..*" IssuedCredential: receives
+
+AuditEntry -[hidden]d- NotarizationAction
+@enduml

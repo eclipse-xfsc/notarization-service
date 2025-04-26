@@ -1,0 +1,620 @@
+ContextMap GaiaXNotarizationApiContext {
+    type = SYSTEM_LANDSCAPE
+    state = TO_BE
+    contains RequestProcessingContext, SSIIssuanceContext, SignatureVerificationContext, SignatureSigningContext, AuditLogContext, OidcIdentityResolverContext, BusinessOwnerFrontEnd, NotarizationOperatorFrontEnd, ProfileContext, RevocationContext, NotificationContext
+
+    RequestProcessingContext Shared-Kernel AuditLogContext {
+        implementationTechnology "Shared Library"
+    }
+
+    RequestProcessingContext Partnership ProfileContext {
+    }
+
+    SSIIssuanceContext Upstream-Downstream RequestProcessingContext {
+        implementationTechnology "RESTful HTTP"
+    }
+
+    SSIIssuanceContext Partnership ProfileContext {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+    }
+
+    SignatureVerificationContext Upstream-Downstream RequestProcessingContext {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+        exposedAggregates Verification
+    }
+
+    RevocationContext Partnership SSIIssuanceContext {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+    }
+
+    RevocationContext Upstream-Downstream RequestProcessingContext {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+        exposedAggregates CredentialRevocation
+    }
+
+    OidcIdentityResolverContext Upstream-Downstream RequestProcessingContext {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+    }
+
+    RequestProcessingContext Upstream-Downstream BusinessOwnerFrontEnd {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+    }
+
+    RequestProcessingContext Upstream-Downstream NotarizationOperatorFrontEnd {
+        implementationTechnology "RESTful HTTP (OpenAPI)"
+    }
+
+    NotificationContext Partnership RequestProcessingContext {
+    }
+
+    SignatureSigningContext Upstream-Downstream ProfileContext {
+        implementationTechnology = "eIDAS-Proof Issuance"
+    }
+
+    OperatorAccessManagementContext Upstream-Downstream  RequestProcessingContext {
+        implementationTechnology = "OAuth2"
+    }
+}
+
+BoundedContext OperatorAccessManagementContext {
+}
+
+BoundedContext RevocationContext {
+    type = APPLICATION
+    responsibilities = "Revocation"
+
+    Aggregate CredentialRevocation {
+    }
+}
+
+BoundedContext SSIIssuanceContext {
+    type = APPLICATION
+    responsibilities = "Issuance", "Verification"
+    Aggregate IssueCredentialAggregate {
+        owner = AdministratorTeam
+        ValueObject IssuanceRequest {
+            !persistent
+            - ProfileId profileID
+            - Json credentialData
+            Timestamp issuanceTimestamp
+            String holderDID
+            String invitationURL
+            URL successURL
+            URL failureURL
+        }
+        Service IssueCredentialController {
+            void startIssuance(@IssuanceRequest request);
+        }
+    }
+}
+
+BoundedContext SignatureSigningContext {
+}
+
+BoundedContext NotificationContext {
+    type = FEATURE
+	domainVisionStatement = "This bounded context notifies operators about new requests and requestors about any updates on their submitted requests."
+}
+
+
+BoundedContext SignatureVerificationContext implements SignatureServiceDomain {
+    type = APPLICATION
+    domainVisionStatement = "This context represents a web application which verifies document signatures"
+    Aggregate Verification {
+        owner = AdministratorTeam
+
+        Entity SignatureServiceSigningCredentials {
+
+        }
+
+        ValueObject SignatureRequest {
+            - SignatureServiceSigningCredentials credential
+            - List<RemoteDocument> files
+        }
+        ValueObject RemoteDocument {
+            URL location
+        }
+
+        Service SignatureService {
+            File sign(@SignatureRequest request); 
+        }
+    }
+}
+
+BoundedContext AuditLogContext {
+    type = FEATURE
+	domainVisionStatement = "This bounded context manages the audit logs of the notarization requests."
+	responsibilities = "Audit Logs"
+	implementationTechnology = "Java, Quarkus"
+
+    Aggregate AuditLogAggregate {
+        Entity HttpNotarizationRequestAudit {
+            aggregateRoot
+
+            String notarizationId
+            String requestUri
+            String sessionId
+            String ipAddress
+            Timestamp receivedAt
+            Timestamp createdAt
+            NotarizationRequestAction action
+            String httpStatus
+            String caller
+            String requestContent
+            String taskName
+        }
+        DomainEvent OnAuditableEvent {
+            UUID id,
+            URI requestUri,
+            SessionId sessionId,
+            - NotarizationRequestId notarizationRequestId,
+            - NotarizationRequestAction action,
+            String ipAddress,
+            Timestamp receivedAt,
+            String requestContent,
+            int httpStatus,
+            String caller,
+            String taskName
+        }
+        ValueObject NotarizationRequestId {
+            UUID id
+        }
+        enum NotarizationRequestAction {
+            CREATE_SESSION,
+            UPDATE_CONTACT,
+            FETCH,
+            TIMEOUT,
+            SUBMIT,
+            UPLOAD_DOCUMENT,
+            FETCH_DOCUMENT,
+            DELETE_DOCUMENT,
+            UPDATE,
+            ASSIGN_DID,
+            MARK_READY,
+            MARK_UNREADY,
+            REVOKE,
+            CLAIM,
+            ACCEPT,
+            REJECT,
+            TASK_START,
+            TASK_CANCEL,
+            TASK_FINISH_SUCCESS,
+            TASK_FINISH_FAIL,
+            MANUAL_RELEASE,
+            FETCH_IDENTITY,
+            NOTARY_FETCH_ALL,
+            NOTARY_FETCH_REQ,
+            NOTARY_FETCH_DOC,
+            NOTARY_DELETE,
+            NOTARY_REVOKE,
+            PRUNE_TERMINATED_SESSIONS,
+            PRUNE_TIMEOUT_SESSIONS,
+            PRUNE_SUBMISSIONTIMEOUT_SESSIONS,
+            ISSUANCE_FINISH_SUCCESS,
+            ISSUANCE_FINISH_FAIL;
+        }
+    }
+}
+
+BoundedContext OidcIdentityResolverContext {
+    type = FEATURE
+
+    Aggregate IdentificationAggregate {
+        Entity Session {
+            aggregateRoot
+            UUID id
+            URL successURI
+            URL failURI
+            String loginNonce
+            String cancelNonce
+        }
+        Service IdentityResource {
+            @BeginResponse beginIdentification(URL success, URL failure);
+            Redirect startLogin(String loginNonce)
+            cancelIdentification(String cancelNonce)
+        }
+        ValueObject BeginResponse {
+            URL redirect
+            URL cancel
+        }
+    }
+}
+
+BoundedContext ProfileContext implements ProfileDomain {
+    type = APPLICATION
+    domainVisionStatement = "This context manages the profiles that define the issuance processes for notarization requests"
+    Aggregate ProfileAggregate {
+        Entity Profile {
+            aggregateRoot
+            - ProfileId id key
+            String name
+            String aip
+            String description nullable
+            Duration validFor
+            boolean isRevocable
+            List<TaskDescription> taskDescriptions
+            TaskTree tasks
+            TaskTree preconditionTasks
+            - JsonLdCredentialTemplate template
+            - JWKs notaries // The public key
+        }
+        ValueObject ProfileId {
+            String profileId
+        }
+        ValueObject JWKs {
+            - List<JWK> jwk;
+        }
+        Service ProfileService {
+            Set<@Profile> availableProfiles();
+            @Profile findById(@ProfileId profileId);
+        }
+        ValueObject JsonLdCredentialTemplate {
+            /**
+             * In the general sense, the template is a JSON structure that contains only common fields and values of all issued credentials by a single issuer for a specific purpose. Generally, that includes the fields:
+                - context: the JSON-LD context
+                - type: the type of credential issued
+                - credentialSubject: common subject values
+                Additional templated fields may include (and are not limited to):
+                - provenanceProof
+             */
+            - Json value
+        }
+        ValueObject Json {
+        }
+        ValueObject JWK {
+        }
+    }
+}
+
+BoundedContext RequestProcessingContext implements NotarizationRequestSubmissionDomain, NotarizationRequestManagementDomain {
+    type = APPLICATION
+    domainVisionStatement = "This context represents a web application which processes notarization requests and is the gateway to issuing credentials"
+    implementationTechnology = "Java, Quarkus"
+    responsibilities = "NotarizationRequests"
+
+    Application {
+        
+        Event RequestSubmitted {
+        }
+        Event IdentityAssigned {
+            - NotarizationRequestId id
+        }
+        Event RequestReadyForReview {
+            - NotarizationRequestId id
+        }
+        Event RequestClaimed {
+            - NotarizationRequestId id
+        }
+        Event RequestAssessed {
+            - NotarizationRequestId id
+        }
+        Event MissingDID {
+            - NotarizationRequestId id
+        }
+        Event RequestSignature {
+            - NotarizationRequestId id
+            - List<Document> aSiC
+        }
+        Event TASK_STARTED {
+        }
+        Event StartIssuing {
+
+        }
+        Event RequestTerminated {
+        }
+        Event RequestIssued {
+        }
+
+        Flow NotarizationRequestSubmissionFlow {
+            operation createSession [ initiated by "Requester" ] delegates to NotarizationRequestCore [ -> CREATED x SUBMITTABLE] emits event  OnAuditableEvent
+
+            operation finishTaskSuccessfully [ initiated by "Requester" ] delegates to NotarizationRequestCore [CREATED -> CREATED x SUBMITTABLE] emits event  OnAuditableEvent
+
+            operation submitRequest [ initiated by "Requester" ] delegates to NotarizationRequestCore [SUBMITTABLE -> EDITABLE] emits event RequestSubmitted + OnAuditableEvent
+            event RequestSubmitted triggers operation startTask
+            operation startTask emits event TASK_STARTED
+            operation timeout [ initiated by "Scheduling" ] delegates to NotarizationRequestCore [ PENDING_DID -> TERMINATED* ] emits event RequestTerminated + OnAuditableEvent
+            
+            operation updateRequest [ initiated by "Requester" ] delegates to NotarizationRequestCore [ EDITABLE -> EDITABLE ] emits event IdentityAssigned + OnAuditableEvent
+
+            operation markReady [ initiated by "Requester" ] delegates to NotarizationRequestCore [ EDITABLE -> READY_FOR_REVIEW ] emits event RequestReadyForReview + OnAuditableEvent
+            operation markUnready [ initiated by "Requester" ] delegates to NotarizationRequestCore [ READY_FOR_REVIEW -> EDITABLE ] emits event OnAuditableEvent
+
+            operation deleteRequest [ initiated by "Requester" ] delegates to NotarizationRequestCore [ EDITABLE, READY_FOR_REVIEW -> TERMINATED ] emits event OnAuditableEvent
+
+            operation claimAvailableRequest [ initiated by "Notarization Operator" ] delegates to NotarizationRequestCore [ READY_FOR_REVIEW -> WORK_IN_PROGRESS ] emits event RequestClaimed + RequestAssessed
+            
+            operation rejectRequest [ initiated by "Notarization Operator" ] delegates to NotarizationRequestCore [ WORK_IN_PROGRESS -> EDITABLE ] emits event IdentityAssigned
+            operation acceptRequest [ initiated by "Notarization Operator" ] delegates to NotarizationRequestCore [ WORK_IN_PROGRESS -> ACCEPTED x PENDING_DID x PENDING_REQUESTOR_RELEASE ] emits event StartIssuing x MissingDID
+
+            operation manualRelease [ initiated by "Requester" ] delegates to NotarizationRequestCore [ PENDING_REQUESTOR_RELEASE -> ACCEPTED ] emits event OnAuditableEvent
+
+            // Is this auditable?
+            operation assignDidHolder [ initiated by "Requester" ] delegates to NotarizationRequestCore [ PENDING_DID -> PENDING_REQUESTOR_RELEASE x ACCEPTED ] emits event StartIssuing
+            operation issuanceResult [ initiated by "Issuer" ] delegates to NotarizationRequestCore [ ACCEPTED -> ISSUED* x TERMINATED* ] emits event RequestIssued
+
+        }
+        Flow DocumentUploadFlow {
+            /* 
+                Describe a simple flow: upload the document (link), then download and hash the document, later delete the document
+            */
+            operation uploadDocument [ initiated by "Requester" ] delegates to NotarizationRequestCore [ EDITABLE -> EDITABLE ] emits event IdentityAssigned + OnAuditableEvent
+        }
+    }
+    Aggregate NotarizationRequestCore {
+        Entity NotarizationRequest {
+            aggregateRoot
+            hint = "The notarization request"
+            UUID id key
+            String did
+            String requestorInvitationUrl
+            String ssiInvitationUrl
+            - NotarizationRequestState requestState
+            DateTime createdAt
+            DateTime lastModified
+            - Session session
+            String data
+            String rejectComment nullable
+            String claimedBy nullable
+            - List<Document> documents
+        }
+        Entity Session {
+            hint = "The notarization request session"
+            String id
+            String accessToken
+            String profileId
+            String identityToken
+            boolean manualRelease
+            String manualReleaseToken
+            DateTime createdAt
+            DateTime lastModified
+        }
+        Entity Document {
+            UUID id key
+            ByteArray content
+            String title
+            String shortDescription
+            String longDescription
+            String mimetype
+            String extension
+            String verificationReport
+            String hash
+            DateTime createdAt
+            DateTime lastModified
+        }
+        ValueObject NotarizationRequestView {
+            !persistent
+            UUID id
+            String profileId
+            DateTime createdAt
+            DateTime lastModified
+            - NotarizationRequestState requestState
+            JsonNode data
+            - DistributedIdentity holder
+            - Set<DocumentView> documents
+            String rejectComment
+        }
+        ValueObject DistributedIdentity {
+            String value
+        }
+        ValueObject DocumentView {
+            !persistent
+            UUID id
+            String title
+            String shortDescription
+            String longDescription
+            String mimetype
+            String extension
+        }
+        enum NotarizationRequestState {
+            aggregateLifecycle
+            CREATED,
+            SUBMITTABLE,
+            EDITABLE,
+            READY_FOR_REVIEW,
+            WORK_IN_PROGRESS,
+            ACCEPTED,
+            PENDING_DID,
+            PENDING_REQUESTOR_RELEASE,
+            ISSUED,
+            TERMINATED
+        }
+    }
+    Aggregate NotarizationRequestInternal {
+        Service NotarizationRequestSystem {
+            void timeout(@NotarizationRequestId id): write;
+            void assignIdentity(@NotarizationRequestId id, @Identity contentUpdate): write;
+            void issuanceResult(@NotarizationRequestId id, @AccessToken token): write;
+        }
+        Service SignatureServiceFacing {
+
+            File submitForSigning(@RequestSignature id): write;
+        }
+        Service IdentificationServiceFacing {
+            void startIdentificationProcess(@NotarizationRequestId id);
+            void receiveIdentity(@IdentificationSuccess content);
+            void receiveIdentificationFailure(@IdentificationFailure content);
+        }
+
+    }
+    Aggregate NotarizationRequestSubmissionAggregate {
+        Service NotarizationRequestSubmissionService {
+            @AccessPathParameters createSession(String profileId);
+            void deleteRequest(@AccessPathParameters params);
+            @SessionSummary fetchSession(@AccessPathParameters params);
+            updateContact(@AccessPathParameters params, String contact)
+            URI startTask(@AccessPathParameters params, UUID taskId, JsonNode data)
+            cancelTask(@AccessPathParameters params, UUID taskId)
+            UUID submitRequest(@AccessPathParameters params, @SubmitNotarizationRequest submissionRequest)
+            @NotarizationRequestView fetchNotarizationRequest(@AccessPathParameters params)
+            updateRequest(@AccessPathParameters params, JsonNode data)
+            assignDidHolder(@AccessPathParameters params, String didHolder, String invitation)
+            URI markReady(@AccessPathParameters params, boolean manualRelease)
+            markUnready(@AccessPathParameters params)
+            manualRelease(String releaseToken)
+            URI getSsiInviteUrl(@AccessPathParameters params)
+        }
+        Service DocumentResource {
+            void uploadDocumentByLink(@AccessPathParameters accessParams, UUID taskId, @DocumentUploadByLink document);
+            void uploadDocument(@AccessPathParameters accessParams, UUID taskId, @DocumentUpload document);
+            DocumentView get(@AccessPathParameters accessParams, UUID documentId);
+            void deleteDocument(@AccessPathParameters accessParams, UUID documentId);
+            void finishUploading(@AccessPathParameters accessParams, UUID taskId);
+        }
+        Service FinishTaskResource {
+            void finishTaskSuccessfully(String nonce, JsonNode data)
+            void finishTaskFailure(String nonce, JsonNode data)
+        }
+        ValueObject AccessPathParameters {
+            String token
+            String sessionId
+        }
+        ValueObject SessionSummary {
+            SessionId sessionId
+            String profileId
+            - NotarizationRequestState requestState
+            Set<SessionTaskSummary> tasks
+            SessionTaskTree preconditionTaskTree
+            SessionTaskTree taskTree
+            boolean preconditionTasksFulfilled
+            boolean tasksFulfilled
+        }
+        enum NotarizationRequestState {
+            CREATED,
+            SUBMITTABLE,
+            EDITABLE,
+            READY_FOR_REVIEW,
+            WORK_IN_PROGRESS,
+            ACCEPTED,
+            PENDING_DID,
+            ISSUED,
+            TERMINATED,
+            PENDING_REQUESTOR_RELEASE;
+        }
+        ValueObject SubmitNotarizationRequest {
+            JsonNode data
+            String holder
+            String invitation
+        }
+        ValueObject NotarizationRequestView {
+            UUID id
+            String profileId
+            Timestamp createdAt
+            Timestamp lastModified
+            - NotarizationRequestState requestState
+            JsonNode data
+            String holder
+            Set<DocumentView> documents
+            String rejectComment
+        }
+        ValueObject DocumentUploadByLink {
+            UUID id
+            URI location
+            String title
+            String mimetype
+            String extension
+            String shortDescription
+            String longDescription
+        }
+        ValueObject DocumentUpload {
+            UUID id
+            FileUpload content
+            String title
+            String shortDescription
+            String longDescription
+        }
+    }
+    Aggregate NotarizationRequestManagementAggregate {
+        Service NotarizationRequestManagementResource {
+            List<Profile> list();
+            List<PagedNotarizationRequestSummary> fetchAvailableRequests(int offset, int limit, @RequestFilter filter)
+            NotarizationRequestView fetchAvailableRequest(@ProfileId profileId, @NotarizationRequestId id)
+            @DocumentFull fetchAvailableDocument(@ProfileId profileId, @NotarizationRequestId id, @DocumentId docId)
+            claimAvailableRequest(@ProfileId profileId, @NotarizationRequestId id)
+            Set<@IdentityView> identity(@ProfileId profileId, @NotarizationRequestId id)
+            void acceptRequest(@ProfileId profileId, @NotarizationRequestId id)
+            void rejectRequest(@ProfileId profileId, @NotarizationRequestId id, @RejectRequest request)
+            void deleteRequest(@ProfileId profileId, @NotarizationRequestId id)
+            void revoke(JsonNode credential)
+        }
+        enum RequestFilter {
+            available,
+            allClaimed,
+            ownClaimed;
+        }
+        ValueObject ProfileId {
+            String profileId
+        }
+        ValueObject NotarizationRequestId {
+            UUID id
+        }
+        ValueObject DocumentId {
+            UUID id
+        }
+        ValueObject DocumentFull {
+            - DocumentId id
+            String title
+            String shortDescription
+            String longDescription
+            String mimetype
+            String extension
+            ByteArray content
+            - VerificationReport verificationReport
+            String hash
+        }
+        ValueObject VerificationReport {
+            String value
+        }
+        ValueObject IdentityView {
+            - EncryptedData data
+            String algorithm
+            String encryption
+            String jwk
+        }
+        ValueObject EncryptedData {
+            String value
+        }
+        ValueObject RejectRequest {
+            String reason
+        }
+    }
+}
+
+BoundedContext NotarizationOperatorFrontEnd {
+    type = APPLICATION
+}
+
+BoundedContext NotarizationOperatorTeam {
+    type TEAM
+}
+
+BoundedContext AdministratorTeam {
+    type TEAM
+}
+
+BoundedContext BusinessOwnerFrontEnd {
+    type = APPLICATION
+}
+
+BoundedContext BusinessOwnerTeam {
+    type TEAM
+}
+
+Domain NotarizationAPIDomain {
+    Subdomain NotarizationRequestSubmissionDomain {
+        type = CORE_DOMAIN
+        domainVisionStatement = "Subdomain managing everything related to notarization reqests submission."
+    }
+    Subdomain NotarizationRequestManagementDomain {
+        type = CORE_DOMAIN
+        domainVisionStatement = "Subdomain managing everything related to management of notarization reqests."
+    }
+    Subdomain SignatureServiceDomain {
+        type = SUPPORTING_DOMAIN
+        domainVisionStatement = "Service (external to Gaia-X) to solve signing of documents"
+    }
+    Subdomain ProfileDomain {
+        type = SUPPORTING_DOMAIN
+        domainVisionStatement = "Subdomain managing everything related to profiles"
+    }
+}

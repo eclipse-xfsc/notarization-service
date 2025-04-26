@@ -1,0 +1,29 @@
+bases:
+- ../../base
+
+configMapGenerator:
+- name: oidc-identity-resolver-config
+  behavior: merge
+  envs:
+  - configs/oidc-identity.env
+  - configs/common.env
+- name: profile-config
+  behavior: merge
+  envs:
+  - configs/profile.env
+  - configs/common.env
+- name: request-processing-config
+  behavior: merge
+  envs:
+  - configs/request-processing.env
+  - configs/common.env
+- name: revocation-config
+  behavior: merge
+  envs:
+  - configs/revocation.env
+  - configs/common.env
+- name: scheduler-config
+  behavior: merge
+  envs:
+  - configs/scheduler.env
+  - configs/common.env

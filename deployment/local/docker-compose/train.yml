@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+
+  # Taken from https://gitlab.eclipse.org/eclipse/xfsc/train/tspa/-/blob/master/deploy/local/docker-compose.yml
+
+  train-server:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/train/tspa-service
+    container_name: train-server
+    ports:
+      - "8093:8080"
+    depends_on:
+      - ipfs-daemon
+    environment:
+       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:9194/realms/notarization-realm
+       ZONEMANAGER_TOKEN_SERVER_URL: http://keycloak:9194/realms/notarization-realm/protocol/openid-connect/token
+       ZONEMANAGER_GRANT_TYPE: client_credentials
+       ZONEMANAGER_CLIENT_ID: train-enrollment-client
+       ZONEMANAGER_CLIENT_SECRET: train-enrollment-secret-12345
+       REQUEST_GET_MAPPING: http://train-server:8080/tspa-service/tspa/v1/
+    networks:
+      default:
+        aliases:
+          - train-server
+
+  ipfs-daemon:
+    image: 'ipfs/kubo:v0.23.0'
+    container_name: ipfs-daemon
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+    user: "ipfs"
+    command: [ "daemon", "--enable-pubsub-experiment" ]
+
+  # Taken from https://gitlab.eclipse.org/eclipse/xfsc/train/trusted-content-resolver/-/blob/main/docker/docker-compose.yml?ref_type=heads
+
+  tcr-server:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/train/trusted-content-resolver-service
+    container_name: tcr-server
+    environment:
+      TCR_DID_BASE_URI: https://dev.uniresolver.io/1.0
+      TCR_DID_CONFIG_PATH:
+      TCR_DID_CACHE_SIZE: 100
+      TCR_DID_CACHE_TIMEOUT: 5M
+      TCR_DNS_HOSTS: #1.1.1.1, 8.8.8.8, 8.8.4.4
+      TCR_DNS_TIMEOUT: 5000
+      TCR_DNS_DOH_ENABLED: false
+      TCR_DNS_DNSSEC_ENABLED: false
+      #TCR_DNS_DNSSEC_ROOTPATH:
+      TCR_TL_CACHE_SIZE: 0
+      TCR_TL_CACHE_TIMEOUT: 5M
+    ports:
+      - "8096:8087"
+    networks:
+      default:
+        aliases:
+          - tcr-server

@@ -1,0 +1,1151 @@
+{
+	"info": {
+		"_postman_id": "e4669d50-b20b-4c58-97a4-eab8d795e01e",
+		"name": "Comprehensive Notarization API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Requestor",
+			"item": [
+				{
+					"name": "Request CRUD",
+					"item": [
+						{
+							"name": "Fetch Profiles",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"content-type": true,
+									"accept": true
+								},
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseurl_profile}}/api/v1/profiles",
+									"host": [
+										"{{baseurl_profile}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Session",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"postman.setEnvironmentVariable(\"token\", jsonData.token);",
+											"postman.setEnvironmentVariable(\"sessionId\", jsonData.sessionId);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"profileId\": \"demo-strict-gaia-x-employee-credential-v2\"\n}\n"
+								},
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "State of Request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"for(const currentTask of jsonData.tasks) {",
+											"    if (currentTask.type === 'vcIdentificationTask') {",
+											"        postman.setEnvironmentVariable(\"taskVcId\", currentTask.taskId);",
+											"    } else if (currentTask.type === 'browserIdentificationTask') {",
+											"        postman.setEnvironmentVariable(\"taskBrowserIdentId\", currentTask.taskId);",
+											"    } else if (currentTask.type === 'fileProvisionTask') {",
+											"        postman.setEnvironmentVariable(\"taskUploadId\", currentTask.taskId);",
+											"    }",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Submit credentials",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"postman.setEnvironmentVariable(\"requestId\", jsonData.id);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"Claims\" : \"admin\",\n        \"FedName\" : \"Simple Federation\",\n        \"PrcId\" : \"5989240124\",\n        \"FedId\": \"30129\",\n        \"PrcEmail\" : \"example@email.com\",\n        \"PrcFName\" : \"Jane\",\n        \"PrcLName\" : \"Doe\"\n    }\n}\n"
+								},
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}",
+										"submission"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mark ready",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"postman.setEnvironmentVariable(\"releaseUrl\", jsonData.releaseUrl);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ready",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}",
+										"submission",
+										"ready"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch Invitation URL",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}",
+										"submission",
+										"ssiInviteUrl"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "4. Fetch Invitation URL",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{BASE_URL}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"session",
+												"{{sessionId}}",
+												"submission",
+												"ssiInviteUrl"
+											]
+										}
+									},
+									"_postman_previewlanguage": "json",
+									"header": [],
+									"cookie": [],
+									"body": "{\n    \"inviteUrl\": \"https://wallet-stage-not.gxfs.dev/some-did-com-unique-id\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Tasks",
+					"item": [
+						{
+							"name": "Browser Identification",
+							"item": [
+								{
+									"name": "Start browser identification task",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = JSON.parse(responseBody);",
+													"",
+													"pm.environment.set(\"currentTaskId\", pm.environment.get(\"taskBrowserIdentId\"));",
+													"pm.environment.set(\"start-oidc-uri\", jsonData.uri);",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/task?taskId={{taskBrowserIdentId}}",
+											"host": [
+												"{{baseurl_request_processing}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"session",
+												"{{sessionId}}",
+												"task"
+											],
+											"query": [
+												{
+													"key": "taskId",
+													"value": "{{taskBrowserIdentId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Start OIDC identification",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Location is present\", function () {",
+													"    pm.response.to.have.header(\"Location\");",
+													"",
+													"    pm.environment.set(\"protected-url-login\", pm.response.headers.get(\"Location\"))",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"followRedirects": false
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{requestor_access_token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{start-oidc-uri}}",
+											"host": [
+												"{{start-oidc-uri}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Access protected resource to complete login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Location is present\", function () {",
+													"    pm.response.to.have.header(\"Location\");",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"followRedirects": false
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{requestor_access_token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{protected-url-login}}",
+											"host": [
+												"{{protected-url-login}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Upload evidence documents",
+							"item": [
+								{
+									"name": "Begin upload processing",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = JSON.parse(responseBody);",
+													"",
+													"pm.environment.set(\"currentTaskId\", pm.environment.get(\"taskUploadId\"));",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/task?taskId={{taskUploadId}}",
+											"host": [
+												"{{baseurl_request_processing}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"session",
+												"{{sessionId}}",
+												"task"
+											],
+											"query": [
+												{
+													"key": "taskId",
+													"value": "{{taskUploadId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload first document",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var uuid = require('uuid'); ",
+													"",
+													"var documentId = uuid.v4();",
+													"",
+													"pm.environment.set(\"documentId\", documentId)"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "content",
+													"type": "file",
+													"src": "/home/neil/_/projects/gaia-x/notarization/demo/timestamped_and_signed.pdf"
+												},
+												{
+													"key": "id",
+													"value": "{{documentId}}",
+													"type": "text"
+												},
+												{
+													"key": "title",
+													"value": "Application",
+													"type": "text"
+												},
+												{
+													"key": "shortDescription",
+													"value": "My signed evidence document",
+													"type": "text"
+												},
+												{
+													"key": "longDescription",
+													"value": "This isn't really an evidence document, but it is signed.",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseurl_request_processing}}/api/v1/document/{{sessionId}}/{{taskUploadId}}/upload",
+											"host": [
+												"{{baseurl_request_processing}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"document",
+												"{{sessionId}}",
+												"{{taskUploadId}}",
+												"upload"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Complete upload proces",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseurl_request_processing}}/api/v1/document/{{sessionId}}/{{taskUploadId}}/finishTask",
+											"host": [
+												"{{baseurl_request_processing}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"document",
+												"{{sessionId}}",
+												"{{taskUploadId}}",
+												"finishTask"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Util",
+							"item": [
+								{
+									"name": "Cancel running task",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = JSON.parse(responseBody);",
+													"",
+													"// postman.setEnvironmentVariable(\"current-task-id\", taskBrowserIdentId)",
+													"postman.setEnvironmentVariable(\"start-oidc-uri\", jsonData.uri);",
+													"console.log(postman)"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/task?taskId={{currentTaskId}}",
+											"host": [
+												"{{baseurl_request_processing}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"session",
+												"{{sessionId}}",
+												"task"
+											],
+											"query": [
+												{
+													"key": "taskId",
+													"value": "{{currentTaskId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Notary",
+			"item": [
+				{
+					"name": "Fetch",
+					"item": [
+						{
+							"name": "Fetch available requests",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"if(jsonData.notarizationRequests.length > 0) {",
+											"    pm.environment.set(\"topAvailableSessionId\", jsonData.notarizationRequests[0].id);",
+											"    pm.environment.set(\"topAvailableProfileId\", jsonData.notarizationRequests[0].profileId);",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/requests?limit=10&offset=0&filter=available",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"requests"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "filter",
+											"value": "available",
+											"description": "Values: available, allClaimed, ownClaimed"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch own claimed requests",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"if(jsonData.notarizationRequests.length > 0) {",
+											"    pm.environment.set(\"currentSessionId\", jsonData.notarizationRequests[0].id);",
+											"    pm.environment.set(\"currentProfileId\", jsonData.notarizationRequests[0].profileId);",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/requests?limit=10&offset=0&filter=ownClaimed",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"requests"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "filter",
+											"value": "ownClaimed",
+											"description": "Values: available, allClaimed, ownClaimed"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View latest request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"if(jsonData.documents.length > 0) {",
+											"    pm.environment.set(\"currentDocumentId\", jsonData.documents[0].id);",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{topAvailableProfileId}}/requests/{{topAvailableSessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{topAvailableProfileId}}",
+										"requests",
+										"{{topAvailableSessionId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Processing",
+					"item": [
+						{
+							"name": "Claim latest request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"currentProfileId\", pm.environment.get(\"topAvailableProfileId\"));",
+											"pm.environment.set(\"currentSessionId\", pm.environment.get(\"topAvailableSessionId\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{topAvailableProfileId}}/requests/{{topAvailableSessionId}}/claim",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{topAvailableProfileId}}",
+										"requests",
+										"{{topAvailableSessionId}}",
+										"claim"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch document details of latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"",
+											"var verificationReport = Buffer.from(jsonData.verificationReport, 'base64');",
+											"",
+											"console.log(\"verificationReport\", verificationReport.toString('utf-8'))",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}/document/{{currentDocumentId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}",
+										"document",
+										"{{currentDocumentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch identity of latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}/identity",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}",
+										"identity"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Accept latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}/accept",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}",
+										"accept"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reject latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"reason\": \"Forgot to include digitally signed form of F-24-B.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}/reject",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}",
+										"reject"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete latest claimed request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/profiles/{{currentProfileId}}/requests/{{currentSessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"profiles",
+										"{{currentProfileId}}",
+										"requests",
+										"{{currentSessionId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{notary_access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "LoginUrl",
+			"value": "login"
+		}
+	]
+}

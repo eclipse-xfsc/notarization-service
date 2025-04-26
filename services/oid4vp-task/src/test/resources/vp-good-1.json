@@ -1,0 +1,44 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "type": [
+    "VerifiablePresentation"
+  ],
+  "holder": "did:key:z6Mku4oiHCAFSRxhY2xWDwsSZ2J6BuggSAoeX5D79e3jMUrr",
+  "verifiableCredential": [
+    {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
+      ],
+      "id": "urn:uuid:1b414c1c-e2a2-4185-9b6b-d49a0280830b",
+      "type": [
+        "VerifiableCredential"
+      ],
+      "issuer": "did:key:z6MkuJHTu9Vmh8fYYXAi741Q1uLh17xaf2n5QwqepGHB5fK8",
+      "issuanceDate": "2010-01-01T19:23:24Z",
+      "credentialSubject": {
+        "name": "peter",
+        "id": "did:key:z6Mku4oiHCAFSRxhY2xWDwsSZ2J6BuggSAoeX5D79e3jMUrr"
+      },
+      "proof": {
+        "type": "Ed25519Signature2018",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "did:key:z6MkuJHTu9Vmh8fYYXAi741Q1uLh17xaf2n5QwqepGHB5fK8#z6MkuJHTu9Vmh8fYYXAi741Q1uLh17xaf2n5QwqepGHB5fK8",
+        "created": "2024-03-19T07:24:02+00:00",
+        "jws": "eyJhbGciOiAiRWREU0EiLCAiYjY0IjogZmFsc2UsICJjcml0IjogWyJiNjQiXX0..n4ZpiX5yRYpMYcFpXRp1FXIdeET9lNuCguq1i2xUrXdlBJ15QMmrErzRg2dEm9AHeN4udy7U4tCX7pXTTKMBAA"
+      }
+    }
+  ],
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:key:z6Mku4oiHCAFSRxhY2xWDwsSZ2J6BuggSAoeX5D79e3jMUrr#z6Mku4oiHCAFSRxhY2xWDwsSZ2J6BuggSAoeX5D79e3jMUrr",
+    "created": "2024-03-19T07:31:05+00:00",
+    "domain": "http://domain",
+    "challenge": "ABC",
+    "proofValue": "zeJS858tvQSBS2S4RWggZshxm8i7sQuK5p1wgsgSNZU4gRr4rtkWWMtxAH3s5vdrem96qzoZNCxtaWUkHmeSY31y"
+  }
+}

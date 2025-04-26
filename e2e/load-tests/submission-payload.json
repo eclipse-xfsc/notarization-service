@@ -1,0 +1,12 @@
+{
+  "data": {
+    "@context": "https://schema.org/",
+    "@type": "Person",
+    "name": "Jane Doe",
+    "jobTitle": "Professor",
+    "telephone": "(425) 123-4567",
+    "url": "http://www.janedoe.com"
+  },
+  "invitation": "string",
+  "holder": "did:I0ts4BD9ORbWniEJd5Cs0cKWZVA9e0Cpoi:pRAvcdI"
+}

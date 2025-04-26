@@ -1,0 +1,1074 @@
+{
+	"info": {
+		"_postman_id": "4e9c9984-7e75-45f4-8c4e-b6e4267cfabb",
+		"name": "Notarization API Ext.1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "keycloak",
+			"item": [
+				{
+					"name": "Get Bearer Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{portal_client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{portal_client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "{{portal_grant_type}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{portal_username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{portal_password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+							"host": [
+								"{{keycloak_url}}"
+							],
+							"path": [
+								"realms",
+								"{{realm}}",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "profiles",
+			"item": [
+				{
+					"name": "Dynamic Profile Configuration",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"test-jsonld\",\n    \"kind\": \"JSON-LD\",\n    \"name\": \"test-jsonld\",\n    \"description\": \"Just an Example JsonLD profile\",\n    \"encryption\": \"ECDH-ES+A256KW\",\n    \"notaryRoles\": [\n        \"test-jsonld\",\n        \"notary\"\n    ],\n    \"notaries\": [\n        {\n            \"algorithm\": \"ECDH-ES+A256KW\",\n            \"key\": {\n                \"kty\": \"EC\",\n                \"use\": \"enc\",\n                \"crv\": \"P-384\",\n                \"kid\": \"CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao\",\n                \"x\": \"s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC\",\n                \"y\": \"c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw\",\n                \"alg\": \"ECDH-ES+A256KW\"\n            }\n        }\n    ],\n    \"validFor\": \"P100Y\",\n    \"isRevocable\": true,\n    \"template\": {\n        \"@context\": [\n            \"https://www.w3.org/2018/credentials/v1\",\n            \"https://w3id.org/citizenship/v1\"\n        ],\n        \"type\": [\n            \"VerifiableCredential\",\n            \"PermanentResidentCard\"\n        ],\n        \"credentialSubject\": {\n            \"type\": \"PermanentResident\"\n        }\n    },\n    \"documentTemplate\": null,\n    \"taskDescriptions\": [\n        \n    ],\n    \"tasks\": {\n        \n    },\n    \"preconditionTasks\": {\n        \n    },\n    \"preIssuanceActions\": {\n        \n    },\n    \"postIssuanceActions\": [\n        \n    ],\n    \"actionDescriptions\": [\n        \n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl_profile}}/api/v1/protected/profiles/test-jsonld",
+							"host": [
+								"{{baseurl_profile}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"protected",
+								"profiles",
+								"test-jsonld"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "oid4vci",
+			"item": [
+				{
+					"name": "0. Fetch Profiles (Optional)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true,
+							"accept": true
+						},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseurl_profile}}/api/v1/profiles",
+							"host": [
+								"{{baseurl_profile}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1. Create Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);",
+									"postman.setEnvironmentVariable(\"sessionId\", jsonData.sessionId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"profileId\": \"demo-oid4vci\"\n}\n"
+						},
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Submit Notarization Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"requestId\", jsonData.id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"id\": \"did:example:b34ca6cd37bbf23\",\n        \"givenName\": \"74c6cb4f-6d2b-4761-b01b-50f4ffb435b5\",\n        \"familyName\": \"SMITH\",\n        \"gender\": \"Male\",\n        \"image\": \"data:image/png;base64,iVBORw0KGgo...kJggg==\",\n        \"residentSince\": \"2015-01-01\",\n        \"lprCategory\": \"C09\",\n        \"lprNumber\": \"999-999-999\",\n        \"commuterClassification\": \"C1\",\n        \"birthCountry\": \"Bahamas\",\n        \"birthDate\": \"1958-07-17\"\n    },\n    \"holder\": null,\n    \"invitation\": null\n}\n"
+						},
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Mark Request ready",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ready",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}",
+								"submission",
+								"ready"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. State of Request (Optional)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Claim Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/profiles/demo-oid4vci/requests/{{requestId}}/claim",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profiles",
+								"demo-oid4vci",
+								"requests",
+								"{{requestId}}",
+								"claim"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Accept Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/profiles/demo-oid4vci/requests/{{requestId}}/accept",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profiles",
+								"demo-oid4vci",
+								"requests",
+								"{{requestId}}",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Fetch OID4VCI Offer-URL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}",
+								"submission",
+								"ssiInviteUrl"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "7. Fetch OID4VCI Offer-URL",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}",
+										"submission",
+										"ssiInviteUrl"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "[\n    {\n        \"inviteUrl\": \"openid-credential-offer://?credential_offer=%7B%22credential_issuer%22%3A%22http%3A%2F%2Flocalhost%3A8094%2F%22%2C%22credential_configuration_ids%22%3A%5B%22demo-vc-issuance-01-without-tasks%22%5D%2C%22grants%22%3A%7B%22urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code%22%3A%7B%22pre-authorized_code%22%3A%22eyJraWQiOiJlX2EyNTYiLCJhbGciOiJBMjU2R0NNS1ciLCJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJEMHB0NVZrOEJZX2tUMzNpIiwidGFnIjoienBrdlJiQXFXNWNTQjc2WXJDYUlhdyJ9.woyJR5GJil95_3mY5XM1dD-Ls6o01BkuN-oWu9s9D9I.Je3_RjBTVOk1aSh5.On7BgURSpnTyhW5UayVsf7iWa05Eh5eMkePC0DeNW7-Ji2YACoFPAXkVyezOoap9VwxE5EGictwEDUmYZjmg4JHFvyziugKG6nKRl2zBBquWdyE4-vVGFxNPq3E3g11DGT0IrQURXvNGETgEBj9wgLOH8GWGFxr_xiGBQIQf0dI5M2p5zwN12giHUS0b8OKLPOEmbRzDU7PxlsZM3mbi-wLw-E5og7RE_mfgITrdJX3FVIXrzxNkpLDGf4oXrZEVKmMy7_4_nTlikA6Onm2qIslfVZQaYKyC37aMx5voYpQDJLuNpkZRhIRYCuzndnvWAx-BxQU8QWr6hY93mCQawydwhwn6Pr716ZocgTPcDQ2xs-yjhdxQFwedeql7ZEu4BJrCueS-9IRpDseMRkXgG1SfPMi6GiU4hAnApbvh6coqTH2IvUg1lTqraaYxCLmlUWgT8xswu4ZRe_IkR9rZ2FE2YlLupUcda6CGOdtumql7a8CW2qMiyyDC48goFEnFZpzJIao8sCPagp5-VOFC1H3afGkq3kxcdU9QF2OEN8s0_CiIQ-I4I4977QmmYItvIPUmA-4pdNsQpbIGMstWm4N53QZ1QovbcHELuONG7MdlEMzu7GhkkIf-Jwc3x0Cci6Upfj7fd2y93l32qMxqD7ydV5ZMQKfzL1uUGvF-aAEz6Rnbe-m-Bgb7E4FFs1av9s_W6w9n3i0EtQLIYucCLQ05sRrtFfP-if_DHI93_bDoSq5ktP3yklQ7qRpB8pq57LkN7BtPvh_dpdEqSWZ3aF1ciI69c1CmIHV09cgnkpUkOTEkEdVxeI3YUy0.fdr_Ht62rXcMBfoPegciTg%22%2C%22interval%22%3A5%7D%7D%7D\",\n        \"issuerVersion\": \"V2\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "8. OID4VCI Token Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"access_token_oid4vci\", jsonData.access_token);",
+									"postman.setEnvironmentVariable(\"cnonce_oid4vci\", jsonData.cnonce);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "urn:ietf:params:oauth:grant-type:pre-authorized_code",
+									"type": "text"
+								},
+								{
+									"key": "pre-authorized_code",
+									"value": "{{pre-authorized_code}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseurl_oidvci}}/oid4vci/token",
+							"host": [
+								"{{baseurl_oidvci}}"
+							],
+							"path": [
+								"oid4vci",
+								"token"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "8. OID4VCI Token Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "urn:ietf:params:oauth:grant-type:pre-authorized_code",
+											"type": "text"
+										},
+										{
+											"key": "pre-authorized_code",
+											"value": "{{pre-authorized_code}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseurl_oidvci}}/oid4vci/token",
+									"host": [
+										"{{baseurl_oidvci}}"
+									],
+									"path": [
+										"oid4vci",
+										"token"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"access_token\": \"eyJraWQiOiJlX2EyNTYiLCJhbGciOiJBMjU2R0NNS1ciLCJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJvZ3dWWFhsdHI3VmRjTXRFIiwidGFnIjoibEh0b0xiZjZZMWVRM3oteEtqQ2JzZyJ9.lEQUkBwFrxm1Dpbsp6fMfHxnJn3tvxuIr7gwNjgpeFE.1hDKcUc8vWp68olN.UdFCzUN6U8apdy6LbnkDsKtCyxpPY8XbuBPWdIANDKCgGw5Ee_CxUZNpJsA-AOhjqYxoTxgZ6PFYctVO5xErqhvuxAzxgJBt6ug5XCNU5xmIqn3fSy3qLvgEeevWfjhdByQrPZc6pNMSR-W-gBNCP6gHintRVLWzX1Mt15LbTf7eeYAzS0vT8OeGLfStv6K4JuDRtOoT-SojG9XcfIz74OPv26Pw2KJVtbhSXvpcHXfTDO14kayLV80I5ERAVZGmEe4AQd6VRGvFQiAO9Q99E9G1vhu5dWvIGnBMAjzelF_goksNxqvObm7QMK1m-plJjA4qZMzkXx5x7RipCvCPRrFRhvJb6RcWaKeXUS4ChaGkmKwcgZc9alvIlNcgTFtAKFw6Z-iJ4jCmDOpRxxJRTMz-2Wx4bRr83Z44qeq1e5ODbCxxHCflXY0Jf6DaeGwvDHFndk4vBgMUVE9MXopsCsqqkLHS_GzIUikvQo2ge66qQq_AhqqdnwSmDYStgD9EQcCKxHgJJnS4Q9SXO8ZwIvsp9MebqNODAPrNcFMMM-jIF0M9GoP3Hf94sc8yXBMJZueMdxeFFuFiM2-zivBX_I5rsPnMdxnbGsKJSNR0OcwYMcqvcLwQz_ItuEzbL2w5IV2jEhB-HmEyptoX0HpSPB3rbS14FEPqI25VxNEXOAlvY0p9c6gA75qLyOsuk2nzs_7kWWouZC2BNb4T_qFnlyYGBIWfEHxDO2AHneTu5wX2e0MQleEajOWbvE7VOZzuSMQa7aH3o2KaAzRGwqtImBEp9cjX-UETxc60GQ6v-FcK6YbuRg.zhEvMmif7vA-JCZ55jNI3A\",\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 1800,\n    \"cnonce\": \"r_W_nH6OQSj7OUG0Q-E0Gb9jQAM1RM7lemamC9LBXHI=\",\n    \"cnonce_expires_in\": 1800\n}"
+						}
+					]
+				},
+				{
+					"name": "9. OID4VCI Credential Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"credential_identifier\": \"demo-oidvci\",\n    \"proof\": {\n        \"proof_type\": \"ldp_vp\",\n        \"ldp_vp\": {\n            \"@context\": [\n                \"https://www.w3.org/2018/credentials/v1\"\n            ],\n            \"type\": [\n                \"VerifiablePresentation\"\n            ],\n            \"holder\": \"did:key:z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh\",\n            \"proof\": {\n                \"type\": \"Ed25519Signature2018\",\n                \"created\": \"2024-03-26T09:59:51Z\",\n                \"domain\": \"http://localhost:8094/\",\n                \"challenge\": \"dzTG1RN_9Ug3NwOSN__2uR9Frbq_MZE7UpllwuLZgtk=\",\n                \"proofPurpose\": \"authentication\",\n                \"verificationMethod\": \"did:key:z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh#z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh\",\n                \"jws\": \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..oxT5k5HGLlBs4OWuGFdVCL2_ekadhYBMEIqiIvV7es3vRTXJXBH0V3wojUGA6d1FfINc_GIFWNTmwNmeytD9AA\"\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl_oidvci}}/oid4vci/credential",
+							"host": [
+								"{{baseurl_oidvci}}"
+							],
+							"path": [
+								"oid4vci",
+								"credential"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "9. OID4VCI Credential Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"credential_identifier\": \"demo-oidvci\",\n    \"proof\": {\n        \"proof_type\": \"ldp_vp\",\n        \"ldp_vp\": {\n            \"@context\": [\n                \"https://www.w3.org/2018/credentials/v1\"\n            ],\n            \"type\": [\n                \"VerifiablePresentation\"\n            ],\n            \"holder\": \"did:key:z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh\",\n            \"proof\": {\n                \"type\": \"Ed25519Signature2018\",\n                \"created\": \"2024-03-26T09:59:51Z\",\n                \"domain\": \"http://localhost:8094/\",\n                \"challenge\": \"dzTG1RN_9Ug3NwOSN__2uR9Frbq_MZE7UpllwuLZgtk=\",\n                \"proofPurpose\": \"authentication\",\n                \"verificationMethod\": \"did:key:z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh#z6MkjSPEfszFxFT3cr1G73ULZYMCu1NhqKxnyEFspr1tLSYh\",\n                \"jws\": \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..oxT5k5HGLlBs4OWuGFdVCL2_ekadhYBMEIqiIvV7es3vRTXJXBH0V3wojUGA6d1FfINc_GIFWNTmwNmeytD9AA\"\n            }\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl_oidvci}}/oid4vci/credential",
+									"host": [
+										"{{baseurl_oidvci}}"
+									],
+									"path": [
+										"oid4vci",
+										"credential"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"credential\": {\n        \"@context\": [\n            \"https://www.w3.org/2018/credentials/v1\",\n            \"https://w3id.org/citizenship/v1\",\n            \"https://w3id.org/vc/status-list/2021/v1\"\n        ],\n        \"id\": \"urn:uuid:2603719e-ce5a-4bf7-8e7a-0945a99d20c5\",\n        \"type\": [\n            \"VerifiableCredential\",\n            \"PermanentResidentCard\"\n        ],\n        \"issuer\": \"did:key:z6MkmfGHh7cmSfLStTrfB9kDtMgtoBwMGHLvTcRBBWapdsyo\",\n        \"issuanceDate\": \"2024-03-26T10:48:07.755009Z\",\n        \"credentialSubject\": {\n            \"type\": \"PermanentResident\",\n            \"id\": \"did:key:z6MksSN5CMvqVq7zciC3yRoTaubT4AdLhtWHH3hcGysuQKYf\",\n            \"image\": \"data:image/png;base64,iVBORw0KGgo...kJggg==\",\n            \"gender\": \"Male\",\n            \"birthDate\": \"1958-07-17\",\n            \"givenName\": \"0395bab3-88e7-4bf8-a14d-25f9bf3ee3b1\",\n            \"lprNumber\": \"999-999-999\",\n            \"familyName\": \"SMITH\",\n            \"lprCategory\": \"C09\",\n            \"birthCountry\": \"Bahamas\",\n            \"residentSince\": \"2015-01-01\",\n            \"commuterClassification\": \"C1\"\n        },\n        \"credentialStatus\": {\n            \"type\": \"StatusList2021Entry\",\n            \"id\": \"http://localhost:8086/status/d154f903-aaad-4d6a-b374-4c3f672e306f#5\",\n            \"statusPurpose\": \"revocation\",\n            \"statusListIndex\": \"5\",\n            \"statusListCredential\": \"http://localhost:8086/status/d154f903-aaad-4d6a-b374-4c3f672e306f\"\n        },\n        \"proof\": {\n            \"type\": \"Ed25519Signature2018\",\n            \"proofPurpose\": \"assertionMethod\",\n            \"verificationMethod\": \"did:key:z6MkmfGHh7cmSfLStTrfB9kDtMgtoBwMGHLvTcRBBWapdsyo#z6MkmfGHh7cmSfLStTrfB9kDtMgtoBwMGHLvTcRBBWapdsyo\",\n            \"created\": \"2024-03-26T10:48:15+00:00\",\n            \"jws\": \"eyJhbGciOiAiRWREU0EiLCAiYjY0IjogZmFsc2UsICJjcml0IjogWyJiNjQiXX0..U-t_zQtGpce5m2WFDvl81LrOnVr2M4cpKafkWKl7vWrOc8OZt9P-uS_6VQxLrzcoOqI2DWkQVw5cncD9K_JRCQ\"\n        }\n    },\n    \"c_nonce\": \"kfEKza8y8IXaj-qT78-X-zUFBn5f4dXRtkwRjA9zTDM=\",\n    \"c_nonce_expires_in\": 1795\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "oid4vp",
+			"item": [
+				{
+					"name": "1. Create Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);",
+									"postman.setEnvironmentVariable(\"sessionId\", jsonData.sessionId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"profileId\": \"demo-oid4vp\"\n}\n"
+						},
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. State of Request (Optional) Copy",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "2. State of Request (Optional) Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"sessionId\": \"40K4_e-vOOUEs9XCEwL-prBDwzv0SJXiB3mOiCrOu1M=\",\n    \"profileId\": \"demo-vc-oid4vp-train\",\n    \"state\": \"created\",\n    \"tasks\": [\n        {\n            \"taskId\": \"085610c0-9798-4529-aa31-0203f3560ea3\",\n            \"name\": \"OID4VP\",\n            \"type\": null,\n            \"fulfilled\": false,\n            \"running\": false\n        }\n    ],\n    \"preconditionTaskTree\": {\n        \"task\": {\n            \"taskId\": \"085610c0-9798-4529-aa31-0203f3560ea3\",\n            \"name\": \"OID4VP\",\n            \"type\": null,\n            \"fulfilled\": false,\n            \"running\": false\n        }\n    },\n    \"taskTree\": {\n        \n    },\n    \"preconditionTasksFulfilled\": false,\n    \"tasksFulfilled\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "3. Start OID4VP Task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"walletBaseUri\": \"http://localhost:30080\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/task?taskId={{taskId}}",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}",
+								"task"
+							],
+							"query": [
+								{
+									"key": "taskId",
+									"value": "{{taskId}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "3. Start OID4VP Task",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/task?taskId={{taskId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}",
+										"task"
+									],
+									"query": [
+										{
+											"key": "taskId",
+											"value": "{{taskId}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"taskId\": \"085610c0-9798-4529-aa31-0203f3560ea3\",\n    \"uri\": \"http://localhost:30080?request_uri=http%3A%2F%2Flocalhost%3A8097%2Foid4vp%2Fauth-request?id%3DFfffdqtv72ehh4-k0aQYYAkixzL9Ncvan5gZEwD8ZgE%3D&client_id=localhost\",\n    \"taskName\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "4. OID4VP Auth-Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/oid4vp/auth-request?id={{authReqId}}",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"oid4vp",
+								"auth-request"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{authReqId}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "4. OID4VP Auth-Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl_oid4vp}}/auth-request?id={{authReqId}}",
+									"host": [
+										"{{baseurl_oid4vp}}"
+									],
+									"path": [
+										"auth-request"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{authReqId}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/oauth-authz-req+jwt",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "eyJ4NWMiOlsiTUlJQnlEQ0NBU3VnQXdJQkFnSVVkQmlLc20waHdBNGx4RGM5SXVVQmpsWDRPSmN3Q2dZSUtvWkl6ajBFQXdJd0ZERVNNQkFHQTFVRUF3d0piRzlqWVd4b2IzTjBNQjRYRFRJME1ETXhPVEE1TURnek5Gb1hEVE0wTURNeE9UQTVNRGd6TkZvd0ZERVNNQkFHQTFVRUF3d0piRzlqWVd4b2IzTjBNSUdiTUJBR0J5cUdTTTQ5QWdFR0JTdUJCQUFqQTRHR0FBUUJoZVd6Y3JvOG11dGgwZWl2anZqeU41aEFOOXZoTFUybnk3aitMN3czYUVuNklHZEM3U0NpbGFra0c1MHVjUmZoZ1h4VlRoRUVFdzNFTU13YXB5S3N0ellCV0JQQW5YMWNiZ01nZm01SnBpK0krZnJiVnNMdDBoT1Q4eHd1ZXdxYWNaZHFIS01rWE85eWZYaGNKUmRiT2F5TTVldlYxSXcvK0kwSEJFZDBsd0cwQTl5akdEQVdNQlFHQTFVZEVRUU5NQXVDQ1d4dlkyRnNhRzl6ZERBS0JnZ3Foa2pPUFFRREFnT0JpZ0F3Z1lZQ1FWdkg5VmVuRVZmcm9UQTNLS0xZT1pZbUIwZ1VzZ0hBNWdacHgxNTIzUURlekcwdTlrZTZlb0VVSjI3NDcraUdpVTVSRk9oZk5XSWhzakZLYTJacG1xQ3JBa0VGQU8zS09URHBRaklRZzlCR05xYzBxa2RUSE5Fb1gwVHhzaHdEYzE2YXFxQzBDNGp5bjhNM3BBNFBXNEl1NmI0aGhlQk8zMXhlRkpOajRlTlNNY2xWRWc9PSJdLCJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJyZXNwb25zZV90eXBlIjoidnBfdG9rZW4iLCJjbGllbnRfaWQiOiJsb2NhbGhvc3QiLCJzdGF0ZSI6IkZmZmZkcXR2NzJlaGg0LWswYVFZWUFraXh6TDlOY3ZhbjVnWkV3RDhaZ0U9Iiwibm9uY2UiOiJ2UW9pak5sSHdRVU5yOUN3M1N0TU5xXzhqUktwRHg5SlFCWG9BWkVWT09jPSIsInByZXNlbnRhdGlvbl9kZWZpbml0aW9uIjp7ImlkIjoiZjAwZGZkNjItMDI3Yy00NzIwLTkyODQtMTg3NWQ4MTRhYTQzIiwiaW5wdXRfZGVzY3JpcHRvcnMiOlt7ImlkIjoiNmExNjU0MzgtMDI3Yy00N2U0LThkYjctYWM3ZjE0NGFhNTA3IiwiZm9ybWF0Ijp7ImxkcF92cCI6e319LCJjb25zdHJhaW50cyI6eyJsaW1pdF9kaXNjbG9zdXJlIjoicHJlZmVycmVkIn19XSwiZm9ybWF0Ijp7ImxkcF92cCI6e319fSwiY2xpZW50X2lkX3NjaGVtZSI6Ing1MDlfc2FuX2RucyIsImNsaWVudF9tZXRhZGF0YSI6eyJ2cF9mb3JtYXRzIjp7ImxkcF92cCI6e319fSwicmVzcG9uc2VfbW9kZSI6ImRpcmVjdF9wb3N0IiwicmVzcG9uc2VfdXJpIjoiaHR0cDovL2xvY2FsaG9zdDo4MDk3L29pZDR2cC9hdXRoLXJlc3BvbnNlIiwiYXVkIjoiaHR0cHM6Ly9zZWxmLWlzc3VlZC5tZS92MiIsImV4cCI6MTcxMTQ0OTQyMiwiaWF0IjoxNzExNDQ5MTMyLCJqdGkiOiJhYWY2M2VlYy1jNWNiLTQwYzYtYjgzMS04YTQwMzFmYjAyZjMiLCJpc3MiOiJsb2NhbGhvc3QifQ.AMWADQDAHUZ3vsdrtZuBOo3HAfbHJ3HT4Rn5vL7uLuZ34EKcEMZuG9Kgv0Hc9pskOv3gJVVdCZ0tiKJbYUx4_LD6ACrhT_05cfrSv4vVWLBhG5ejEwQsYj0_M9sT5SxjvVNoz0j3Bdd8Rzwz8fxrNDmQqkwAnLAxUEj1Ufjc3RQjaMGQ\n"
+						}
+					]
+				},
+				{
+					"name": "5. OID4VP Auth-Response",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "vp_token",
+									"value": "{ \"@context\" : [ \"https://www.w3.org/2018/credentials/v1\" ],\n  \"type\" : [ \"VerifiablePresentation\" ],\n  \"holder\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n  \"verifiableCredential\" : {\n    \"@context\" : [ \"https://www.w3.org/2018/credentials/v1\", \"https://www.w3.org/2018/credentials/v1\", \"https://www.w3.org/2018/credentials/examples/v1\" ],\n    \"type\" : [ \"VerifiableCredential\", \"VerifiableCredential\" ],\n    \"id\" : \"urn:uuid:1b414c1c-e2a2-4185-9b6b-d49a0280830b\",\n    \"issuer\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n    \"issuanceDate\" : \"2019-06-16T18:56:59Z\",\n    \"credentialSubject\" : {\n      \"id\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n      \"name\" : \"peter\"\n    },\n    \"proof\" : {\n      \"type\" : \"Ed25519Signature2018\",\n      \"created\" : \"2024-03-26T10:32:19Z\",\n      \"proofPurpose\" : \"assertionMethod\",\n      \"verificationMethod\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy#z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n      \"jws\" : \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..gukqdapRHz9HkZo7-SGfXrKpFCJ07oiznwPcDKhWyHtyXG0vmSuR1w7EiBCA0QZcfIEwJqgYSeh4807xvLldDQ\"\n    }\n  },\n  \"proof\" : {\n    \"type\" : \"Ed25519Signature2018\",\n    \"created\" : \"2024-03-26T10:32:19Z\",\n    \"domain\" : \"localhost\",\n    \"challenge\" : \"vQoijNlHwQUNr9Cw3StMNq_8jRKpDx9JQBXoAZEVOOc=\",\n    \"proofPurpose\" : \"authentication\",\n    \"verificationMethod\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy#z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n    \"jws\" : \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..gI2MG3JfNjlnmcWKfeercdwicFrCtDTxlRt3EZcNyVnx7rfIN5zZ8_DUvY-PWa4_jqsITigSsFYa9gQJy70TDQ\"\n  }\n}",
+									"type": "text"
+								},
+								{
+									"key": "presentation_submission",
+									"value": "{ \"id\": \"Presentation Submission\",\n    \"definition_id\": \"8f0f3a49-f710-4503-8882-7f60daa07218\",\n    \"descriptor_map\": [\n        {\n            \"id\": \"232111d2-f4ca-41b7-861d-0ae714520c45\",\n            \"format\": \"ldp_vp\",\n            \"path\": \"$\",\n            \"path_nested\": {\n                \"format\": \"ldp_vc\",\n                \"path\": \"$.verifiableCredential[0]\"\n            }\n        }\n    ]\n}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseurl_oid4vp}}/auth-response",
+							"host": [
+								"{{baseurl_oid4vp}}"
+							],
+							"path": [
+								"auth-response"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "5. OID4VP Auth-Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "vp_token",
+											"value": "{ \"@context\" : [ \"https://www.w3.org/2018/credentials/v1\" ],\n  \"type\" : [ \"VerifiablePresentation\" ],\n  \"holder\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n  \"verifiableCredential\" : {\n    \"@context\" : [ \"https://www.w3.org/2018/credentials/v1\", \"https://www.w3.org/2018/credentials/v1\", \"https://www.w3.org/2018/credentials/examples/v1\" ],\n    \"type\" : [ \"VerifiableCredential\", \"VerifiableCredential\" ],\n    \"id\" : \"urn:uuid:1b414c1c-e2a2-4185-9b6b-d49a0280830b\",\n    \"issuer\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n    \"issuanceDate\" : \"2019-06-16T18:56:59Z\",\n    \"credentialSubject\" : {\n      \"id\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n      \"name\" : \"peter\"\n    },\n    \"proof\" : {\n      \"type\" : \"Ed25519Signature2018\",\n      \"created\" : \"2024-03-26T10:32:19Z\",\n      \"proofPurpose\" : \"assertionMethod\",\n      \"verificationMethod\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy#z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n      \"jws\" : \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..gukqdapRHz9HkZo7-SGfXrKpFCJ07oiznwPcDKhWyHtyXG0vmSuR1w7EiBCA0QZcfIEwJqgYSeh4807xvLldDQ\"\n    }\n  },\n  \"proof\" : {\n    \"type\" : \"Ed25519Signature2018\",\n    \"created\" : \"2024-03-26T10:32:19Z\",\n    \"domain\" : \"localhost\",\n    \"challenge\" : \"vQoijNlHwQUNr9Cw3StMNq_8jRKpDx9JQBXoAZEVOOc=\",\n    \"proofPurpose\" : \"authentication\",\n    \"verificationMethod\" : \"did:key:z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy#z6MknuLYaNpXDWAsm8ZhhM73ogmUX6i1TrdELBWgnotCLPKy\",\n    \"jws\" : \"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..gI2MG3JfNjlnmcWKfeercdwicFrCtDTxlRt3EZcNyVnx7rfIN5zZ8_DUvY-PWa4_jqsITigSsFYa9gQJy70TDQ\"\n  }\n}",
+											"type": "text"
+										},
+										{
+											"key": "presentation_submission",
+											"value": "{ \"id\": \"Presentation Submission\",\n    \"definition_id\": \"8f0f3a49-f710-4503-8882-7f60daa07218\",\n    \"descriptor_map\": [\n        {\n            \"id\": \"232111d2-f4ca-41b7-861d-0ae714520c45\",\n            \"format\": \"ldp_vp\",\n            \"path\": \"$\",\n            \"path_nested\": {\n                \"format\": \"ldp_vc\",\n                \"path\": \"$.verifiableCredential[0]\"\n            }\n        }\n    ]\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseurl_oid4vp}}/auth-response",
+									"host": [
+										"{{baseurl_oid4vp}}"
+									],
+									"path": [
+										"auth-response"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "6. State of Request",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+							"host": [
+								"{{baseurl_request_processing}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "7. State of Request (Optional)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+									"host": [
+										"{{baseurl_request_processing}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"session",
+										"{{sessionId}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "\n{\n    \"sessionId\": \"40K4_e-vOOUEs9XCEwL-prBDwzv0SJXiB3mOiCrOu1M=\",\n    \"profileId\": \"demo-vc-oid4vp-train\",\n    \"state\": \"submittable\",\n    \"tasks\": [\n        {\n            \"taskId\": \"085610c0-9798-4529-aa31-0203f3560ea3\",\n            \"name\": \"OID4VP\",\n            \"type\": null,\n            \"fulfilled\": true,\n            \"running\": false\n        }\n    ],\n    \"preconditionTaskTree\": {\n        \"task\": {\n            \"taskId\": \"085610c0-9798-4529-aa31-0203f3560ea3\",\n            \"name\": \"OID4VP\",\n            \"type\": null,\n            \"fulfilled\": true,\n            \"running\": false\n        }\n    },\n    \"taskTree\": {\n        \n    },\n    \"preconditionTasksFulfilled\": true,\n    \"tasksFulfilled\": true\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,286 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: notarization-profile-config
+data:
+    application.yaml: |
+        quarkus:
+            opentelemetry:
+                enabled: true
+        gaia-x:
+            profile:
+                config:
+                - name: Simple VC
+                  kind: JSON-LD
+                  id: simple-4b5a59b1-d02b-44d9-a3c1-e310dd2f07fb
+                  description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+                  notaries:
+                    - jwk: >
+                        {
+                          "kty": "EC",
+                          "use": "enc",
+                          "crv": "P-384",
+                          "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                          "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                          "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                          "alg": "ECDH-ES+A256KW"
+                        }
+                  valid-for: P100Y
+                  is-revocable: true
+                  task-descriptions: >
+                    [
+                      {
+                        "name": "eID-Validation",
+                        "type": "browserIdentificationTask",
+                        "description": "Identification via browser using eID means."
+                      }
+                    ]
+                  tasks: >
+                    {}
+                  precondition-tasks: >
+                    {
+                      "taskName" : "eID-Validation"
+                    }
+                  template: >
+                    {
+                      "@context": [
+                        "https://www.w3.org/2018/credentials/v1",
+                        "https://www.w3.org/2018/credentials/examples/v1"
+                      ],
+                      "type": ["VerifiableCredential", "AlumniCredential"],
+                      "credentialSubject": {
+                        "alumniOf": {
+                          "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                          "name": "Mars University"
+                        }
+                      }
+                    }
+                - name: GAIA-X Employee Credential
+                    kind: AnonCred
+                    id: demo-gaia-x-employee-credential-v1
+                    description: This credential is used for employees in the GAIA-X demonstration.
+                    valid-for: P1Y
+                    is-revocable: true
+                    task-descriptions: >
+                        [
+                            {
+                                "name": "eID-Validation",
+                                "type": "browserIdentificationTask",
+                                "description": "Identification via browser using eID means."
+                            },
+                            {
+                                "name": "DocumentUpload",
+                                "type": "fileProvisionTask",
+                                "description": "Upload of documents proofing the case."
+                            }
+                        ]
+                    tasks: >
+                        {
+                            "taskName" : "DocumentUpload"
+                        }
+                    precondition-tasks: >
+                        {
+                            "taskName" : "eID-Validation"
+                        }
+                    document-template: >
+                        {
+                            "evidenceDocument": <documents:{doc|"<doc.sha.hex>"}; separator=" ,">
+                        }
+                    template: >
+                        {
+                            "attributes": [
+                                "Claims",
+                                "FederationName",
+                                "EmpId",
+                                "FederationId",
+                                "EmpEmail",
+                                "EmpFirstName",
+                                "EmpLastName",
+                                "evidenceDocument"
+                            ]
+                        }
+                  - name: VC with eIDAS Proof
+                    id: demo-vc-issuance-01-given-eIDAS-proof
+                    description: The VC must add the eIDAS Proof into the credential. There is no chained root VC. As we want an organizational credential, the VC subject should be https://schema.org/Organization.
+                    kind: JSON-LD
+                    is-revocable: true
+                    notaries:
+                      - jwk: >
+                          {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                          }
+                    valid-for: P100Y
+                    task-descriptions: >
+                      [
+                        {
+                          "name": "eID-Validation",
+                          "type": "browserIdentificationTask",
+                          "description": "Identification via browser using eID means."
+                        },
+                        {
+                          "name": "DocumentUpload",
+                          "type": "fileProvisionTask",
+                          "description": "Upload of documents proofing the case."
+                        }
+                      ]
+                    tasks: >
+                      {
+                        "taskName" : "DocumentUpload"
+                      }
+                    precondition-tasks: >
+                      {
+                        "taskName" : "eID-Validation"
+                      }
+                    template: >
+                      {
+                        "@context": [
+                          "https://www.w3.org/2018/credentials/v1",
+                          "https://www.w3.org/2018/credentials/examples/v1",
+                          "https://spherity.github.io/schemas/testing/ap13/chained-credential.jsonld"
+                        ],
+                        "type": [
+                          "VerifiableCredential",
+                          "AlumniCredential",
+                          "ChainedCredential"
+                        ],
+                        "issuer": "https://example.edu/issuers/565049",
+                        "credentialSubject": {
+                          "alumniOf": {
+                            "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                            "name": "Mars University"
+                          }
+                        },
+                        "provenanceProof":
+                          [
+                            {
+                              "@context": [
+                                "https://www.w3.org/2018/credentials/v1",
+                                "https://www.w3.org/2018/credentials/examples/v1"
+                              ],
+                              "id": "http://example.edu/credentials/1872",
+                              "type": [
+                                "VerifiableCredential",
+                                "VerifiableID"
+                              ],
+                              "issuer": "did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE",
+                              "issuanceDate": "2019-12-31T23:59:60Z",
+                              "credentialSubject": {
+                                "id": "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2",
+                                "firstName": "Eva",
+                                "lastName": "Monroe",
+                                "gender": "Female",
+                                "dateOfBirth": "12/11/1970",
+                                "placeOfBirth": "Madrid",
+                                "currentAddress": "Arago 179 4a",
+                                "city": "Barcelona",
+                                "state": "Catalunya",
+                                "zip": "08011"
+                              },
+                              "proof": {
+                                "type": "CAdESRSASignature2020",
+                                "created": "2022-05-20T09:29:03Z",
+                                "proofPurpose": "assertionMethod",
+                                "verificationMethod": "did:key:changeme-issuer#MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArgiJhibfIIkiXuO2eEIqpPkEp5Jxwzqug5CvGC1YyyYn68QH24+Wkdlx36cdKNswjyF/aXmUNPdWGVDO6kftVKg7I9kYpu3FP8czKXz8kkkcZEY8/aKXackdaBRT4lJNlrHd7dDHWKdP7hJKQylCYY/Fe1HrGrbtZXCfZz13m4Q/3NQq+eJ+8nUKKDRSR4OOukVlg7E0pAvUvIf95jVe78KKq5LUtrGytOw9kC1PtGL803droh96rnCuV5OHbj0VMxLJpknwXTJRqSBMRGJE8ugxybEB8NUFPkLf5JkLkNBxKLLRNgNsbY/Kp6tEb33vLSZ3ZRbHIjidd4PlrKY24QIDAQAB",
+                                "cades": "-----BEGIN PKCS7-----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-----END PKCS7-----"
+                              }
+                            }
+                          ]
+                      }
+                  - name: VC with chained eIDAS based VC
+                    id: demo-vc-issuance-03-chaining-given-eIDAS
+                    description: The VC will have a chained proof (according to Aries RfC 104) to the organisation credential. As it describes an employee, the https://schema.org/Person should be used.
+                    kind: JSON-LD
+                    notaries:
+                      - jwk: >
+                          {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                          }
+                    valid-for: P100Y
+                    is-revocable: true
+                    task-descriptions: >
+                      [
+                        {
+                          "name": "VC-Validation",
+                          "type": "vcIdentificationTask",
+                          "description": "Identification via a VC."
+                        },
+                        {
+                          "name": "DocumentUpload",
+                          "type": "fileProvisionTask",
+                          "description": "Upload of documents proofing the case."
+                        }
+                      ]
+                    tasks: >
+                      {
+                        "taskName" : "DocumentUpload"
+                      }
+                    precondition-tasks: >
+                      {
+                        "taskName" : "VC-Validation"
+                      }
+                    template: >
+                      {
+                        "@context": [
+                          "https://www.w3.org/2018/credentials/v1",
+                          "https://www.w3.org/2018/credentials/examples/v1",
+                          "https://spherity.github.io/schemas/testing/ap13/chained-credential.jsonld"
+                        ],
+                        "type": [
+                          "VerifiableCredential",
+                          "AlumniCredential",
+                          "ChainedCredential"
+                        ],
+                        "issuer": "https://example.edu/issuers/565049",
+                        "credentialSubject": {
+                          "alumniOf": {
+                            "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+                            "name": "Mars University"
+                          }
+                        },
+                        "provenanceProof": [
+                          {
+                            "@context": [
+                              "https://www.w3.org/2018/credentials/v1",
+                              "https://spherity.github.io/schemas/testing/membership-authorization.jsonld"
+                            ],
+                            "type": [
+                              "VerifiableCredential",
+                              "MembershipAuthorization"
+                            ],
+                            "issuer": "did:sov:AADChVSQzmdjVAaUsXHmhd",
+                            "issuanceDate": "2022-02-14T12:48:53.049981",
+                            "credentialSubject": {
+                              "type": "MembershipAuthorization",
+                              "proxiedPermissions": {
+                                "grant": [
+                                  "issue membership credential"
+                                ],
+                                "when": {
+                                  "role": "membership department"
+                                }
+                              },
+                              "registrationId": "883110000015376",
+                              "id": "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2"
+                            },
+                            "proof": {
+                              "type": "CAdESRSASignature2020",
+                              "created": "2020-06-22T14:11:44Z",
+                              "proofPurpose": "assertionMethod",
+                              "verificationMethod": "did:key:z6MkfGYwYV8xQgoNtyFgxdHLuBC6vzSCoHUKpeUg5uBvkXLE#MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvcPOS736aX2tfwEj+mMCJ3kw6KBCDHLRNqtkDseXNTuhdIs5Uj7wPcOETexT1DnGDfPZ3HYBsc8x8jWKFtO/E5oqFzXDyq60G8Qmlt509JKQJLP0YxrXwjZcLD/uM9Qf8lCjjiVJjDYnztE88p5jkQ2V9HCf3NK3ASL3m2q4M5QRHNGiTTvCvcRG2qRocVIp3EB8fwIpgqWxi6uI242yE7E1J4fVDXlD4hYpocDH0HOzazQXrNubHz6EGkOt5nAKeEzToqE9ow++h6TRHhfmdWJFb2HQ7FvoAMUYopQJaKpk/V5FpmXTDyMPNt2uj9UBS/EML7Z3vXzXUUJq/pTbdtJIpZaZk0SOCdt3iWk8CCNIHAHdN0uy+SWC+AH0hv56urQqR0Zaz33fGguhbuUYKzXt1CTQgCTkEhcwT9Sml4m1WGMl3fbFMFkacPGRwSMs5ZXKjDCRdz+N8/pFExOuobCqIMUPGC98TVsV3drrsSe716CSHS3BWuaum/W3ve5w1Z11nGbRih9X5AuYg5t/gwFDsg05iQa76ymzWSaZEEL5btHvCXNsmsyDU1n/KJw4S8nnXj+qt+xLNENNWsijcP7VnE1bkXvEQ0rg/PewmPWKVLIHZf5s8RJTmAdCFE0IJT1WiXufwT9QUa6BfyE1mOpnk4LpwkhcmM0jNADHvp8CAwEAAQ==",
+                              "cades": "308204c906092a864886f70d010702...266ad9fee3375d8095"
+                            }
+                          }
+                        ]
+                      }

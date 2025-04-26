@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "ssi-issuance.fullname" . }}-test-connection"
+  labels:
+    {{- include "ssi-issuance.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "ssi-issuance.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

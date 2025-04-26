@@ -1,0 +1,203 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not
+    app.quarkus.io/commit-id: 0ab9c03a41286cd5d834a16a8a80cdad905f9f95
+    app.quarkus.io/vcs-uri: git@gitlab.eclipse.org:eclipse/xfsc/not.git
+    app.quarkus.io/build-timestamp: 2024-01-19 - 12:00:55 +0000
+  labels:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+    app.kubernetes.io/managed-by: quarkus
+  name: revocation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+  name: view-jobs
+rules:
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+  name: revocation-view-jobs
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: view-jobs
+subjects:
+  - kind: ServiceAccount
+    apiGroup: ""
+    name: revocation
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not
+    app.quarkus.io/commit-id: 0ab9c03a41286cd5d834a16a8a80cdad905f9f95
+    app.quarkus.io/vcs-uri: git@gitlab.eclipse.org:eclipse/xfsc/not.git
+    app.quarkus.io/build-timestamp: 2024-01-19 - 12:00:55 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8086"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+    app.kubernetes.io/managed-by: quarkus
+  name: revocation
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8086
+  selector:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not
+    app.quarkus.io/commit-id: 0ab9c03a41286cd5d834a16a8a80cdad905f9f95
+    app.quarkus.io/vcs-uri: git@gitlab.eclipse.org:eclipse/xfsc/not.git
+    app.quarkus.io/build-timestamp: 2024-01-19 - 12:00:55 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8086"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: revocation
+    app.kubernetes.io/part-of: notarization-system
+    app.kubernetes.io/version: java21-latest
+    app.kubernetes.io/managed-by: quarkus
+  name: revocation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/version: java21-latest
+      app.kubernetes.io/part-of: notarization-system
+      app.kubernetes.io/name: revocation
+  template:
+    metadata:
+      annotations:
+        app.quarkus.io/vcs-ref: main
+        app.quarkus.io/vcs-url: https://gitlab.eclipse.org/eclipse/xfsc/notarization-service/not
+        app.quarkus.io/commit-id: 0ab9c03a41286cd5d834a16a8a80cdad905f9f95
+        app.quarkus.io/vcs-uri: git@gitlab.eclipse.org:eclipse/xfsc/not.git
+        app.quarkus.io/build-timestamp: 2024-01-19 - 12:00:55 +0000
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8086"
+        prometheus.io/scheme: http
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.kubernetes.io/version: java21-latest
+        app.kubernetes.io/part-of: notarization-system
+        app.kubernetes.io/name: revocation
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_FLYWAY_ENABLED
+              value: "false"
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/revocation:java21-latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/live
+              port: 8086
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: revocation
+          ports:
+            - containerPort: 8086
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/ready
+              port: 8086
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 45
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/started
+              port: 8086
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+      initContainers:
+        - args:
+            - job
+            - revocation-flyway-init
+          image: groundnuty/k8s-wait-for:no-root-v1.7
+          imagePullPolicy: IfNotPresent
+          name: wait-for-flyway
+      serviceAccountName: revocation
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: revocation-flyway-init
+spec:
+  completionMode: NonIndexed
+  template:
+    metadata: {}
+    spec:
+      containers:
+        - env:
+            - name: QUARKUS_FLYWAY_ENABLED
+              value: "true"
+            - name: QUARKUS_INIT_AND_EXIT
+              value: "true"
+          image: registry.gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/revocation:java21-latest
+          name: revocation-flyway-init
+      restartPolicy: OnFailure
+      serviceAccountName: revocation

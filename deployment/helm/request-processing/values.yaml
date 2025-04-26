@@ -1,0 +1,143 @@
+---
+replicaCount: 2
+
+image:
+  repository: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/request-processing
+  pullPolicy: Always
+  tag: "dev-029bdea70f0e98e7151a067b3f0b82215fb388a7"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8084
+
+ingress:
+  enabled: true
+  certManager: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production-http
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # proxy_set_header is necessary for the bearer authentication. Otherwise
+    # the bearer token is not passed to the service via authorization header.
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Authorization $http_authorization;
+  hosts:
+    - host: test-not.xfsc.dev
+      paths:
+        - path: "/request-processing/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-test-not.xfsc.dev
+     hosts:
+       - test-not.xfsc.dev
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /q/health/live
+    port: 8084
+
+readinessProbe:
+  httpGet:
+    path: /q/health/ready
+    port: 8084
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  datasourceJdbcUrl: "jdbc:postgresql://postgres-postgresql.not-api.svc.cluster.local:5432/test_request_processing"
+  datasourceReactiveUrl: "postgresql://postgres-postgresql.not-api.svc.cluster.local:5432/test_request_processing"
+  datasourceUsername: "not_api"
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  notarizationProcessingInternalUrl: "https://test-not.xfsc.dev/request-processing"
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "notarization-oidc-secret"
+  oidcAuthServerUrl: "https://idp-not.xfsc.dev/realms/notarization-realm-test"
+  oidcClientId: "notarization-client"
+  oidcIntrospectionPath: "https://idp-not.xfsc.dev/realms/notarization-realm-test/protocol/openid-connect/token/introspect"
+  amqpHost: "rabbitmq.not-api.svc.cluster.local"
+  amqpPort: "5672"
+  amqpExistingSecret: "notarization-credentials"
+  amqpSecretKey: "amqp-password"
+  otelConnectorUrl: "http://otel-collector.not-api.svc.cluster.local:4317"
+  restClientDssApiUrl: "http://dss.not-api.svc.cluster.local:8080/services/rest"
+  restClientRevocationApiUrl: "https://test-not.xfsc.dev/revocation"
+  restClientProfileApiUrl: "https://test-not.xfsc.dev/profile/"
+  restClientSsiIssuanceV1ApiUrl: "http://ssi-issuance.not-api-test.svc.cluster.local:8088"
+  restClientSsiIssuanceV2ApiUrl: "http://ssi-issuance2.not-api-test.svc.cluster.local:8089"
+  browserIdentificationUrl: "https://test-not.xfsc.dev/oidc-identity-resolver/session/"
+  vcIdentificationUrl: "http://ssi-issuance.not-api.svc.cluster.local:8088/credential/verify"
+  mpMessagingOutgoingRequestorAddress: "test-requestor-request-changed"
+  mpMessagingOutgoingOperatorAddress: "test-operator-request-changed"
+  gaiaxTasksOidcIdentifyLocation: "https://test-not.xfsc.dev/oidc-identity-resolver/session/"
+  gaiaxTasksComplianceLocation: "https://test-not.xfsc.dev/compliance-task"
+  gaiaxActionsTrainEnrollmentLocation: "https://test-not.xfsc.dev/train-enrollment"
+
+envConfig: {}

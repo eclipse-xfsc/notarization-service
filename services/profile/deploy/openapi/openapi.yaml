@@ -1,0 +1,613 @@
+---
+openapi: 3.0.3
+info:
+  title: Notarization Request Processing API
+  description: This micro-service manages the configured profiles.
+  contact:
+    name: GAIA-X
+    url: https://www.gaia-x.eu/
+    email: techsupport@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+servers:
+- url: http://localhost:8083
+  description: Auto generated value
+- url: http://0.0.0.0:8083
+  description: Auto generated value
+tags:
+- name: CDI Wrapper
+paths:
+  /api/v1/profile-ids:
+    get:
+      tags:
+      - Profile Resource
+      summary: All profile identifiers
+      description: The identifiers of all the profiles.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/profiles:
+    get:
+      tags:
+      - Profile Resource
+      summary: Fetch profiles
+      description: Fetches available profiles using paging.
+      parameters:
+      - name: index
+        in: query
+        schema:
+          format: int32
+          minimum: 0
+          type: integer
+          nullable: true
+      - name: size
+        in: query
+        schema:
+          format: int32
+          maximum: 100
+          minimum: 1
+          type: integer
+          nullable: true
+      - name: sort
+        in: query
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/SortDirection'
+          - $ref: '#/components/schemas/SortDirection'
+          - $ref: '#/components/schemas/SortDirection'
+          nullable: true
+      responses:
+        "200":
+          description: A page of the available profiles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedViewProfileNoFilter'
+  /api/v1/profiles/{profileId}:
+    get:
+      tags:
+      - Profile Resource
+      summary: Single profile
+      description: Fetches a single profile.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: The given profile id did not identify a known profile.
+        "200":
+          description: A single profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+  /api/v1/profiles/{profileId}/ssi-data:
+    get:
+      tags:
+      - Profile Resource
+      summary: DID summary of a profile
+      description: Fetches the DID summary for the identified profile.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A DID summary of a profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SSIData'
+  /api/v1/profiles/{profileId}/ssi-data/v1:
+    get:
+      tags:
+      - Profile Resource
+      summary: Issuance V1 of the DID summary of the profile
+      description: Fetches the issuance v1 DID summary for the identified profile.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A DID summary of the profile.
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/profiles/{profileId}/ssi-data/v2:
+    get:
+      tags:
+      - Profile Resource
+      summary: Issuance V2 of the DID summary of the profile
+      description: Fetches the issuance v2 DID summary for the identified profile.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A DID summary of the profile.
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/protected/profiles/{profileId}:
+    put:
+      tags:
+      - Protected Profile Resource
+      summary: Set profile
+      description: Create or override a profile with the given identifier.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        "204":
+          description: The operation was successful.
+    delete:
+      tags:
+      - Protected Profile Resource
+      summary: Delete profile
+      description: Delete a profile with the given identifier.
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: A single profile.
+  /api/v1/protected/profiles/{profileId}/did:
+    post:
+      tags:
+      - Protected Profile Resource
+      summary: Set DID for the profile
+      description: "A one-time operation per profile, initialising the DIDs to use."
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDidRequest'
+      responses:
+        "204":
+          description: The operation was successful.
+components:
+  schemas:
+    DidType:
+      description: Kind of DID used for the profile.
+      enum:
+      - automatic
+      - provided
+      type: string
+    KeyType:
+      description: Kind of key specified for creation.
+      enum:
+      - RSA
+      - secp256k1
+      - Bls48581G1
+      - Bls48581G2
+      - Bls48581G1
+      - Bls48581G2
+      - Ed25519
+      - X25519
+      - P-256
+      - P-384
+      - P-521
+      type: string
+    TaskTreeNode:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/NodeEmpty'
+      - $ref: '#/components/schemas/NodeAllOf'
+      - $ref: '#/components/schemas/NodeOneOf'
+      - $ref: '#/components/schemas/NodeTask'
+    Aip20IssuanceSpecification:
+      required:
+      - issuingDid
+      type: object
+      properties:
+        issuingDid:
+          type: string
+        revocatingDid:
+          type: string
+          nullable: true
+    NodeOneOf:
+      description: This represents a node satisfied when any single child node is
+        fulfilled.
+      required:
+      - oneOf
+      type: object
+      properties:
+        oneOf:
+          description: The array of child nodes.
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskTreeNode'
+          nullable: true
+      example:
+        oneOf:
+        - taskName: vcIdentification
+        - taskName: eID
+    NodeTask:
+      description: This represents a node satisfied when the named work (a task or
+        actions) is fulfilled.
+      required:
+      - taskName
+      type: object
+      properties:
+        taskName:
+          description: The name of the work to be performed and satisfied.
+          type: string
+          nullable: true
+      example:
+        taskName: eID
+    Profile:
+      description: A notarization profile specifies a single notarization submission
+        process and the resulting credential type.
+      required:
+      - id
+      - name
+      - description
+      - notaryRoles
+      - encryption
+      - notaries
+      - template
+      - taskDescriptions
+      - tasks
+      - preconditionTasks
+      - preIssuanceActions
+      - postIssuanceActions
+      - actionDescriptions
+      type: object
+      properties:
+        notaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotaryAccess'
+        template:
+          description: This value is the should contain the fixed content of the VC
+            to be issued.
+        notaryRoles:
+          description: A range of OIDC roles required to access notarization requests
+            related for this profile via REST. A single role is sufficient to grant
+            access.
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        actionDescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssuanceAction'
+        validFor:
+          $ref: '#/components/schemas/Period'
+        kind:
+          $ref: '#/components/schemas/CredentialKind'
+        aip:
+          $ref: '#/components/schemas/AipVersion'
+        description:
+          description: A human readable description of the profile
+          type: string
+        revocable:
+          type: boolean
+        postIssuanceActions:
+          type: array
+          items:
+            type: string
+        isRevocable:
+          type: boolean
+        extensions: {}
+        encryption:
+          description: This value specifies the fallback encryption algorithm if not
+            defined in a NotaryAccess.
+          type: string
+        name:
+          description: A human readable name of the profile
+          type: string
+        id:
+          description: The unique identifier of the profile.
+          type: string
+        taskDescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskDescription'
+        documentTemplate:
+          description: A template that is applied to the evidence documents. The result
+            is merged into the issued credential. The specification is StringTemplate
+            (https://www.stringtemplate.org/).
+          type: string
+          nullable: true
+        tasks:
+          $ref: '#/components/schemas/TaskTreeNode'
+        preconditionTasks:
+          $ref: '#/components/schemas/TaskTreeNode'
+        preIssuanceActions:
+          $ref: '#/components/schemas/TaskTreeNode'
+    NodeEmpty:
+      description: This represents an empty node. There is no work to be done.
+      type: object
+      example: {}
+    ResultsResponse:
+      type: object
+      properties:
+        totalChanges:
+          format: int64
+          type: integer
+    Aip10IssuanceSpecification:
+      required:
+      - did
+      - schemaId
+      - credentialDefinitionId
+      type: object
+      properties:
+        did:
+          type: string
+        schemaId:
+          type: string
+        credentialDefinitionId:
+          type: string
+    SortDirection:
+      description: The sort direction.
+      enum:
+      - Ascending
+      - Descending
+      type: string
+    TaskDescription:
+      description: "A description for a task that is performed before or during the\
+        \ submission process, by the requester."
+      required:
+      - name
+      type: object
+      properties:
+        serviceLocation:
+          format: uri
+          type: string
+          nullable: true
+        encryptAtRest:
+          type: boolean
+          nullable: true
+        name:
+          description: The identifier of the task or action. It must be unique within
+            a given profile.
+          type: string
+        description:
+          description: A human readable description of the task or action.
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TaskType'
+        serviceName:
+          description: |-
+            The identifier of the extension service that executes this task or action.
+
+            This is optional when the request-processing service has a configured association for the task/action name with a known extension service.
+          type: string
+          nullable: true
+      additionalProperties: true
+      example:
+        name: train-enrollment
+        serviceName: train-enrollment-proxy
+    TaskType:
+      description: The task types.
+      enum:
+      - browserIdentificationTask
+      - fileProvisionTask
+      - vcIdentificationTask
+      type: string
+    NodeAllOf:
+      description: This represents a node satisfied only when every single child node
+        is fulfilled.
+      required:
+      - allOf
+      type: object
+      properties:
+        allOf:
+          description: The array of child nodes.
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskTreeNode'
+          nullable: true
+      example:
+        allOf:
+        - taskName: eID
+        - taskName: signedFormUpload
+    SSIData:
+      type: object
+      properties:
+        v1:
+          anyOf:
+          - $ref: '#/components/schemas/Aip10IssuanceSpecification'
+          - $ref: '#/components/schemas/Aip20IssuanceSpecification'
+          nullable: true
+        v2:
+          required:
+          - issuingDid
+          - signatureType
+          type: object
+          properties:
+            issuingDid:
+              type: string
+            revocatingDid:
+              type: string
+              nullable: true
+            signatureType:
+              $ref: '#/components/schemas/SignatureType'
+          nullable: true
+    ApiVersion:
+      description: The version of the SSI Issuance service used within the Notarization-AP.
+      enum:
+      - v1
+      - v2
+      type: string
+    NoFilter:
+      type: string
+    Period:
+      format: duration
+      type: string
+      example: P1D
+    SignatureType:
+      description: Kind of signature algorithm specified for creation.
+      enum:
+      - Ed25519Signature2018
+      - Ed25519Signature2020
+      - RsaSignature2018
+      - JcsEd25519Signature2020
+      - EcdsaSecp256k1Signature2019
+      - EcdsaKoblitzSignature2016
+      - JcsEcdsaSecp256k1Signature2019
+      - JsonWebSignature2020
+      - BbsBlsSignature2020
+      - BbsBlsSignatureProof2020
+      - RS256
+      - RS384
+      - RS512
+      - PS256
+      - PS384
+      - PS512
+      - ES256
+      - ES384
+      - ES512
+      - ES256K
+      - EdDSA
+      type: string
+    Date:
+      format: date
+      type: string
+      example: 2022-03-10
+    CredentialKind:
+      description: Kind of credential specified for creation.
+      enum:
+      - AnonCred
+      - JSON-LD
+      - SD-JWT
+      type: string
+    IssuanceAction:
+      description: "A description for an action that is performed before or after\
+        \ the issuance of a verifiable credential, by the notary operator."
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        serviceName:
+          type: string
+          nullable: true
+        serviceLocation:
+          format: uri
+          type: string
+          nullable: true
+        encryptAtRest:
+          type: boolean
+          nullable: true
+      example:
+        name: train-enrollment
+        serviceName: train-enrollment-proxy
+    PagedViewProfileNoFilter:
+      required:
+      - index
+      - size
+      - pageCount
+      - total
+      - sort
+      - items
+      type: object
+      properties:
+        filter:
+          $ref: '#/components/schemas/NoFilter'
+        pageCount:
+          format: int32
+          type: integer
+        total:
+          format: int64
+          type: integer
+        size:
+          format: int32
+          type: integer
+        index:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/SortDirection'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile'
+    AipVersion:
+      description: The Aries Interop Profile (AIP) version.
+      enum:
+      - "1.0"
+      - "2.0"
+      type: string
+      deprecated: true
+    NotaryAccess:
+      required:
+      - algorithm
+      - key
+      type: object
+      properties:
+        key:
+          description: The public JWK of a notary - https://www.rfc-editor.org/rfc/rfc7517
+          type: object
+        algorithm:
+          description: The encryption algorithm used when persisting encrypting identities
+            to be read by a notary.
+          type: string
+          example: A256GCM
+    AutomaticDidCreationRequest:
+      description: The parameters are used to create new keys for issuance for the
+        given profile.
+      type: object
+      properties:
+        versions:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiVersion'
+          nullable: true
+        signatureType:
+          $ref: '#/components/schemas/SignatureType'
+        keyType:
+          $ref: '#/components/schemas/KeyType'
+    ProfileDidRequest:
+      type: object
+  securitySchemes:
+    SecurityScheme:
+      type: openIdConnect
+      description: Authentication
+      openIdConnectUrl: http://identitymanager.localhost/.well-known/openid-configuration

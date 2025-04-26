@@ -1,0 +1,774 @@
+gaia-x:
+    profile:
+        issuance:
+            - profile-id: demo-vc-issuance-01-simple
+            - profile-id: demo-vc-issuance-01-simple-portal
+            - profile-id: demo-vc-issuance-01-identification-precondition
+            - profile-id: demo-vc-issuance-01-without-tasks
+            - profile-id: demo-vc-issuance-01-anoncred
+            - profile-id: demo-vc-issuance-01-given-eIDAS-proof
+            - profile-id: demo-vc-issuance-03-chaining-given-eIDAS
+            - profile-id: demo-document-upload
+            - profile-id: demo-document-upload-aip-10
+            - profile-id: demo-aip10
+            - profile-id: demo-compliance-check
+            - profile-id: demo-train-enrollment
+            - profile-id: demo-auto-notarization-tsa
+            - profile-id: demo-vc-oid4vp-train
+            - profile-id: demo-vc-sd-jwt
+            - profile-id: demo-vc-oid4vp-train-validation
+        config:
+            - name: Simple VC
+              aip: "2.0"
+              id: demo-vc-issuance-01-simple
+              description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                    # }
+                    # public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        }
+                    ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Simple Portal VC
+              aip: "2.0"
+              id: demo-vc-issuance-01-simple-portal
+              description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                    # }
+                    # public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Simple VC with both identification types
+              aip: "2.0"
+              id: demo-vc-issuance-01-identification-precondition
+              description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                    # }
+                    # public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        },
+                        {
+                            "name": "VC-Validation",
+                            "type": "vcIdentificationTask",
+                            "description": "Identification via presenting proof of VC."
+                        }
+                    ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "oneOf": [
+                    { "taskName" : "eID-Validation" },
+                    { "taskName" : "VC-Validation" }
+                  ]
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Simple Portal VC without Tasks
+              aip: "2.0"
+              id: demo-vc-issuance-01-without-tasks
+              description: This credential is a minimal VC without any tasks. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: true
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1",
+                    "https://w3id.org/vc/status-list/2021/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Simple AnonCred VC without Tasks
+              aip: "1.0"
+              id: demo-vc-issuance-01-anoncred
+              description: This credential is a minimal AnonCred VC without any tasks.
+              notaries:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: true
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                  "attributes": [
+                      "givenName",
+                      "familyName",
+                      "birthDate",
+                      "evidenceDocument"
+                  ]
+                }
+            - name: VC with eIDAS Proof
+              aip: "2.0"
+              id: demo-vc-issuance-01-given-eIDAS-proof
+              description: The VC must add the eIDAS Proof into the credential. There is no chained root VC. As we want an organizational credential, the VC subject should be https://schema.org/Organization.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        },
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: VC with chained eIDAS based VC
+              aip: "2.0"
+              id: demo-vc-issuance-03-chaining-given-eIDAS
+              description: The VC will have a chained proof (according to Aries RfC 104) to the organisation credential. As it describes an employee, the https://schema.org/Person should be used.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "VC-Validation",
+                            "type": "vcIdentificationTask",
+                            "description": "Identification via a VC."
+                        },
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {
+                  "taskName" : "VC-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Document Upload
+              aip: "2.0"
+              id: demo-document-upload
+              description: Simple profile to upload documents.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {}
+              document-template: >
+                {
+                  "credentialSubject": {
+                      "evidenceDocument": <documents:{doc|"<doc.sha.hex>"}; separator=" ,">
+                  }
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://gitlab.com/gaia-x/data-infrastructure-federation-services/not/notarization-service/-/raw/main/services/profile/deploy/config/citizenship-with-evidence.jsonld"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Document Upload AIP 1.0
+              aip: "1.0"
+              id: demo-document-upload-aip-10
+              description: Simple profile to upload documents with AIP 1.0.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                    # }
+                    # Just public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                    [
+                        {
+                            "name": "DocumentUpload",
+                            "type": "fileProvisionTask",
+                            "description": "Upload of documents proofing the case."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "DocumentUpload"
+                }
+              precondition-tasks: >
+                {}
+              document-template: >
+                {
+                  "evidenceDocument": <documents:{doc|"<doc.sha.hex>"}; separator=" ,">
+                }
+              template: >
+                  {
+                    "attributes": [
+                        "givenName",
+                        "familyName",
+                        "birthDate",
+                        "evidenceDocument"
+                    ]
+                  }
+            - name: Demo AIP 1.0
+              aip: "1.0"
+              id: demo-aip10
+              description: Simple profile for AIP 1.0. A copy of the demo-vc-issuance-01-simple, but for AIP 1.0
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                # }
+                # public key:
+                  - jwk: >
+                      {
+                          "kty": "EC",
+                          "use": "enc",
+                          "crv": "P-384",
+                          "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                          "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                          "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                          "alg": "ECDH-ES+A256KW"
+                      }
+              valid-for: P100Y
+              # ACA-Py does not support revocation for AIP 1.0
+              is-revocable: false
+              task-descriptions: >
+                  [
+                      {
+                          "name": "eID-Validation",
+                          "type": "browserIdentificationTask",
+                          "description": "Identification via browser using eID means."
+                      }
+                  ]
+              tasks: >
+                  {}
+              precondition-tasks: >
+                  {
+                    "taskName" : "eID-Validation"
+                  }
+              template: >
+                  {
+                      "attributes": [
+                          "givenName",
+                          "familyName",
+                          "birthDate"
+                      ]
+                  }
+            - name: Compliance-Check
+              aip: "2.0"
+              id: demo-compliance-check
+              description: Simple profile to perform a compliance check.
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                # }
+                # Just public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                [
+                    {
+                        "name": "Compliance-Check",
+                        "description": "Performing a compliance check by using the GAIA-X compliance service."
+                    }
+                ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "Compliance-Check"
+                }
+              document-template: >
+                { }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Train Example Profile
+              aip: "2.0"
+              id: demo-train-enrollment
+              description: Simple profile to perform a train enrollment.
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                # }
+                # Just public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                [ ]
+              action-descriptions: >
+                [
+                    {
+                        "name": "TRAIN-Enrollment",
+                        "description": "Performing an enrollment with TRAIN."
+                    }
+                ]
+              tasks: >
+                { }
+              precondition-tasks: >
+                { }
+              post-issuance-actions:
+                - "TRAIN-Enrollment"
+              document-template: >
+                { }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Auto Notarization by using TSA service with OPA policies
+              aip: "2.0"
+              id: demo-auto-notarization-tsa
+              description: Simple profile that is used for auto notarization.
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                # }
+                # Just public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                [ ]
+              tasks: >
+                { }
+              precondition-tasks: >
+                { }
+              document-template: >
+                { }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: OID4VP Profile
+              aip: "2.0"
+              id: demo-vc-oid4vp-train
+              description: Profile to use OID for Verifiable Presentations as precondition validation task
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                # }
+                # Just public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                [
+                    {
+                        "name": "OID4VP",
+                        "description": "Validating verifiable presentations over OID4VP."
+                    }
+                ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "OID4VP"
+                }
+              document-template: >
+                { }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: OID4VP TRAIN-Validation Profile
+              aip: "2.0"
+              id: demo-vc-oid4vp-train-validation
+              description: Profile to use OID for Verifiable Presentations as precondition validation task and a validation via TRAIN TCR.
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu",
+                # }
+                # Just public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                [
+                    {
+                        "name": "OID4VP-TRAIN",
+                        "description": "Validating verifiable presentations over OID4VP and TRAIN.",
+                        "trainParameter": {
+                            "trustSchemePointers": [
+                                "alice.trust.train1.xfsc.dev"
+                            ],
+                            "endpointTypes": [
+                                "gx-trust-list-issuer-public-json"
+                            ]
+                        }
+                    }
+                ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "OID4VP-TRAIN"
+                }
+              document-template: >
+                { }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: Simple Profile for issuing SD-JWTs
+              kind: "SD-JWT"
+              id: demo-vc-sd-jwt
+              description: A sample profile which issues SD-JWTs.
+              notaries:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              is-revocable: false
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                  "vct": "eu.europa.ec.eudi.pid.1",
+                  "issuing_country": "DE",
+                  "issuing_authority": "DE"
+                }
+quarkus:
+    log:
+        level: INFO

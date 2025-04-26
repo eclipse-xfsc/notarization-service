@@ -1,0 +1,17 @@
+---
+version: "3"
+services:
+  k6:
+    image: grafana/k6:latest
+    container_name: k6
+    environment:
+      - PROFILE_HOSTNAME=profile
+      - REQUEST_PROCESSING_HOSTNAME=request-processing
+    volumes:
+      - ../../../e2e/load-tests/examples:/scripts
+    networks:
+      notarization-service:
+
+networks:
+  notarization-service:
+    name: notarization-service_default

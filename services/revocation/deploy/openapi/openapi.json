@@ -1,0 +1,369 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "revocation API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8086",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8086",
+    "description" : "Auto generated value"
+  } ],
+  "paths" : {
+    "/management/lists" : {
+      "get" : {
+        "summary" : "Listing of the managed lists",
+        "description" : "Retrieves a list of pairs containing the profile identifier and the associated list name.",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ListMapping"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Registers a new list",
+        "description" : "Register a new list for the given profile. This call initiates the database for the new list. A ListCredential is not created.",
+        "parameters" : [ {
+          "name" : "issue-list-credential",
+          "in" : "query",
+          "schema" : {
+            "default" : true,
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "profile",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the list name of the newly created list.",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned in case the profile already exists."
+          },
+          "500" : {
+            "description" : "Returned in case the profile could not be created."
+          }
+        }
+      }
+    },
+    "/management/lists/issue-credential/{profileName}" : {
+      "post" : {
+        "summary" : "Start issuance of one specific ListCredential",
+        "description" : "\n            Given the right conditions (e.i. renewal interval reached and changes in the revocation data present), a new\n            ListCredential is requested from the issuance service. This call checks the conditions for one managed list.\n        ",
+        "parameters" : [ {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "force",
+          "in" : "query",
+          "schema" : {
+            "default" : false,
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Returned when the issuance process is finished."
+          },
+          "404" : {
+            "description" : "Returned if the profile does not exist."
+          }
+        }
+      }
+    },
+    "/management/lists/issue-credentials" : {
+      "post" : {
+        "summary" : "Start issuance of all ListCredentials",
+        "description" : "Given the right conditions (e.i. renewal interval reached and changes in the revocation data present), a new ListCredential is requested from the issuance service. This call checks the conditions for all managed lists.",
+        "responses" : {
+          "204" : {
+            "description" : "Returned when the issuance process is finished."
+          }
+        }
+      }
+    },
+    "/management/lists/{profileName}" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ListDefinition"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/lists/{profileName}/encoded" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/lists/{profileName}/entry" : {
+      "post" : {
+        "summary" : "Register a new credential with the list",
+        "description" : "When this method is called, a new list entry is created and the CredentialStatus element described in the W3C specification is returned, so that it can be included in the new credential.",
+        "parameters" : [ {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the CredentialStatus object of the added entry.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CredentialStatus"
+                },
+                "example" : {
+                  "type" : "StatusList2021Entry",
+                  "statusPurpose" : "revocation",
+                  "statusListIndex" : "94567",
+                  "statusListCredential" : "https://revocation.example.com/status/somelistname"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Returned if the list does not exists."
+          }
+        }
+      }
+    },
+    "/management/lists/{profileName}/entry/{idx}" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "idx",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ListEntry"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Revokes the referenced Credential",
+        "description" : "The URL pointing to this list is the statusListCredential value in the StatusListEntry.",
+        "parameters" : [ {
+          "name" : "idx",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "profileName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Returned if the entry has been set to revoked."
+          },
+          "404" : {
+            "description" : "Returned if neither the list, nor the index in this list exists."
+          }
+        }
+      }
+    },
+    "/status/{listName}" : {
+      "get" : {
+        "summary" : "Retrieves the current ListCredential",
+        "description" : "The URL pointing to this list is the statusListCredential value in the StatusListEntry.",
+        "parameters" : [ {
+          "name" : "listName",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the currently issued ListCredential for the requested list.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Returned if either the list does not exists, or no ListCredential has been issued yet."
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "CredentialStatus" : {
+        "required" : [ "statusId" ],
+        "type" : "object",
+        "properties" : {
+          "statusId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Instant" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T16:15:50Z"
+      },
+      "ListDefinition" : {
+        "required" : [ "listName", "profileName", "lastUpdate" ],
+        "type" : "object",
+        "properties" : {
+          "listName" : {
+            "type" : "string"
+          },
+          "profileName" : {
+            "type" : "string"
+          },
+          "encodedList" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "listCredential" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "lastUpdate" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "ListEntry" : {
+        "required" : [ "createdAt", "revokedAt" ],
+        "type" : "object",
+        "properties" : {
+          "index" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "revoked" : {
+            "type" : "boolean"
+          },
+          "revokedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "processed" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ListMapping" : {
+        "required" : [ "profileName", "listName" ],
+        "type" : "object",
+        "properties" : {
+          "profileName" : {
+            "type" : "string"
+          },
+          "listName" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+
+image:
+  tag: "latest-dev"
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: CHANGEME
+      paths:
+        - path: "/profile/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-not-accept
+     hosts:
+       - CHANGEME
+
+envConfig:
+  QUARKUS_LOG_LEVEL: INFO
+
+config:
+  datasourceJdbcUrl: CHANGEME
+  datasourceReactiveUrl: CHANGEME
+  datasourceUsername: CHANGEME
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-accept-password"
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "profile-oidc-secret"
+  oidcAuthServerUrl: CHANGEME
+  oidcClientId: CHANGEME
+  oidcIntrospectionPath: CHANGEME
+  otelConnectorUrl: CHANGEME
+  restClientRevocationApiUrl: CHANGEME
+  restClientSsiIssuanceV1ApiUrl: CHANGEME
+  restClientSsiIssuanceV2ApiUrl: CHANGEME

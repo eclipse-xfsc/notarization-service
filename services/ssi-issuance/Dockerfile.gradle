@@ -1,0 +1,24 @@
+# Base
+FROM docker.io/library/node:20.9.0-bookworm as base
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tini && \
+    rm -rf /var/lib/apt/lists/*
+
+# Final
+FROM base
+
+ARG APP_HOME=/home/node/app
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+ENV APP_HOME=${APP_HOME}
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["node", "dist/main"]
+
+USER node
+WORKDIR ${APP_HOME}
+
+COPY --chown=node:node /package.json ${APP_HOME}/
+COPY --chown=node:node /node_modules ${APP_HOME}/node_modules
+COPY --chown=node:node /dist ${APP_HOME}/dist

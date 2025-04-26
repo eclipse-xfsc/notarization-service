@@ -1,0 +1,964 @@
+version: "3"
+services:
+
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:1.34.1
+    container_name: jaegertracing
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250"
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:0.50.0
+    container_name: opentelemetry-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ../../../deploy/resources/config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "13133:13133"  # Health_check extension
+      - "4317:4317"    # OTLP gRPC receiver
+      - "55680:55680"  # OTLP gRPC receiver alternative port
+    depends_on:
+      - jaeger-all-in-one
+
+  profile-db:
+    image: postgres:14
+    container_name: profile-db
+    ports:
+      - "35433:5432"
+    environment:
+      POSTGRES_USER: profile
+      POSTGRES_PASSWORD: profile
+      POSTGRES_DB: profile_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profile -d profile_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  profile-flyway:
+    image: flyway/flyway:8.5
+    container_name: profile-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://profile-db:5432/profile_database -schemas=public -user=profile -password=profile -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/profile/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      profile-db:
+        condition: service_healthy
+
+  profile:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/profile:latest-dev
+    container_name: profile
+    depends_on:
+      profile-flyway:
+        condition: service_completed_successfully
+      ssi-issuance-v1:
+        condition: service_healthy
+      revocation:
+        condition: service_healthy
+      keycloak-initial-config-importer:
+        condition: service_completed_successfully
+    ports:
+      - "8083:8083"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8083
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_LOG_CATEGORY__EU_GAIAX__LEVEL: DEBUG
+      QUARKUS_OIDC_AUTH_SERVER_URL: http://keycloak:9194/realms/notarization-realm
+      QUARKUS_OIDC_CLIENT_ID: profile-client
+      QUARKUS_OIDC_CREDENTIALS_SECRET: not-profile-api-secret-54321
+      QUARKUS_OIDC_DISCOVERY_ENABLED: false
+      QUARKUS_OIDC_INTROSPECTION_PATH: http://keycloak:9194/realms/notarization-realm/protocol/openid-connect/token/introspect
+      QUARKUS_DATASOURCE_USERNAME: profile
+      QUARKUS_DATASOURCE_PASSWORD: profile
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://profile-db:5432/profile_database
+      QUARKUS_REST_CLIENT_SSI_ISSUANCE_V1_API_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}"
+      QUARKUS_REST_CLIENT_SSI_ISSUANCE_V2_API_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v2:8089}"
+      QUARKUS_REST_CLIENT_REVOCATION_API_URL: http://revocation:8086
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    volumes:
+      - ../../../services/profile/deploy/config/application-example-docker-compose.yaml:/home/jboss/config/application.yaml
+    networks:
+      default:
+        aliases:
+          - profile
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8083/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
+
+  dss:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/dev-ops/dss@sha256:db37b0cb6e1e835155f24fca00f1ded7ddb0ffd4defa37e24cd29dca657779c5
+    container_name: dss
+    ports:
+      - "8080"
+
+  request-processing-db:
+    image: postgres:14
+    container_name: request-processing-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: request
+      POSTGRES_PASSWORD: request
+      POSTGRES_DB: requests_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U request -d requests_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  request-processing-flyway:
+    image: flyway/flyway:8.5
+    container_name: request-processing-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://request-processing-db:5432/requests_database -schemas=public -user=request -password=request -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/request-processing/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      request-processing-db:
+        condition: service_healthy
+
+  rabbitmq:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/rabbitmq-dev:3.13.7-management
+    container_name: 'rabbitmq'
+    ports:
+        - 5671:5671   # amqp/tls
+        - 5672:5672   # amqp
+        - 15672:15672 # http
+        - 15692:15692 # prometheus
+    environment:
+      RABBITMQ_DEFAULT_USER: request-rabbit
+      RABBITMQ_DEFAULT_PASS: request-rabbit-password
+    volumes:
+      - ../../../deploy/resources/config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ../../../deploy/resources/config/rabbitmq/rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
+      - ../../../deploy/resources/config/rabbitmq/ca_certificate.pem:/notarization/ca_certificate.pem
+      - ../../../deploy/resources/config/rabbitmq/server_notarization_certificate.pem:/notarization/server_certificate.pem
+      - ../../../deploy/resources/config/rabbitmq/server_notarization_key.pem:/notarization/server_key.pem
+      - ../../../deploy/resources/config/rabbitmq/erl_crash.dump:/var/log/rabbitmq/erl_crash.dump
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-23.0.7}
+    ports:
+      - "${KEYCLOAK_PORT:-9194}:${KEYCLOAK_PORT:-9194}"
+    command: "start-dev --http-port=${KEYCLOAK_PORT:-9194} --log-level=INFO --health-enabled=true"
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-keycloak}
+      - KEYCLOAK_PORT=${KEYCLOAK_PORT:-9194}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-keycloakcd}
+      # Changed because of TRAIN, previously: localhost
+      - KC_HOSTNAME=keycloak
+      - KC_DB=postgres
+      - KC_DB_USERNAME=${KEYCLOAK_DATABASE_USER:-keycloakdb}
+      - KC_DB_PASSWORD=${KEYCLOAK_DATABASE_PASSWORD:-keycloakdb}
+      - KC_DB_URL=jdbc:postgresql://keycloakdb/keycloakdb
+    networks:
+      default:
+        aliases:
+          - keycloak
+    depends_on:
+      - keycloakdb
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/${KEYCLOAK_PORT:-9194};echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"]
+      start_period: 50s
+      interval: 5s
+      timeout: 5s
+      retries: 150
+
+  keycloakdb:
+    image: postgres:${POSTGRES_VERSION:-14}
+    container_name: keycloak-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${KEYCLOAK_DATABASE_USER:-keycloakdb}
+      - POSTGRES_PASSWORD=${KEYCLOAK_DATABASE_PASSWORD:-keycloakdb}
+      - POSTGRES_DB=${KEYCLOAK_DATABASE_NAME:-keycloakdb}
+    networks:
+      default:
+
+  keycloak-initial-config-importer:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/keycloak-jq@sha256:982a3118a6d30572e0ca571b46dd2fa8a413bd91b62636dd17cee931ce0eb1eb
+    container_name: keycloak-config
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-keycloak}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-keycloakcd}
+      - KEYCLOAK_PORT=9194
+      - KC_HOSTNAME=keycloak
+    volumes:
+      - ./keycloak/keycloak_init.sh:/tmp/keycloak_init.sh
+    restart: on-failure
+    entrypoint: "/tmp/keycloak_init.sh"
+    networks:
+      default:
+
+  request-processing:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/request-processing:latest-dev
+    container_name: request-processing
+    depends_on:
+      - request-processing-flyway
+      - keycloak-initial-config-importer
+      - rabbitmq
+      - dss
+      - profile
+    ports:
+      - "8084:8084"
+    environment:
+      QUARKUS_HTTP_PORT: 8084
+      QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083/
+      BROWSER_IDENTIFICATION_URL: http://oidc-identity-resolver:8085/session/
+      VC_IDENTIFICATION_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}/credential/verify"
+      QUARKUS_LOG_CATEGORY__EU_GAIAX__LEVEL: DEBUG
+      QUARKUS_REST_CLIENT_LOGGING_SCOPE: request-response
+      QUARKUS_REST_CLIENT_LOGGING_BODY_LIMIT: 500
+      QUARKUS_HTTP_ACCESS_LOG_EXCLUDE_PATTERN: (\/api\/v1\/routines\/deleteTimeout|\/api\/v1\/routines\/deleteSubmitTimeout|\/api\/v1\/routines\/deleteTerminated)
+      QUARKUS_LOG_CATEGORY__ORG_JBOSS_RESTEASY_REACTIVE_CLIENT_LOGGING__LEVEL: DEBUG
+      QUARKUS_REST_CLIENT_SSI_ISSUANCE_V1_API_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}"
+      QUARKUS_REST_CLIENT_SSI_ISSUANCE_V2_API_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v2:8089}"
+      QUARKUS_REST_CLIENT_REVOCATION_API_URL: http://revocation:8086
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://request-processing-db:5432/requests_database
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+      QUARKUS_DATASOURCE_USERNAME: request
+      QUARKUS_DATASOURCE_PASSWORD: request
+      QUARKUS_OIDC_AUTH_SERVER_URL: http://keycloak:9194/realms/notarization-realm
+      QUARKUS_OIDC_CLIENT_ID: notarization-client
+      QUARKUS_OIDC_CREDENTIALS_SECRET: notarization-api-secret-12345
+      QUARKUS_OIDC_DISCOVERY_ENABLED: false
+      QUARKUS_OIDC_INTROSPECTION_PATH: http://keycloak:9194/realms/notarization-realm/protocol/openid-connect/token/introspect
+      AMQP_HOST: rabbitmq
+      AMQP_PORT: 5672
+      AMQP_USERNAME: request-processing-user
+      AMQP_PASSWORD: request-rabbit-password
+      NOTARIZATION_PROCESSING_INTERNAL_URL: http://request-processing:8084
+      NOTARIZATION_AMQP_SSL: "false"
+      NOTARIZATION_AMQP_CA_PATH: /tmp/ca_certificate.pem
+      NOTARIZATION_AMQP_TLS_CERT_PATH: /tmp/client_certificate.pem
+      NOTARIZATION_AMQP_TLS_KEY_PATH: /tmp/client_key.pem
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      QUARKUS_REST_CLIENT_DSS_API_URL: http://dss:8080/services/rest
+      GAIA_X_EXTENSIONS_INTERNAL_TASKS_UPLOAD_DOCUMENTS_NAMES: DocumentUpload
+      GAIA_X_EXTENSIONS_TASKS_OIDCIDENTIFY_SERVICE_NAME: eID-Validation
+      GAIA_X_EXTENSIONS_TASKS_OIDCIDENTIFY_NAMES: eID-Validation
+      GAIA_X_EXTENSIONS_TASKS_OIDCIDENTIFY_LOCATION: http://oidc-identity-resolver:8085/session/
+      GAIA_X_EXTENSIONS_TASKS_VCIDENTIFY_SERVICE_NAME: VC-Validation
+      GAIA_X_EXTENSIONS_TASKS_VCIDENTIFY_NAMES: VC-Validation
+      GAIA_X_EXTENSIONS_TASKS_VCIDENTIFY_LOCATION: "${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}/credential/verify"
+      GAIA_X_EXTENSIONS_TASKS_COMPLIANCE_SERVICE_NAME: Compliance-Check
+      GAIA_X_EXTENSIONS_TASKS_COMPLIANCE_NAMES: Compliance-Check
+      GAIA_X_EXTENSIONS_TASKS_COMPLIANCE_LOCATION: http://compliance-task:8090/task/begin
+      GAIA_X_EXTENSIONS_TASKS_OID4VP_SERVICE_NAME: OID4VP
+      GAIA_X_EXTENSIONS_TASKS_OID4VP_NAMES: OID4VP
+      GAIA_X_EXTENSIONS_TASKS_OID4VP_LOCATION: http://oid4vp:8097/internal/oid4vp-task/begin
+      GAIA_X_EXTENSIONS_TASKS_OID4VPTRAIN_SERVICE_NAME: OID4VP-TRAIN
+      GAIA_X_EXTENSIONS_TASKS_OID4VPTRAIN_NAMES: OID4VP-TRAIN
+      GAIA_X_EXTENSIONS_TASKS_OID4VPTRAIN_LOCATION: http://oid4vp-train:8098/internal/oid4vp-task/begin
+      GAIA_X_EXTENSIONS_ACTIONS_TRAINENROLLMENT_SERVICE_NAME: TRAIN-Enrollment
+      GAIA_X_EXTENSIONS_ACTIONS_TRAINENROLLMENT_NAMES: TRAIN-Enrollment
+      GAIA_X_EXTENSIONS_ACTIONS_TRAINENROLLMENT_LOCATION: http://train-enrollment:8092/task/begin
+    volumes:
+      - ../../../deploy/resources/config/rabbitmq/ca_certificate.pem:/tmp/ca_certificate.pem
+      - ../../../deploy/resources/config/rabbitmq/client_notarization_certificate.pem:/tmp/client_certificate.pem
+      - ../../../deploy/resources/config/rabbitmq/client_notarization_key.pem:/tmp/client_key.pem
+    restart: on-failure
+    networks:
+      default:
+        aliases:
+          - request-processing
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8084/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
+
+  oidc-identity-resolver-db:
+    image: postgres:14
+    container_name: oidc-identity-resolver-db
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_USER: oidc-identity-resolver
+      POSTGRES_PASSWORD: oidc-identity-resolver
+      POSTGRES_DB: demo_identity_oidc_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oidc-identity-resolver -d demo_identity_oidc_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  oidc-identity-resolver-flyway:
+    image: flyway/flyway:8.5
+    container_name: oidc-identity-resolver-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://oidc-identity-resolver-db:5432/demo_identity_oidc_database -schemas=public -user=oidc-identity-resolver -password=oidc-identity-resolver -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/oidc-identity-resolver/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      oidc-identity-resolver-db:
+        condition: service_healthy
+
+  oidc-identity-resolver:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oidc-identity-resolver:latest-dev
+    container_name: oidc-identity-resolver
+    depends_on:
+      oidc-identity-resolver-db:
+        condition: service_healthy
+      keycloak-initial-config-importer:
+        condition: service_completed_successfully
+    ports:
+      - "8085:8085"
+    environment:
+      QUARKUS_HTTP_PORT: 8085
+      QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+      # OIDC
+      OIDC_IDENTITY_RESOLVER_WEBSERVICE_ENABLED: "true"
+      QUARKUS_OIDC_CLIENT_ID: portal-client
+      QUARKUS_OIDC_CREDENTIALS_SECRET: portal-secret-12345
+      QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:9194/realms/notarization-realm"
+      DEMO_IDENTITY_OIDC_EXTERNAL_URL: http://localhost:8085
+      REDIRECT_LOGIN_SUCCESS_URL: http://localhost:30123
+      REDIRECT_LOGIN_FAILURE_URL: http://localhost:30124
+      # Database
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://oidc-identity-resolver-db:5432/demo_identity_oidc_database
+      # QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: validate
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+      QUARKUS_DATASOURCE_USERNAME: oidc-identity-resolver
+      QUARKUS_DATASOURCE_PASSWORD: oidc-identity-resolver
+    restart: on-failure
+    networks:
+      default:
+        aliases:
+          - oidc-identity-resolver
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  scheduler-db:
+    image: postgres:14
+    container_name: scheduler-db
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_USER: scheduler
+      POSTGRES_PASSWORD: scheduler
+      POSTGRES_DB: scheduler_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scheduler -d scheduler_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  scheduler-flyway:
+    image: flyway/flyway:8.5
+    container_name: scheduler-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://scheduler-db:5432/scheduler_database -schemas=public -user=scheduler -password=scheduler -connectRetries=60 -baselineOnMigrate=true -table=flyway_quarkus_history migrate"
+    volumes:
+      - ../../../services/scheduler/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      scheduler-db:
+        condition: service_healthy
+
+  scheduler:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/scheduler:latest-dev
+    container_name: scheduler
+    depends_on:
+      request-processing:
+        condition: service_healthy
+      scheduler-db:
+        condition: service_healthy
+      profile:
+        condition: service_healthy
+      revocation:
+        condition: service_healthy
+    ports:
+      - "8087:8087"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8087
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      QUARKUS_REST_CLIENT_REQUESTPROCESSING_API_URL: http://request-processing:8084
+      QUARKUS_REST_CLIENT_REVOCATION_API_URL: http://revocation:8086
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083
+      QUARKUS_REST_CLIENT_ISSUANCE2_API_URL: http://ssi-issuance-v2:8089
+      QUARKUS_QUARTZ_CLUSTERED: "true"
+      QUARKUS_QUARTZ_STORE_TYPE: jdbc-cmt
+      # Datasource configuration.
+      QUARKUS_DATASOURCE_DB_KIND: postgresql
+      QUARKUS_DATASOURCE_USERNAME: scheduler
+      QUARKUS_DATASOURCE_PASSWORD: scheduler
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://scheduler-db:5432/scheduler_database
+      # Hibernate configuration
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+      QUARKUS_HIBERNATE_ORM_LOG_SQL: "true"
+      QUARKUS_HIBERNATE_ORM_SQL_LOAD_SCRIPT: no-file
+      # flyway configuration
+      QUARKUS_FLYWAY_CONNECT_RETRIES: 10
+      QUARKUS_FLYWAY_TABLE: flyway_quarkus_history
+      QUARKUS_FLYWAY_MIGRATE_AT_START: "true"
+      QUARKUS_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      QUARKUS_FLYWAY_BASELINE_VERSION: "1_0"
+      QUARKUS_FLYWAY_BASELINE_DESCRIPTION: Quartz
+      # quarz cron style (Seconds Minutes Hours 'Day Of Month' Month 'Day Of Week' Year)
+      CRON_PRUNE_TERMINATED: "*/10 * * ? * * *"
+      CRON_PRUNE_TIMEOUT: "*/5 * * ? * * *"
+      CRON_PRUNE_SUBMISSION_TIMEOUT: "*/2 * * ? * * *"
+      CRON_ISSUE_REVOCATION_CREDENTIALS: "0 * * ? * * *"
+      CRON_PROFILE_REQUEST_OUTSTANDING_DIDS: "0 * * ? * * *"
+    networks:
+      default:
+        aliases:
+          - scheduler
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+
+
+  revocation-db:
+    image: postgres:14
+    container_name: revocation-db
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_USER: revocation
+      POSTGRES_PASSWORD: revocation
+      POSTGRES_DB: revocation
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U revocation -d revocation"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  revocation-flyway:
+    image: flyway/flyway:8.5
+    container_name: revocation-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://revocation-db:5432/revocation -schemas=public -user=revocation -password=revocation -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/revocation/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      revocation-db:
+        condition: service_healthy
+
+  revocation:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/revocation:latest-dev
+    container_name: revocation
+    ports:
+      - "8086:8086"
+    depends_on:
+      - revocation-flyway
+    environment:
+      QUARKUS_HTTP_PORT: 8086
+      QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+      QUARKUS_DATASOURCE_USERNAME: revocation
+      QUARKUS_DATASOURCE_PASSWORD: revocation
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://revocation-db:5432/revocation
+      QUARKUS_REST_CLIENT_SSI_ISSUANCE_API_URL: "${SSI_SERVICE_URL:-http://ssi-issuance-v1:8088}"
+      REVOCATION_BASE_URL: http://localhost:8086
+      REVOCATION_MIN_ISSUE_INTERVAL: PT0S
+      QUARKUS_OPENTELEMETRY_ENABLED: "true"
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    restart: on-failure
+    networks:
+      default:
+        aliases:
+          - revocation
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8086/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
+
+  ssi-issuance-v1:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/ssi-issuance:latest-dev
+    container_name: ssi-issuance-v1
+    ports:
+      - "8088:8088"
+    restart: on-failure
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: trace
+      LOG_BUFFER_INITIAL: true
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8088
+      ACAPY_API_URL: http://acapy:80
+      ACAPY_WEBHOOKS_PATH: /acapy/webhooks
+      SSI_SERVICE_URL: http://ssi-issuance-v1:8088
+      PROFILE_SERVICE_URL: http://profile:8083
+      REVOCATION_SERVICE_URL: http://revocation:8086
+    networks:
+      default:
+        aliases:
+          - ssi-issuance-v1
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8088/healthz"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
+
+  compliance-task-db:
+    image: postgres:14
+    container_name: compliance-task-db
+    ports:
+      - "35434:5432"
+    environment:
+      POSTGRES_USER: compliance-task
+      POSTGRES_PASSWORD: compliance-task
+      POSTGRES_DB: compliance_task_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U compliance-task -d compliance_task_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  compliance-task-flyway:
+    image: flyway/flyway:8.5
+    container_name: compliance-task-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://compliance-task-db:5432/compliance_task_database -schemas=public -user=compliance-task -password=compliance-task -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/compliance-task/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      compliance-task-db:
+        condition: service_healthy
+
+  compliance-task:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/compliance-task:latest-dev
+    container_name: compliance-task
+    depends_on:
+      - compliance-task-flyway
+    ports:
+      - "8090:8090"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8090
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_REST_CLIENT_LOGGING_SCOPE: request-response
+      QUARKUS_REST_CLIENT_LOGGING_BODY_LIMIT: 500
+      QUARKUS_HTTP_ACCESS_LOG_EXCLUDE_PATTERN: (\/api\/v1\/routines\/deleteTimeout|\/api\/v1\/routines\/deleteSubmitTimeout|\/api\/v1\/routines\/deleteTerminated)
+      QUARKUS_LOG_CATEGORY__ORG_JBOSS_RESTEASY_REACTIVE_CLIENT_LOGGING__LEVEL: DEBUG
+      QUARKUS_DATASOURCE_USERNAME: compliance-task
+      QUARKUS_DATASOURCE_PASSWORD: compliance-task
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://compliance-task-db:5432/compliance_task_database
+      # Change this to https if enabled
+      QUARKUS_REST_CLIENT_COMPLIANCE_URL: http://compliance:3000
+      GAIA_X_COMPLIANCE_TASK_EXTERNAL_URL: http://localhost:8090
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    networks:
+      default:
+        aliases:
+          - compliance-task
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8083/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+
+  train-enrollment-db:
+    image: postgres:14
+    container_name: train-enrollment-db
+    ports:
+      - "35435:5432"
+    environment:
+      POSTGRES_USER: train-enrollment
+      POSTGRES_PASSWORD: train-enrollment
+      POSTGRES_DB: train_enrollment_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U train-enrollment -d train_enrollment_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  train-enrollment-flyway:
+    image: flyway/flyway:8.5
+    container_name: train-enrollment-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://train-enrollment-db:5432/train_enrollment_database -schemas=public -user=train-enrollment -password=train-enrollment -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/train-enrollment/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      train-enrollment-db:
+        condition: service_healthy
+
+  train-enrollment:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/train-enrollment:latest-dev
+    container_name: train-enrollment
+    depends_on:
+      - train-enrollment-flyway
+      - keycloak-initial-config-importer
+    ports:
+      - "8092:8092"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8092
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_DATASOURCE_USERNAME: train-enrollment
+      QUARKUS_DATASOURCE_PASSWORD: train-enrollment
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://train-enrollment-db:5432/train_enrollment_database
+      QUARKUS_REST_CLIENT_TRAIN_URL: http://train-server:8080/tspa-service
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+
+      QUARKUS_OIDC_CLIENT_AUTH_SERVER_URL: https://auth-cloud-wallet.xfsc.dev/realms/train
+      QUARKUS_OIDC_CLIENT_CLIENT_ID: tfm-demo
+      # TODO: Insert client credential secret
+      QUARKUS_OIDC_CLIENT_CREDENTIALS_SECRET:
+      QUARKUS_OIDC_CLIENT_SCOPES: openid
+      QUARKUS_OIDC_CLIENT_GRANT_TYPE: client
+
+      GAIA_X_TRAIN_ENROLLMENT_EXTERNAL_URL: http://localhost:8092/
+    networks:
+      default:
+        aliases:
+          - train-enrollment
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8083/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+
+  oid4vci-db:
+    image: postgres:14
+    container_name: oid4vci-db
+    ports:
+      - "35436:5432"
+    environment:
+      POSTGRES_USER: oid4vci
+      POSTGRES_PASSWORD: oid4vci
+      POSTGRES_DB: oid4vci_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oid4vci -d oid4vci_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  oid4vci-flyway:
+    image: flyway/flyway:8.5
+    container_name: oid4vci-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://oid4vci-db:5432/oid4vci_database -schemas=public -user=oid4vci -password=oid4vci -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/oid4vci/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      oid4vci-db:
+        condition: service_healthy
+
+  oid4vci:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oid4vci:latest-dev
+    container_name: oid4vci
+    depends_on:
+      - oid4vci-flyway
+    ports:
+      - "8094:8094"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8094
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_DATASOURCE_USERNAME: oid4vci
+      QUARKUS_DATASOURCE_PASSWORD: oid4vci
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://oid4vci-db:5432/oid4vci_database
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      GAIA_X_OID4VCI_ISSUER_URL: http://localhost:8094/
+      SMALLRYE_JWT_SIGN_KEY_LOCATION: classpath:/demo_keys/sign_jwks.json
+      SMALLRYE_JWT_SIGN_KEY_ID: s_es256
+      MP_JWT_VERIFY_PUBLICKEY_LOCATION: classpath:/demo_keys/verify_jwks.json
+      MP_JWT_VERIFY_PUBLICKEY_ALGORITHM: ES256
+      # Use for octet keys
+      #SMALLRYE_JWT_VERIFY_PUBLICKEY_LOCATION: classpath:/demo_keys/verify_jwks.json
+      #SMALLRYE_JWT_VERIFY_PUBLICKEY_ALGORITHM: HS256
+      SMALLRYE_JWT_ENCRYPT_KEY_LOCATION: classpath:/demo_keys/encrypt_jwks.json
+      MP_JWT_DECRYPT_KEY_LOCATION: classpath:/demo_keys/decrypt_oct_jwks.json
+      SMALLRYE_JWT_ENCRYPT_KEY_ID: e_a256
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083/
+    networks:
+      default:
+        aliases:
+          - oid4vci
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8094/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+
+
+  ssi-issuance2-db:
+    image: postgres:14
+    container_name: ssi-issuance2-db
+    ports:
+      - "35437:5432"
+    environment:
+      POSTGRES_USER: ssi-issuance2
+      POSTGRES_PASSWORD: ssi-issuance2
+      POSTGRES_DB: ssi_issuance2_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ssi-issuance2 -d ssi_issuance2_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ssi-issuance2-flyway:
+    image: flyway/flyway:8.5
+    container_name: ssi-issuance2-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://ssi-issuance2-db:5432/ssi_issuance2_database -schemas=public -user=ssi-issuance2 -password=ssi-issuance2 -connectRetries=60 -baselineOnMigrate=true -table=flyway_quarkus_history migrate"
+    volumes:
+      - ../../../services/ssi-issuance2/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      ssi-issuance2-db:
+        condition: service_healthy
+
+  ssi-issuance2:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/ssi-issuance2:latest-dev
+    container_name: ssi-issuance-v2
+    depends_on:
+      - ssi-issuance2-flyway
+      - oid4vci
+    ports:
+      - "8089:8089"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8089
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_LOG_CATEGORY__EU_XFSC__LEVEL: DEBUG
+      QUARKUS_REST_CLIENT_LOGGING_SCOPE: request-response
+      QUARKUS_REST_CLIENT_LOGGING_BODY_LIMIT: 500
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+
+      ISSUANCE2_SERVICE_URL: http://ssi-issuance-v2:8089
+
+      GAIA_X_KEYMANAGER_LOCAL_JWK: '{"alg":"A256GCM","k":"ohqtC5643zRspDvmuHu39cXZqHvBr95QBdqfiAmMWPQ","key_ops":["encrypt","decrypt"],"kty":"oct"}'
+
+      QUARKUS_REST_CLIENT_REVOCATION_SERVICE_URL: http://revocation:8086
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083
+      QUARKUS_REST_CLIENT_OFFER_API_URL: http://oid4vci:8094
+      QUARKUS_REST_CLIENT_ACAPY_JSON_URL: http://acapy:80
+      # Datasource configuration.
+      QUARKUS_DATASOURCE_DB_KIND: postgresql
+      QUARKUS_DATASOURCE_USERNAME: ssi-issuance2
+      QUARKUS_DATASOURCE_PASSWORD: ssi-issuance2
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://ssi-issuance2-db:5432/ssi_issuance2_database
+      # Hibernate configuration
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+      QUARKUS_HIBERNATE_ORM_SQL_LOAD_SCRIPT: no-file
+    networks:
+      default:
+        aliases:
+          - ssi-issuance-v2
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8089/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+
+  oid4vp-db:
+    image: postgres:14
+    container_name: oid4vp-db
+    ports:
+      - "35438:5432"
+    environment:
+      POSTGRES_USER: oid4vp
+      POSTGRES_PASSWORD: oid4vp
+      POSTGRES_DB: oid4vp_database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oid4vp -d oid4vp_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  oid4vp-flyway:
+    image: flyway/flyway:8.5
+    container_name: oid4vp-flyway
+    command: "-locations=filesystem:/sql-migrations -url=jdbc:postgresql://oid4vp-db:5432/oid4vp_database -schemas=public -user=oid4vp -password=oid4vp -connectRetries=60 migrate"
+    volumes:
+      - ../../../services/oid4vp-task/src/main/jib/db-flyway/:/sql-migrations
+    depends_on:
+      oid4vp-db:
+        condition: service_healthy
+
+  oid4vp:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oid4vp-task:latest-dev
+    container_name: oid4vp
+    depends_on:
+      - oid4vp-flyway
+    ports:
+      - "8097:8097"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8097
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_DATASOURCE_USERNAME: oid4vp
+      QUARKUS_DATASOURCE_PASSWORD: oid4vp
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://oid4vp-db:5432/oid4vp_database
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+
+      QUARKUS_HTTP_LIMITS_MAX_FORM_ATTRIBUTE_SIZE: 1M
+
+      SMALLRYE_JWT_SIGN_KEY_LOCATION: classpath:/demo_keys/sign_jwks.json
+      SMALLRYE_JWT_SIGN_KEY_ID: s_es256
+      MP_JWT_VERIFY_PUBLICKEY_LOCATION: classpath:/demo_keys/verify_jwks.json
+      MP_JWT_VERIFY_PUBLICKEY_ALGORITHM: ES256
+
+      GAIA_X_OID4VP_CLIENT_CLIENT_ID: localhost
+      GAIA_X_OID4VP_BASE_URL: http://localhost:8097/
+      GAIA_X_OID4VP_CLIENT_JWS_ALG: ES512
+      GAIA_X_OID4VP_CLIENT_SCHEME: x509_san_dns
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_LOCATION: classpath:/demo_keys/oid-client.jks
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_ALIAS: client-key-dns
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_PASSWORD: 123456
+
+      GAIA_X_OID4VP_ISSUER_URL: http://localhost:8097/
+      GAIA_X_OID4VP_FINISH_REDIRECT_URI: http://localhost:8097/finished
+
+      #QUARKUS_REST_CLIENT_TRAIN_API_URL: http://tcr-server:8087/tcr/v1
+      #QUARKUS_REST_CLIENT_TRAIN_API_URL: https://tcr.train.xfsc.dev/tcr/v1
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083/
+
+      #GAIA_X_DID_RESOLVER_URL: https://dev.uniresolver.io/1.0
+    networks:
+      default:
+        aliases:
+          - oid4vp
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8094/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+
+  oid4vp-train:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oid4vp-task:latest-dev
+    container_name: oid4vp-train
+    depends_on:
+      - oid4vp-flyway
+    ports:
+      - "8098:8098"
+    restart: on-failure
+    environment:
+      "QUARKUS_HTTP_PORT": 8098
+      "QUARKUS_HTTP_ACCESS_LOG_ENABLED": "true"
+      QUARKUS_DATASOURCE_USERNAME: oid4vp
+      QUARKUS_DATASOURCE_PASSWORD: oid4vp
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://oid4vp-db:5432/oid4vp_database
+      QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+
+      QUARKUS_HTTP_LIMITS_MAX_FORM_ATTRIBUTE_SIZE: 1M
+
+      SMALLRYE_JWT_SIGN_KEY_LOCATION: classpath:/demo_keys/sign_jwks.json
+      SMALLRYE_JWT_SIGN_KEY_ID: s_es256
+      MP_JWT_VERIFY_PUBLICKEY_LOCATION: classpath:/demo_keys/verify_jwks.json
+      MP_JWT_VERIFY_PUBLICKEY_ALGORITHM: ES256
+
+      GAIA_X_OID4VP_CLIENT_CLIENT_ID: localhost
+      GAIA_X_OID4VP_BASE_URL: http://localhost:8098/
+      GAIA_X_OID4VP_CLIENT_JWS_ALG: ES512
+      GAIA_X_OID4VP_CLIENT_SCHEME: x509_san_dns
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_LOCATION: classpath:/demo_keys/oid-client.jks
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_ALIAS: client-key-dns
+      GAIA_X_OID4VP_CLIENT_KEYSTORE_PASSWORD: 123456
+
+      GAIA_X_OID4VP_ISSUER_URL: http://localhost:8098/
+      GAIA_X_OID4VP_FINISH_REDIRECT_URI: http://localhost:8098/finished
+
+      QUARKUS_REST_CLIENT_TRAIN_API_URL: https://tcr.train1.xfsc.dev/tcr/v1/
+      QUARKUS_REST_CLIENT_PROFILE_API_URL: http://profile:8083/
+
+      #GAIA_X_DID_RESOLVER_URL: https://dev.uniresolver.io/1.0
+    networks:
+      default:
+        aliases:
+          - oid4vp-train
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8094/q/health/ready"]
+      interval: 20s
+      timeout: 20s
+      retries: 5

@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "b1321f27-cb27-4ff0-9b3a-c80d457aaaf5",
+		"name": "Notarization API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0. Fetch Profiles (Optional)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true,
+					"accept": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl_profile}}/api/v1/profiles",
+					"host": [
+						"{{baseurl_profile}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"profiles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1. Create Session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token);",
+							"postman.setEnvironmentVariable(\"sessionId\", jsonData.sessionId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"profileId\": \"demo-gaia-x-employee-credential-v1\"\n}\n"
+				},
+				"url": {
+					"raw": "{{baseurl_request_processing}}/api/v1/session",
+					"host": [
+						"{{baseurl_request_processing}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"session"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Submit Notarization Request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"Claims\" : \"admin\",\n        \"FedName\" : \"Simple Federation\",\n        \"PrcId\" : \"5989240124\",\n        \"FedId\": \"30129\",\n        \"PrcEmail\" : \"example@email.com\",\n        \"PrcFName\" : \"Jane\",\n        \"PrcLName\" : \"Doe\"\n    }\n}\n"
+				},
+				"url": {
+					"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission",
+					"host": [
+						"{{baseurl_request_processing}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"session",
+						"{{sessionId}}",
+						"submission"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Mark Request ready",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ready",
+					"host": [
+						"{{baseurl_request_processing}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"session",
+						"{{sessionId}}",
+						"submission",
+						"ready"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. State of Request (Optional)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}",
+					"host": [
+						"{{baseurl_request_processing}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"session",
+						"{{sessionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Fetch Invitation URL",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseurl_request_processing}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+					"host": [
+						"{{baseurl_request_processing}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"session",
+						"{{sessionId}}",
+						"submission",
+						"ssiInviteUrl"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "4. Fetch Invitation URL",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/session/{{sessionId}}/submission/ssiInviteUrl",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"session",
+								"{{sessionId}}",
+								"submission",
+								"ssiInviteUrl"
+							]
+						}
+					},
+					"_postman_previewlanguage": "json",
+					"header": [],
+					"cookie": [],
+					"body": "{\n    \"inviteUrl\": \"https://wallet-stage-not.gxfs.dev/some-did-com-unique-id\"\n}"
+				}
+			]
+		}
+	]
+}

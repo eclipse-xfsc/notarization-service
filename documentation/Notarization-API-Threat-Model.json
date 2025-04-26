@@ -1,0 +1,3111 @@
+{
+    "version": "2.0.0",
+    "summary": {
+      "title": "Notarization API Threat Model",
+      "owner": "Neil Crossley",
+      "description": "The document discusses security concepts around GAIA-X Notarization Service. The document assumes a basic knowledge of security methodologies and practices in the audience reading the document and does not explain these topics in detail.\n\nThe goal of GAIA-X Notarization Service project is to implement a service which will issue verifiable credentials to respective holders.\n\nThe intent of this document is to provide an overview of implemented functionality with respect to information security principles and concepts taken into account in implementation of the Notarization Service project.",
+      "id": 0
+    },
+    "detail": {
+      "contributors": [
+        {
+          "name": "Mike Prechtl"
+        },
+        {
+          "name": "Dr. Detlef Hühnlein"
+        }
+      ],
+      "diagrams": [
+        {
+          "name": "",
+          "id": 1,
+          "title": "System components",
+          "description": "A components diagram that also outline various top-level threats and mitigations.",
+          "diagramType": "STRIDE",
+          "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+          "version": "2.0.0",
+          "cells": [
+            {
+              "position": {
+                "x": -860.0000000000006,
+                "y": -509.9999999999993
+              },
+              "size": {
+                "width": 830,
+                "height": 389.06249999999994
+              },
+              "shape": "trust-boundary-box",
+              "attrs": {
+                "headerText": {
+                  "text": "Notarization API Components"
+                }
+              },
+              "zIndex": -1,
+              "id": "584675b5-f03e-4b8d-98cc-f58e884e8cce",
+              "data": {
+                "type": "tm.BoundaryBox",
+                "name": "Notarization API Components",
+                "description": "The core software components of the Notarization API system.",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "4db5b9af-cfb4-47d4-b7fd-cef638f6e6fb",
+                    "title": "Data flow should use HTTP/S",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Information disclosure",
+                    "description": "All requests are made over the public internet and could be intercepted by an attacker.",
+                    "mitigation": "Mitigated by the administrator:\n1. The requests should require HTTP/S. This will provide confidentiality and integrity. HTTP should not be supported.\n",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "7f8a0668-a8dd-4c40-92be-34cd0a2b123c",
+                    "title": "Credential theft",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Elevation of privilege",
+                    "description": "An external attacker could use stolen credentials to make unauthorised queries against internal components.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use ingress firewalls to restrict access to the internal services.\n2. Use network mesh to restrict access between components such that only required service-to-service communication is permitted.\n3. Use network mesh to encrypt all communication in transport to prevent leakage.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "088278a4-594f-463d-8989-a3034639d0d7",
+                    "title": "Brute force request information",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An external attacker could use brute force to discover the endpoints and thus information of the backend services.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use ingress firewalls to restrict access to the internal services.\n2. Use network mesh to restrict access between components such that only authenticated service-to-service communication is permitted.\n3. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "f5d1cbab-f165-47b1-b9fd-7718b7f86f48",
+                    "title": "Log files leak",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "Log files could contain sensitive information.",
+                    "mitigation": "Mitigated by the application:\n1. Log files only contain strictly necessary information.\nMitigated by the administrator:\n1. Access to log files is restricted.\n2. Log level is appropriate.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "1309019b-b51a-4136-ba73-1f554018555f",
+                    "title": "Distributed Denial of Service Attack",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Denial of service",
+                    "description": "A huge number of requests may lead to denial of service (DoS).",
+                    "mitigation": "Mitigated by the administrator:\n1. Implement additional web application firewalls (WAF).\n2. Implement rate limiting and quota on the API gateway to mitigate DDOS attacks.\n3. Improve availability with redundancy measures.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "c0d5bed8-d7ac-4d9b-adaf-0884fcb65a2a",
+                    "title": "Outdated components enable elevated privileges",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Elevation of privilege",
+                    "description": "Outdated software components with vulnerabilities give rise to elevation of privilege.",
+                    "mitigation": "Mitigated by the administrator:\n1. Regularly check for vulnerabilities and patch accordingly.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "a332a656-13f6-47ef-88e2-1e1478af207a",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "title": "Run operating system commands to elevate privileges",
+                    "type": "Elevation of privilege",
+                    "description": "A malicious user could run operating system commands through injection attacks to elevate privileges and perform remote code execution",
+                    "mitigation": "Mitigated by the administrator:\n1. Ensure the server process is running with the principle of least privilege\n2. Use jailing and sandboxing mechanisms whereever applicable\n3. Ensure input validation routines are in place to allow only known data (whitelisting)",
+                    "modelType": "STRIDE"
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": -800.0000000000003,
+                "y": -89.9999999999996
+              },
+              "size": {
+                "width": 576.0000000000002,
+                "height": 270
+              },
+              "shape": "trust-boundary-box",
+              "attrs": {
+                "headerText": {
+                  "text": "Supporting internal components"
+                }
+              },
+              "zIndex": -1,
+              "id": "1989dde5-da54-47cd-9230-1c23c29e416b",
+              "data": {
+                "type": "tm.BoundaryBox",
+                "name": "Supporting internal components",
+                "description": "The services that are additionally operated by the administrator.",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              }
+            },
+            {
+              "position": {
+                "x": -1000,
+                "y": -480
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requestor"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 1,
+              "id": "2a6df342-c2f1-4600-a15b-a475d0039e9e",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Requestor",
+                "description": "The requestor submits descriptions of credentials to be issued by the notarization system.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The client or front-end required by the requestor is out of context and to be considered relatively unsafe.",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -1010,
+                "y": -60
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Notary"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 2,
+              "id": "f8897c87-ed93-4fec-8264-a5d6c92b9c94",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Notary",
+                "description": "The notary agent or front-end that approves or rejects the issuance of submitted notarization requests.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": true,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -190,
+                "y": -410
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Profile Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 3,
+              "id": "2ca8a4ed-b9ff-4a13-9223-3674dc0ff0f3",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Profile Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -785.6249999999999,
+                "y": -410
+              },
+              "size": {
+                "width": 187.49999999999991,
+                "height": 100
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request Processing Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 4,
+              "id": "115406fa-0db8-4a13-adc0-69daf62fb13a",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Request Processing Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -437,
+                "y": -410
+              },
+              "size": {
+                "width": 150,
+                "height": 80
+              },
+              "attrs": {
+                "text": {
+                  "text": "SSI-Controller Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 5,
+              "id": "ad1042b0-13e8-43a4-b76f-b90311295807",
+              "data": {
+                "type": "tm.Actor",
+                "name": "SSI-Controller Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -748.1249999999999,
+                "y": -480
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Aca-Py"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 6,
+              "id": "bef6baf3-b4c9-4fab-87ef-92639cd41ebf",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Aca-Py",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -422,
+                "y": -200.93749999999864
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Audit Log DB"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "0090b96a-308a-4ba4-8ad1-0c52210de77f",
+              "zIndex": 7,
+              "data": {
+                "type": "tm.Store",
+                "name": "Audit Log DB",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": true,
+                "storesCredentials": false,
+                "isEncrypted": false,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "45af1cae-3096-4542-aad0-d2d97665ab36",
+                    "title": "Unauthorized data access through database files",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An attacker could steal audit data by stealing database files.",
+                    "mitigation": "Mitigated by administrator:\n1. Set proper privileges on the database files.\n2. Run the database server with the principle of least privilege.\n3. Encrypt the database at rest.\n4. Store the decryption keys in a Hardware Security Module (HSM).",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": -193.75,
+                "y": -200.93749999999864
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "DBMS"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "624dbb9f-de56-4dca-a210-5a3ffdf63098",
+              "zIndex": 8,
+              "data": {
+                "type": "tm.Store",
+                "name": "DBMS",
+                "description": "The database management service and the individual databases it provides.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": false,
+                "storesCredentials": false,
+                "isEncrypted": true,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "93d05b43-3c4c-4a44-b3a8-e0c498bd110e",
+                    "title": "Unauthorized data access through database files",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An attacker could steal request data or issuing keys by stealing database files.",
+                    "mitigation": "Mitigated by administrator:\n1. Set proper privileges on the database files.\n2. Run the database server with the principle of least privilege.\n3. Encrypt the database at rest.\n4. Store the decryption keys in a Hardware Security Module (HSM).",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": -399.5,
+                "y": 50
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Message Queue"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 9,
+              "id": "1b291b45-f032-4d7c-ae5e-a4e9262faf38",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Message Queue",
+                "description": "The event messaging service used to enable asynchronous notifications.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The safe and secure operation of an IAM-system is not within context of the notarization system. ",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -1010,
+                "y": -390
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requestor Wallet"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 10,
+              "id": "fc53a8bf-c104-47ff-b4dd-bf9caea43a26",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Requestor Wallet",
+                "description": "The technical recipient of the issued credential.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The client must implement the DIDComm protocol and cannot be otherwise verified by the system.",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                ""
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "",
+                "description": "",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "959de81a-e4bf-4077-be10-fa05e86769b4",
+              "source": {
+                "cell": "584675b5-f03e-4b8d-98cc-f58e884e8cce"
+              },
+              "target": {
+                "cell": "584675b5-f03e-4b8d-98cc-f58e884e8cce"
+              }
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                ""
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "",
+                "description": "",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "9585b8e9-641f-46ad-8218-be15d0944552",
+              "source": {
+                "x": -520,
+                "y": -510
+              },
+              "target": {
+                "x": -520,
+                "y": -100
+              }
+            },
+            {
+              "position": {
+                "x": -757.4999999999999,
+                "y": -293.2187499999998
+              },
+              "size": {
+                "width": 131.25,
+                "height": 70
+              },
+              "attrs": {
+                "text": {
+                  "text": "Revocation Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 12,
+              "id": "ff6a721b-00cb-41a0-b0ec-299ba6e7f1ea",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Revocation Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -766.8749999999999,
+                "y": -210.93749999999864
+              },
+              "size": {
+                "width": 150,
+                "height": 79.99999999999999
+              },
+              "attrs": {
+                "text": {
+                  "text": "OIDC Identity Resolver"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 13,
+              "id": "2d7df1b6-fded-4722-be3f-b348df536f01",
+              "data": {
+                "type": "tm.Actor",
+                "name": "OIDC Identity Resolver",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -766.8749999999999,
+                "y": 50
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "eID Provider"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 14,
+              "id": "d9543eab-9f5d-4946-bcee-5749cb17ce63",
+              "data": {
+                "type": "tm.Actor",
+                "name": "eID Provider",
+                "description": "The provider of the electronic identity of the requestor.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The safe and secure operation of an identity provider is not within context of the notarization system.",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -772.5,
+                "y": -50
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "IAM"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 15,
+              "id": "22b63d0b-90dc-45e1-8b63-0dc7851d7d6a",
+              "data": {
+                "type": "tm.Actor",
+                "name": "IAM",
+                "description": "Identity and access management (IAM) for the notary.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The safe and secure operation of an IAM-system is not within context of the notarization system. ",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -710,
+                "y": -520
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Publicly accessible components"
+                }
+              },
+              "shape": "td-text-block",
+              "zIndex": 16,
+              "id": "d10cfaa1-3e5f-4a52-b64c-d9a6fd55942d",
+              "data": {
+                "type": "tm.Text",
+                "name": "Publicly accessible components",
+                "hasOpenThreats": false
+              }
+            },
+            {
+              "position": {
+                "x": -418.25,
+                "y": -293.2187499999998
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Scheduler"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 17,
+              "id": "1d7b61a5-b839-4a89-aa14-282565c8455f",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Scheduler",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "cd1a62ab-d5d0-409d-a943-77e0839293f1",
+                    "title": "Triggers not called ",
+                    "status": "Mitigated",
+                    "severity": "Medium",
+                    "type": "Repudiation",
+                    "description": "An attacker might disrupt this service, preventing this service from triggering required operations in other services (such as clean-up or renewal).",
+                    "mitigation": "Mitigated by administrator:\n1. Configure the monitoring and alerting system to the notify the administrator when the scheduled operations fail unexpectedly often, or do not execute at all.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": -598.125,
+                "y": -50
+              },
+              "size": {
+                "width": 150.00000000000003,
+                "height": 80
+              },
+              "attrs": {
+                "text": {
+                  "text": "Monitoring and alerting"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 18,
+              "id": "93c1c301-f482-4eec-8040-104599687999",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Monitoring and alerting",
+                "description": "The ",
+                "outOfScope": true,
+                "reasonOutOfScope": "The safe and secure operation of monitoring, logging and alerting system is not within context of the notarization system. ",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": -399.5,
+                "y": -50
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "DSS"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 19,
+              "id": "4d80f0c3-1296-4f77-8b6f-454715d3f69a",
+              "data": {
+                "type": "tm.Actor",
+                "name": "DSS",
+                "description": "A digital signature service (DSS) for validating evidence documents.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The safe and secure operation of DSS is not within context of the notarization system. ",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "Minimal request submission and VC issuance.",
+          "id": 2,
+          "title": "Minimal request submission and VC issuance.",
+          "diagramType": "STRIDE",
+          "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+          "version": "2.0.0",
+          "cells": [
+            {
+              "position": {
+                "x": 197.5,
+                "y": -570
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requestor"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 1,
+              "id": "99e936ce-8731-4a9d-a6b5-ce9f5616a651",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Requestor",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 110,
+                "y": -220
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Notary"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 2,
+              "id": "efb8b8d0-ac0b-4e01-be2d-ed4d47f1127c",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Notary",
+                "description": "The notary, also known as the notarization operator.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": true,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 460,
+                "y": -430
+              },
+              "size": {
+                "width": 190,
+                "height": 190
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request Processing Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 3,
+              "id": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab",
+              "data": {
+                "type": "tm.Process",
+                "name": "Request Processing Service",
+                "description": "The request submission process is performed by the request processing service.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                "Notary network"
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "Notary network",
+                "description": "The network used by the notary. This may be a separate enterprise network.",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "5215bc21-26eb-461d-9b0e-b3499434aed0",
+              "source": {
+                "x": 270,
+                "y": -350
+              },
+              "target": {
+                "x": 570,
+                "y": -50
+              },
+              "vertices": [
+                {
+                  "x": 290,
+                  "y": -170
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Inspect token",
+                "description": "Inspect the credentials ",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "openid-connect",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "0d4ee596-2821-480a-aa19-176a71cd627e",
+              "labels": [
+                "Inspect token"
+              ],
+              "source": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "target": {
+                "cell": "c8c24f86-a502-43f8-8c7b-62a8338642e9"
+              },
+              "vertices": [
+                {
+                  "x": 510,
+                  "y": -160
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Login",
+                "description": "",
+                "outOfScope": true,
+                "reasonOutOfScope": "",
+                "protocol": "openid-connect",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "53011b64-3ead-43bf-977b-d46b6038313e",
+              "labels": [
+                "Login"
+              ],
+              "source": {
+                "cell": "efb8b8d0-ac0b-4e01-be2d-ed4d47f1127c"
+              },
+              "target": {
+                "cell": "c8c24f86-a502-43f8-8c7b-62a8338642e9"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                "Requestor network"
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "Requestor network",
+                "description": "The network from which the Requestor accesses the notarization system.",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "998fc428-c54a-43e7-9642-879b364c42d8",
+              "source": {
+                "x": 180,
+                "y": -480
+              },
+              "target": {
+                "x": 1000,
+                "y": -480
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Coordinate issuance",
+                "description": "Command and coordinate the issuance of the requested verifiable credential.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "92bbf84a-71dc-4c78-b5f2-71aaba02cc4f",
+              "labels": [
+                "Coordinate issuance"
+              ],
+              "source": {
+                "cell": "fbef8d23-fdeb-48ff-9a54-2b582d4689af"
+              },
+              "target": {
+                "cell": "2d69fe7b-ee9c-4480-b49d-8b962e583ed9"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Issue credential",
+                "description": "Issue the requested credential as specified using the DIDComm protocol.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The Aries protocol and implementation are a part of the Aries project https://github.com/hyperledger/aries-cloudagent-python/blob/main/SupportedRFCs.md",
+                "protocol": "DIDComm",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "54c63f26-ffd7-4db2-85b8-116ce231b79a",
+              "labels": [
+                "Issue credential"
+              ],
+              "source": {
+                "cell": "2d69fe7b-ee9c-4480-b49d-8b962e583ed9"
+              },
+              "target": {
+                "cell": "6469601f-897a-4241-9ee2-ceb342374505"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Database queries",
+                "description": "Queries to persist and retrieve the request information.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "cccb253c-9b66-4593-8151-a41704124535",
+                    "title": "Man in the middle attack",
+                    "status": "Mitigated by Admin",
+                    "severity": "Low",
+                    "type": "Information disclosure",
+                    "description": "An attacker could intercept the DB queries in transit and obtain sensitive information, such as DB credentials, query parameters or query results (is unlikely since the data flow is over a private network).",
+                    "mitigation": "Mitigated by the administrator:\n1. Enforce an encrypted connection to the DB server, such as via a network mesh.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "6f11575a-054c-4de5-8fac-4bd877822dbc",
+              "labels": [
+                "Database queries"
+              ],
+              "source": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "target": {
+                "cell": "1be9e221-6681-4b6f-92fc-a46cf430d48e"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Submitted request",
+                "description": "The submitted notarization request including the details of the candidate credential are presented to the notary for reviewing.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": true,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "3171601b-1db5-4b18-aefe-ccdb7780b2ad",
+                    "title": "Data flow should use HTTP/S",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Information disclosure",
+                    "description": "These responses are over the public internet and could be intercepted by an attacker.",
+                    "mitigation": "Mitigated by the administrator:\n1. The requests should require HTTP/S. This will provide confidentiality and integrity. HTTP should not be supported.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "895949c6-d7b3-49ce-9eee-298c3d399696",
+                    "title": "Spoofing",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Tampering",
+                    "description": "An attacker could spoof the notary.",
+                    "mitigation": "1. Enforce server side checks for privileges by actively validating the user.\n2. The identity of the notary is established using a secure authentication protocol, OpenID-connect.\nMitigated by the administrator:\n1. Access to notary credentials are safely and securely stored.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "4c1bd9e5-ed52-4f4d-ae91-1755ba3b5fee",
+              "labels": [
+                "Submitted request"
+              ],
+              "source": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "target": {
+                "cell": "efb8b8d0-ac0b-4e01-be2d-ed4d47f1127c"
+              },
+              "vertices": [
+                {
+                  "x": 360,
+                  "y": -280
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Submit candidate credentials",
+                "description": "The request is submitted ",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "6d26fa15-1fa1-4b61-b532-aa17d27126a3",
+                    "title": "Tamper with HTTP request data",
+                    "status": "Mitigated",
+                    "severity": "Medium",
+                    "type": "Tampering",
+                    "description": "Tamper with HTTP request data to alter requested credentials.",
+                    "mitigation": "1. Enforce server side checks for priveleges using an access token issued once per credential submission request.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "088278a4-594f-463d-8989-a3034639d0d7",
+                    "title": "Brute force request information",
+                    "status": "Mitigated",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An external attacker could use brute force to discover the endpoints and thus information of the submitted credential requests.",
+                    "mitigation": "1. Enforce server side checks for priveleges using a unique access token issued once per credential submission request.\n2. The access token cannot be requested via any API.\n3. Use random identifiers (UUID) instead of sequential values",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "30af4eb8-fa50-4fbf-bc8f-a573587307d9",
+                    "title": "Data flow should use HTTP/S",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Information disclosure",
+                    "description": "These requests are made over the public internet and could be intercepted by an attacker.",
+                    "mitigation": "Mitigated by the administrator:\n1. The requests should require HTTP/S. This will provide confidentiality and integrity. HTTP should not be supported.\n",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "ac5f4ea7-b064-4718-992f-861d67a6c651",
+              "labels": [
+                "Submit candidate credentials"
+              ],
+              "source": {
+                "cell": "99e936ce-8731-4a9d-a6b5-ce9f5616a651"
+              },
+              "target": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Decision of Approval",
+                "description": "The notary submits their approval or rejection of the notarization request. The approval leads to the issuance of the requested credentials.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": true,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "6338faf8-1a3a-4ae7-8820-9000a4b31de4",
+                    "title": "Data flow should use HTTP/S",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Tampering",
+                    "description": "These responses are over the public internet and could be intercepted by an attacker.",
+                    "mitigation": "Mitigated by the administrator:\n1. The requests should require HTTP/S. This will provide confidentiality and integrity. HTTP should not be supported.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "54d17eec-c2d3-430f-9aa6-e09cd69ea86b",
+              "labels": [
+                "Decision of Approval"
+              ],
+              "source": {
+                "cell": "efb8b8d0-ac0b-4e01-be2d-ed4d47f1127c"
+              },
+              "target": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "vertices": [
+                {
+                  "x": 400,
+                  "y": -230
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Audit log entry",
+                "description": "The audit log entry includes: action type, the request identifier and/or session identifier, called URI, received time, caller IP address,  HTTP status code, notary identifier (if available),",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "4a917f2d-1d1c-414b-8f4a-768acca3f023",
+              "labels": [
+                "Audit log entry"
+              ],
+              "source": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "target": {
+                "cell": "6996a29f-3312-4a5a-855d-7206a334f366"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Start issuance",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "fb5244af-d9a1-4c72-b092-b81d971337ae",
+              "labels": [
+                "Start issuance"
+              ],
+              "source": {
+                "cell": "8b35ecf4-61e6-4733-b043-2f9ecaf47dab"
+              },
+              "target": {
+                "cell": "fbef8d23-fdeb-48ff-9a54-2b582d4689af"
+              },
+              "vertices": []
+            },
+            {
+              "position": {
+                "x": 620,
+                "y": -610
+              },
+              "size": {
+                "width": 187.5,
+                "height": 100
+              },
+              "attrs": {
+                "text": {
+                  "text": "Recipient credential manager"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 11,
+              "id": "6469601f-897a-4241-9ee2-ceb342374505",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Recipient credential manager",
+                "description": "The recipient of the issued credentials. A credential manager that supports the DIDComm protocol. ",
+                "outOfScope": true,
+                "reasonOutOfScope": "The credential manager is a third-party software solution.",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 630,
+                "y": -120
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requests Store"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "1be9e221-6681-4b6f-92fc-a46cf430d48e",
+              "zIndex": 12,
+              "data": {
+                "type": "tm.Store",
+                "name": "Requests Store",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": false,
+                "storesCredentials": false,
+                "isEncrypted": false,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "59d37e4f-a2fc-48aa-8960-746985dc7ee7",
+                    "title": "Unauthorised access",
+                    "status": "Mitigated by Admin",
+                    "severity": "High",
+                    "type": "Tampering",
+                    "description": "An attacker could make an query call on the DB.",
+                    "mitigation": "Mitigated by the administrator:\n1. Require all queries to be authenticated.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "7f8a0668-a8dd-4c40-92be-34cd0a2b123c",
+                    "title": "Credential theft",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An attacker could obtain the DB credentials and use them to make unauthorised queries.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use network mesh to restrict access to the database only to the request submission service.\n2. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": 843.25,
+                "y": -320
+              },
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "attrs": {
+                "text": {
+                  "text": "SSI-Controller"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 13,
+              "id": "fbef8d23-fdeb-48ff-9a54-2b582d4689af",
+              "data": {
+                "type": "tm.Process",
+                "name": "SSI-Controller",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "014560e7-cc99-48f5-b6c8-0400a40a4206",
+                    "title": "Log files leak",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "Log files could contain sensitive information.",
+                    "mitigation": "Mitigated by the application:\n1. Log files only contain strictly necessary information.\nMitigated by the administrator:\n1. Access to log files is restricted.\n2. Log level is appropriate.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "f9527dd7-2070-4a4a-8e06-b25f2dce7da8",
+                    "title": "Private key leak",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "Private keys used to issue credentials could be leaked.",
+                    "mitigation": "Mitigated by the administrator:\n1. Protect private keys with suitable passwords.\n2. Restrict access to private keys.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "5a489de2-6d13-4803-b2ba-b7fcffe46a2c",
+                    "title": "Issued credentials may be repudiated.",
+                    "status": "Mitigated",
+                    "severity": "Medium",
+                    "type": "Repudiation",
+                    "description": "Issued credentials may be repudiated.",
+                    "mitigation": "The service issues verifiable credentials.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  },
+                  {
+                    "id": "28a9dade-2eec-4976-996c-11270ab960b5",
+                    "title": "Outdated components enable elevated privileges",
+                    "status": "Mitigated by Admin",
+                    "severity": "Medium",
+                    "type": "Elevation of privilege",
+                    "description": "Outdated software components with vulnerabilities give rise to elevation of privilege.",
+                    "mitigation": "Mitigated by the administrator:\n1. Regularly check for vulnerabilities and patch accordingly.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": 310,
+                "y": -70
+              },
+              "size": {
+                "width": 80,
+                "height": 80
+              },
+              "attrs": {
+                "text": {
+                  "text": "Identity and Access Management"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "process",
+              "zIndex": 14,
+              "id": "c8c24f86-a502-43f8-8c7b-62a8338642e9",
+              "data": {
+                "type": "tm.Process",
+                "name": "Identity and Access Management",
+                "description": "An IAM service configured to manage the notarization operators.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The assumption is that there is an existing secure and safe IAM in operation.",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 863.25,
+                "y": -120
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Audit Log"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "6996a29f-3312-4a5a-855d-7206a334f366",
+              "zIndex": 16,
+              "data": {
+                "type": "tm.Store",
+                "name": "Audit Log",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": true,
+                "storesCredentials": false,
+                "isEncrypted": false,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "1e92f1e3-a2b1-4f25-a879-a12e461c81ea",
+                    "title": "Unauthorised access",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Tampering",
+                    "description": "An attacker could make an query call on the DB.",
+                    "mitigation": "Mitigated by the administrator:\n1. Require all queries to be authenticated.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              }
+            },
+            {
+              "position": {
+                "x": 843.25,
+                "y": -430
+              },
+              "size": {
+                "width": 60,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "ACA-Py"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "process",
+              "zIndex": 17,
+              "id": "2d69fe7b-ee9c-4480-b49d-8b962e583ed9",
+              "data": {
+                "type": "tm.Process",
+                "name": "ACA-Py",
+                "description": "An Aries Cloud Agent - Python is a microservice  Verifiable Credential (VC) ecosystems.",
+                "outOfScope": true,
+                "reasonOutOfScope": "The credential manager is a third-party software solution.",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "",
+          "id": 3,
+          "title": "Requestor Identification Process",
+          "diagramType": "STRIDE",
+          "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+          "version": "2.0.0",
+          "cells": [
+            {
+              "position": {
+                "x": 220,
+                "y": 60
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requestor"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 1,
+              "id": "075d0a48-53fa-4e06-8be0-081f0e43eb2f",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Requestor",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 120,
+                "y": 460
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Notary"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 2,
+              "id": "777f2926-9227-4496-82fb-394f6fca6689",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Notary",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 380,
+                "y": 260
+              },
+              "size": {
+                "width": 90,
+                "height": 90
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request Submission Service "
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 3,
+              "id": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d",
+              "data": {
+                "type": "tm.Process",
+                "name": "Request Submission Service ",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                {
+                  "attrs": {
+                    "text": {
+                      "text": ""
+                    }
+                  }
+                }
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "",
+                "description": "",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "1378d44c-f4fb-4785-839c-33e8bad0ac43",
+              "source": {
+                "x": 420,
+                "y": 550
+              },
+              "target": {
+                "x": 1060,
+                "y": 150
+              },
+              "vertices": [
+                {
+                  "x": 240,
+                  "y": 240
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Encrypted requestor identity",
+                "description": "The notary m",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "b92b44a6-9506-4b1a-9c64-72ff04cceced",
+              "labels": [
+                "Encrypted requestor identity"
+              ],
+              "source": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "target": {
+                "cell": "777f2926-9227-4496-82fb-394f6fca6689"
+              }
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Protected resource location",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "7de7de5c-f83b-4841-bf2c-43807bce06de",
+              "labels": [
+                "Protected resource location"
+              ],
+              "source": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "target": {
+                "cell": "075d0a48-53fa-4e06-8be0-081f0e43eb2f"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Encrypted requestor identity",
+                "description": "The attributes of the requestor eID are encrypted with the public key of the notary.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "fb113400-259a-45cf-af00-b9c9f603aafd",
+              "labels": [
+                "Encrypted requestor identity"
+              ],
+              "source": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "target": {
+                "cell": "4407cb0e-5099-4379-8098-af3515f5a379"
+              },
+              "vertices": [
+                {
+                  "x": 640,
+                  "y": 390
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Protected resource",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "cf8757a4-b048-4d0f-9e1c-a4bbb3b6190c",
+              "labels": [
+                "Protected resource"
+              ],
+              "source": {
+                "cell": "075d0a48-53fa-4e06-8be0-081f0e43eb2f"
+              },
+              "target": {
+                "cell": "b0b591d6-51ed-4161-b2c9-25391fbe343c"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Identification initiation",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "47b1a41d-0352-42cf-a594-10532667e05b",
+                    "title": "",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Tampering",
+                    "description": "An attacker could modify the callback URLs ",
+                    "mitigation": "Mitigated by the application:\n1. Whitelist the callback URLs before accepting an identification initiation request.\nMitigated by the administrator:\n1. Use network mesh to restrict access to the OIDC identity resolver only to the request submission service.\n2. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "cc244dc9-0e4e-4100-bb2d-b7e9428ff152",
+              "labels": [
+                "Identification initiation"
+              ],
+              "source": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "target": {
+                "cell": "b0b591d6-51ed-4161-b2c9-25391fbe343c"
+              },
+              "vertices": [
+                {
+                  "x": 570,
+                  "y": 273
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Request login",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "175eca30-1e19-4d62-b1b8-0456d7b47a37",
+              "labels": [
+                "Request login"
+              ],
+              "source": {
+                "cell": "b0b591d6-51ed-4161-b2c9-25391fbe343c"
+              },
+              "target": {
+                "cell": "06a8924e-19ec-4a61-9e9a-03ef4b16a841"
+              },
+              "vertices": [
+                {
+                  "x": 730,
+                  "y": 180
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Requestor identity",
+                "description": "The attributes of the electronic identity of the requestor.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "546ece45-978f-4fd6-bb7a-692e6f5ad208",
+                    "title": "Requestor identity leak",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An attacker could intercept the requestor identity.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use HTTPS to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "e9a1ec73-0ef3-4738-a2d7-263f904d3472",
+              "labels": [
+                "Requestor identity"
+              ],
+              "source": {
+                "cell": "06a8924e-19ec-4a61-9e9a-03ef4b16a841"
+              },
+              "target": {
+                "cell": "b0b591d6-51ed-4161-b2c9-25391fbe343c"
+              },
+              "vertices": [
+                {
+                  "x": 940,
+                  "y": 190
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Requestor identity",
+                "description": "The attributes of the electronic identity of the requestor.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "7f40f4b3-d3ee-4bab-bd31-ea1e57535035",
+                    "title": "Requestor identity leak",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Information disclosure",
+                    "description": "An attacker on the internal network could intercept the requestor identity.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "cc3bc365-e043-44a0-be53-ff3fca52a8c7",
+              "labels": [
+                "Requestor identity"
+              ],
+              "source": {
+                "cell": "b0b591d6-51ed-4161-b2c9-25391fbe343c"
+              },
+              "target": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "vertices": [
+                {
+                  "x": 640,
+                  "y": 330
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Notary public key",
+                "description": "The notary public key.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "3534c068-0e70-4dd3-8eb1-ac8f0a0d2aef",
+                    "title": "Fake notary key insertion",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Tampering",
+                    "description": "An attacker could insert fake notary keys to ensure the identity can be encrypted with their own keys.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use network mesh to authenticate the profile service by the request submission service.\n2. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "6a7ad91c-19e5-4565-aa74-c2588c6aebb5",
+              "labels": [
+                "Notary public key"
+              ],
+              "source": {
+                "cell": "8e73cb05-9192-4aca-a860-d6f1d02ac629"
+              },
+              "target": {
+                "cell": "bbc1f7bc-b897-4067-aeff-82fc45d7b48d"
+              },
+              "vertices": []
+            },
+            {
+              "position": {
+                "x": 750,
+                "y": 210
+              },
+              "size": {
+                "width": 150,
+                "height": 150
+              },
+              "attrs": {
+                "text": {
+                  "text": "OIDC Identity Resolver"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 11,
+              "id": "b0b591d6-51ed-4161-b2c9-25391fbe343c",
+              "data": {
+                "type": "tm.Process",
+                "name": "OIDC Identity Resolver",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 760,
+                "y": 30
+              },
+              "size": {
+                "width": 110,
+                "height": 110
+              },
+              "attrs": {
+                "text": {
+                  "text": "eID Provider"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "process",
+              "zIndex": 12,
+              "id": "06a8924e-19ec-4a61-9e9a-03ef4b16a841",
+              "data": {
+                "type": "tm.Process",
+                "name": "eID Provider",
+                "description": "An electronic identity provider.",
+                "outOfScope": true,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 650,
+                "y": 460
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request Store"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "4407cb0e-5099-4379-8098-af3515f5a379",
+              "zIndex": 13,
+              "data": {
+                "type": "tm.Store",
+                "name": "Request Store",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": false,
+                "storesCredentials": false,
+                "isEncrypted": false,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 460,
+                "y": 440
+              },
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "attrs": {
+                "text": {
+                  "text": "Profile Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "id": "8e73cb05-9192-4aca-a860-d6f1d02ac629",
+              "zIndex": 15,
+              "data": {
+                "type": "tm.Process",
+                "name": "Profile Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "",
+          "id": 4,
+          "title": "Evidence document processing ",
+          "diagramType": "STRIDE",
+          "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+          "version": "2.0.0",
+          "cells": [
+            {
+              "position": {
+                "x": 170,
+                "y": -500
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Requestor"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 1,
+              "id": "00062e34-1139-41a6-a8ce-53218845b6dd",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Requestor",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 470,
+                "y": -320
+              },
+              "size": {
+                "width": 60,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request Submission Service"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 2,
+              "id": "3afd4c87-ad13-457c-b129-d12cef002089",
+              "data": {
+                "type": "tm.Process",
+                "name": "Request Submission Service",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Evidence documents, reports, hashes",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "faddc770-ede5-4d50-a435-7aa33f884580",
+              "labels": [
+                "Evidence documents, reports, hashes"
+              ],
+              "source": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "target": {
+                "cell": "ab77105a-d1b5-4657-9af2-649ba2cd7cfe"
+              }
+            },
+            {
+              "shape": "trust-broundary-curve",
+              "attrs": {
+                "line": {
+                  "targetMarker": "",
+                  "sourceMarker": ""
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "labels": [
+                {
+                  "attrs": {
+                    "text": {
+                      "text": ""
+                    }
+                  }
+                }
+              ],
+              "data": {
+                "type": "tm.Boundary",
+                "name": "",
+                "description": "",
+                "isTrustBoundary": true,
+                "hasOpenThreats": false
+              },
+              "id": "a87e3446-2d05-4dd5-8ea1-6e2df0f9a1bf",
+              "source": {
+                "x": 400,
+                "y": -70
+              },
+              "target": {
+                "x": 860,
+                "y": -410
+              },
+              "vertices": [
+                {
+                  "x": 250,
+                  "y": -370
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Evidence document location",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "6dd28747-470a-48b4-af8f-2865f6959ee8",
+              "labels": [
+                "Evidence document location"
+              ],
+              "source": {
+                "cell": "00062e34-1139-41a6-a8ce-53218845b6dd"
+              },
+              "target": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              }
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Evidence document",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": true,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "fc6bb1b7-8e61-4dae-a7ac-a1dabbc55b99",
+              "labels": [
+                "Evidence document"
+              ],
+              "source": {
+                "cell": "37a04f58-bd61-4072-be69-1f488704c12d"
+              },
+              "target": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "vertices": []
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Evidence document",
+                "description": "Upload an evidence document",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "ba48cd31-26be-476a-b902-8cbc03e267ea",
+              "labels": [
+                "Evidence document"
+              ],
+              "source": {
+                "cell": "00062e34-1139-41a6-a8ce-53218845b6dd"
+              },
+              "target": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "vertices": [
+                {
+                  "x": 430,
+                  "y": -440
+                },
+                {
+                  "x": 480,
+                  "y": -360
+                }
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Evidence document",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "024e03bb-78cd-480b-ace7-8c68eebc673e",
+              "source": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "target": {
+                "cell": "8ffad639-7763-4941-a1a0-05a33ba19d05"
+              },
+              "vertices": [
+                {
+                  "x": 660,
+                  "y": -350
+                }
+              ],
+              "labels": [
+                "Evidence document"
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Verification report",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": [
+                  {
+                    "id": "8bcb57a4-13db-48fc-b150-ffa09c9835b0",
+                    "title": "Evidence report tampering ",
+                    "status": "Mitigated By Admin",
+                    "severity": "Medium",
+                    "type": "Tampering",
+                    "description": "An attacker could tamper with the verification report.",
+                    "mitigation": "Mitigated by the administrator:\n1. Use network mesh to encrypt all communication in transport.",
+                    "modelType": "STRIDE",
+                    "new": false
+                  }
+                ]
+              },
+              "id": "25814b94-434a-4e90-8a7d-9cf4bf738d8a",
+              "source": {
+                "cell": "8ffad639-7763-4941-a1a0-05a33ba19d05"
+              },
+              "target": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "vertices": [
+                {
+                  "x": 660,
+                  "y": -260
+                }
+              ],
+              "labels": [
+                "Verification report"
+              ]
+            },
+            {
+              "shape": "flow",
+              "attrs": {
+                "line": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "targetMarker": {
+                    "name": "classic"
+                  },
+                  "strokeDasharray": null
+                }
+              },
+              "width": 200,
+              "height": 100,
+              "zIndex": 10,
+              "connector": "smooth",
+              "data": {
+                "type": "tm.Flow",
+                "name": "Document, report, hash",
+                "description": "The evidence document, a hash of the evidence document and the verification report.",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "protocol": "",
+                "isEncrypted": false,
+                "isPublicNetwork": false,
+                "hasOpenThreats": false,
+                "threats": []
+              },
+              "id": "3662ae6a-f257-42fd-950b-8af42dfb9499",
+              "labels": [
+                "Document, report, hash"
+              ],
+              "source": {
+                "cell": "3afd4c87-ad13-457c-b129-d12cef002089"
+              },
+              "target": {
+                "cell": "4678d639-b145-43c9-a001-f6ad081a279a"
+              }
+            },
+            {
+              "position": {
+                "x": 610,
+                "y": -520
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Document host"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": "5 2"
+                }
+              },
+              "shape": "actor",
+              "zIndex": 11,
+              "id": "37a04f58-bd61-4072-be69-1f488704c12d",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Document host",
+                "description": "",
+                "outOfScope": true,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 792,
+                "y": -320
+              },
+              "size": {
+                "width": 60,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Evidence verification"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "process",
+              "zIndex": 12,
+              "id": "8ffad639-7763-4941-a1a0-05a33ba19d05",
+              "data": {
+                "type": "tm.Process",
+                "name": "Evidence verification",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "privilegeLevel": "",
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 650,
+                "y": -130
+              },
+              "size": {
+                "width": 120,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Request store"
+                },
+                "topLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                },
+                "bottomLine": {
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "store",
+              "id": "4678d639-b145-43c9-a001-f6ad081a279a",
+              "zIndex": 13,
+              "data": {
+                "type": "tm.Store",
+                "name": "Request store",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "isALog": false,
+                "storesCredentials": false,
+                "isEncrypted": false,
+                "isSigned": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            },
+            {
+              "position": {
+                "x": 130,
+                "y": -120
+              },
+              "size": {
+                "width": 112.5,
+                "height": 60
+              },
+              "attrs": {
+                "text": {
+                  "text": "Notary"
+                },
+                "body": {
+                  "stroke": "#333333",
+                  "strokeWidth": 1,
+                  "strokeDasharray": null
+                }
+              },
+              "shape": "actor",
+              "zIndex": 14,
+              "id": "ab77105a-d1b5-4657-9af2-649ba2cd7cfe",
+              "data": {
+                "type": "tm.Actor",
+                "name": "Notary",
+                "description": "",
+                "outOfScope": false,
+                "reasonOutOfScope": "",
+                "providesAuthentication": false,
+                "hasOpenThreats": false,
+                "threats": []
+              }
+            }
+          ]
+        }
+      ],
+      "reviewer": "Tobias Wich"
+    }
+  }
+  

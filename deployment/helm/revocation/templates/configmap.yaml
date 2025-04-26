@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: revocation-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_OPENTELEMETRY_ENABLED: "true"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  QUARKUS_REST_CLIENT_REVOCATION_API_URL: "{{ .Values.config.restClientRevocationApiUrl }}"
+  QUARKUS_REST_CLIENT_SSI_ISSUANCE_API_URL: "{{ .Values.config.restClientSsiIssuanceApiUrl }}"
+  REVOCATION_BASE_URL: "{{ .Values.config.revocationBaseUrl }}"
+  REVOCATION_MIN_ISSUE_INTERVAL: "{{ .Values.config.revocationMinIssueInterval }}"

@@ -1,0 +1,6 @@
+
+quarkus:
+    otel:
+        enabled: true
+    log:
+        level: WARN

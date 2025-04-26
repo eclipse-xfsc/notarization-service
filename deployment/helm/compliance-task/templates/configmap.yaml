@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compliance-task-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  FLYWAY_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_JDBC_URL: "{{ .Values.config.datasourceJdbcUrl }}"
+  QUARKUS_DATASOURCE_USERNAME: "{{ .Values.config.datasourceUsername }}"
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_PORT: "{{ .Values.service.port }}"
+  QUARKUS_LOG_LEVEL: "WARN"
+  QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: "{{ .Values.config.otelConnectorUrl }}"
+  QUARKUS_REST_CLIENT_COMPLIANCE_URL: "{{ .Values.config.restClientComplianceUrl }}"
+  GAIA_X_COMPLIANCE_TASK_EXTERNAL_URL: "{{ .Values.config.gaiaxComplianceTaskExternalUrl }}"

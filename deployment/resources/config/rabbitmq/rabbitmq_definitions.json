@@ -1,0 +1,62 @@
+{
+    "bindings": [],
+    "exchanges": [],
+    "global_parameters": [],
+    "parameters": [],
+    "permissions": [
+        {
+            "configure": ".*",
+            "read": ".*",
+            "user": "request-rabbit",
+            "vhost": "/",
+            "write": ".*"
+        },
+        {
+            "configure": ".*",
+            "read": ".*",
+            "user": "request-processing-user",
+            "vhost": "/",
+            "write": ".*"
+        }
+    ],
+    "policies": [],
+    "queues": [],
+    "rabbit_version": "3.9.14",
+    "rabbitmq_version": "3.9.14",
+    "topic_permissions": [],
+    "users": [
+        {
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "limits": {},
+            "name": "subject=O=client,CN=notarization",
+            "password_hash": "",
+            "tags": []
+        },
+        {
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "limits": {},
+            "name": "request-rabbit",
+            "password_hash": "Bz2LnwzptTK7Wp0jqpPqk5Mxxsp8ZM3d9Wmax+cY0KtGcOpk",
+            "tags": [
+                "administrator"
+            ]
+        },
+        {
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "limits": {},
+            "name": "request-processing-user",
+            "password_hash": "Bz2LnwzptTK7Wp0jqpPqk5Mxxsp8ZM3d9Wmax+cY0KtGcOpk",
+            "tags": []
+        }
+    ],
+    "vhosts": [
+        {
+            "limits": [],
+            "metadata": {
+                "description": "Default virtual host",
+                "tags": []
+            },
+            "name": "/"
+        }
+    ]
+}

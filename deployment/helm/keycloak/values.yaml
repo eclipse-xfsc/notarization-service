@@ -1,0 +1,40 @@
+---
+# Documentation:
+# https://github.com/bitnami/charts/tree/master/bitnami/keycloak/#installing-the-chart
+replicaCount: 2
+
+auth:
+  adminUser: kcadmin
+  existingSecret: "notarization-credentials"
+  passwordSecretKey: "keycloak-admin-password"
+
+externalDatabase:
+  host: "postgres-postgresql.not-api.svc.cluster.local"
+  user: not_api
+  database: not_keycloak
+  existingSecret: "notarization-credentials"
+  existingSecretPasswordKey: "postgresql-not-api-password"
+  port: 5432
+
+# No internal database.
+postgresql:
+  enabled: false
+
+# Needed to prevent spinning wheel "Loading the Admin UI" in newer Keycloak versions.
+proxy: reencrypt
+
+# Optional
+extraEnvVars:
+  - name: KEYCLOAK_LOG_LEVEL
+    value: INFO
+
+ingress:
+  enabled: true
+  hostname: idp-not.xfsc.dev
+  tls: true
+  certManager: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production-http
+    # Prevent: "upstream sent too big header while reading response header from upstream".
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"

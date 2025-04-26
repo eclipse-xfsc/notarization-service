@@ -1,0 +1,8 @@
+ARG RABBITMQ_VERSION=3.13.7-management
+
+FROM rabbitmq:${RABBITMQ_VERSION}
+
+RUN mkdir /notarization
+
+RUN rabbitmq-plugins enable --offline rabbitmq_prometheus rabbitmq_stomp rabbitmq_web_stomp rabbitmq_auth_backend_oauth2 rabbitmq_auth_backend_cache rabbitmq_amqp1_0
+

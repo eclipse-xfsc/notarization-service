@@ -1,0 +1,123 @@
+---
+replicaCount: 2
+
+image:
+  repository: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/not/oid4vci
+  pullPolicy: Always
+  tag: "dev-598dc95e93aa7d7c1d0b4bf2532bd6f73c15a59d"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8094
+
+ingress:
+  enabled: true
+  certManager: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production-http
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  hosts:
+    - host: test-not.xfsc.dev
+      paths:
+        - path: "/oid4vci/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-test-not.xfsc.dev
+     hosts:
+       - test-not.xfsc.dev
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /q/health/live
+    port: 8094
+
+readinessProbe:
+  httpGet:
+    path: /q/health/ready
+    port: 8094
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  datasourceJdbcUrl: "jdbc:postgresql://postgres-postgresql.not-api.svc.cluster.local:5432/test_oid4vci"
+  datasourceUsername: "not_api"
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  gaiaXOid4vciIssuerUrl: "https://test-not.xfsc.dev/oid4vci/"
+  mpJwtDecryptKeyLocation: "classpath:/demo_keys/decrypt_oct_jwks.json"
+  otelConnectorUrl: "http://otel-collector.not-api.svc.cluster.local:4317"
+  restClientProfileApiUrl: "https://test-not.xfsc.dev/profile/"
+  smallRyeJwtEncryptKeyID: "e_a256"
+  smallRyeJwtEncryptKeyLocation: "classpath:/demo_keys/encrypt_jwks.json"
+  smallRyeJwtSignKeyID: "s_es256"
+  smallRyeJwtSignKeyLocation: "classpath:/demo_keys/sign_jwks.json"
+  smallRyeJwtVerifyPublicKeyAlgorithm: "ES256"
+  smallRyeJwtVerifyPublicKeyLocation: "classpath:/demo_keys/verify_jwks.json"

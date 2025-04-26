@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  acapy-holder-db:
+    image: postgres:${POSTGRES_VERSION:-14}
+    container_name: acapy-holder-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '35432:5432'
+
+# Seed: 000000000000000000000000000User1
+# DID: 4qk3Ab43ufPQVif4GAzLUW
+# Verkey: ~4JVGRa8j4GUPmiMi8PmBL9
+
+# Seed: 000000000000000000000000000User1
+# DID: 4qk3Ab43ufPQVif4GAzLUW
+# Verkey: 36QKEqKjfNYL4A8SCURmKhsovScf2iuM5ziLDDtCypS9
+
+  acapy-holder:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12.0rc2
+    container_name: acapy-holder
+    depends_on:
+      - acapy-holder-db
+    restart: on-failure
+    ports:
+      - '38030:8030'
+      - '30080:80'
+      - '35678:5678'
+    networks:
+      default:
+      indy:
+        ipv4_address: 10.0.0.5
+    command:
+      - start
+      - --auto-provision
+      - --inbound-transport
+      - http 
+      - '0.0.0.0'
+      - '8030'
+      - --outbound-transport
+      - http
+      - --endpoint
+      - http://acapy-holder:8030
+      - --genesis-url
+      - http://ledger-browser:8000/genesis
+      - --seed
+      - "000000000000000000000000000User1"
+      - --wallet-type
+      - askar
+      - --wallet-storage-type
+      - 'postgres_storage'
+      - --wallet-name
+      - 'holder'
+      - --wallet-key
+      - "123"
+      - --wallet-storage-config
+      - '{"url":"acapy-holder-db:5432","max_connections":5,"wallet_scheme":"MultiWalletSingleTable"}'
+      - --wallet-storage-creds
+      - '{"account":"postgres","password":"postgres","admin_account":"postgres","admin_password":"postgres"}'
+      - --admin
+      - '0.0.0.0'
+      - '80'
+      - --admin-insecure-mode
+      - --label
+      - Holder
+      - --auto-ping-connection
+      - --auto-accept-requests
+      - --auto-respond-credential-proposal
+      - --auto-respond-credential-offer
+      - --auto-respond-credential-request
+      - --auto-store-credential
+      - --auto-respond-presentation-proposal
+      - --auto-respond-presentation-request
+      - --public-invites
+      - --requests-through-public-did
+      - --debug-connections
+      - --debug-credentials
+      - --debug-presentations
+      - --log-level
+      - debug
+networks:
+  indy:
+    name: ledger_network
+    external: true

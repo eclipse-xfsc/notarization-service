@@ -1,0 +1,29 @@
+
+image:
+  tag: "latest-dev"
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: CHANGEME
+      paths:
+        - path: "/oid4vci/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-not-accept
+     hosts:
+       - CHANGEME
+
+config:
+  datasourceJdbcUrl: CHANGEME
+  datasourceUsername: CHANGEME
+  gaiaXOid4vciIssuerUrl: CHANGEME
+  otelConnectorUrl: CHANGEME
+  restClientProfileApiUrl: CHANGEME
+
+envConfig:
+  QUARKUS_LOG_LEVEL: INFO

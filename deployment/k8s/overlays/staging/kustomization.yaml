@@ -1,0 +1,72 @@
+bases:
+- ../gxfs.dev
+
+patchesJson6902:
+- path: patches/acapy.yml
+  target:
+    version: v1
+    kind: Deployment
+    name: not-acapy
+
+resources:
+- ingress/ingress.yml
+- ingress/acapy.yml
+
+configMapGenerator:
+- name: oidc-identity-resolver-config
+  behavior: merge
+  envs:
+  - configs/oidc-identity.env
+- name: profile-config
+  behavior: merge
+  envs:
+  - configs/profile.env
+- name: profiles
+  behavior: merge
+  files:
+  - configs/application.yaml
+- name: request-processing-config
+  behavior: merge
+  envs:
+  - configs/request-processing.env
+- name: revocation-config
+  behavior: merge
+  envs:
+  - configs/revocation.env
+- name: scheduler-config
+  behavior: merge
+  envs:
+  - configs/scheduler.env
+- name: ssi-issuance-controller
+  behavior: merge
+  envs:
+  - configs/ssi-issuance.env
+secretGenerator:
+- name: oidc-identity-resolver-secrets
+  behavior: merge
+  envs:
+  - secrets/oidc-identity.secrets
+- name: profile-secrets
+  behavior: merge
+  envs:
+  - secrets/profile.secrets
+- name: request-processing-secrets
+  behavior: merge
+  envs:
+  - secrets/request-processing.secrets
+- name: revocation-secrets
+  behavior: merge
+  envs:
+  - secrets/revocation.secrets
+- name: scheduler-secrets
+  behavior: merge
+  envs:
+  - secrets/scheduler.secrets
+- name: ssi-issuance-controller
+  behavior: merge
+  envs:
+  - secrets/ssi-issuance.secrets
+- name: not-acapy
+  behavior: merge
+  envs:
+  - secrets/not-acapy.secrets

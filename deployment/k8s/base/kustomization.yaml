@@ -1,0 +1,57 @@
+
+resources:
+- build/java21-kubernetes.yml
+- build/ssi-issuance-controller.yml
+- build/not-acapy.yml
+patchesStrategicMerge:
+- patches/deployments.yml
+
+configMapGenerator:
+- name: oidc-identity-resolver-config
+  envs:
+  - configs/oidc-identity.env
+  - configs/common.env
+- name: profile-config
+  envs:
+  - configs/profile.env
+  - configs/common.env
+- name: profiles
+  files:
+  - configs/application.yaml
+- name: request-processing-config
+  envs:
+  - configs/request-processing.env
+  - configs/common.env
+- name: revocation-config
+  envs:
+  - configs/revocation.env
+  - configs/common.env
+- name: scheduler-config
+  envs:
+  - configs/scheduler.env
+  - configs/common.env
+- name: ssi-issuance-controller
+  envs:
+  - configs/ssi-issuance.env
+secretGenerator:
+- name: oidc-identity-resolver-secrets
+  envs:
+  - secrets/oidc-identity.secrets
+- name: profile-secrets
+  envs:
+  - secrets/profile.secrets
+- name: request-processing-secrets
+  envs:
+  - secrets/request-processing.secrets
+- name: revocation-secrets
+  envs:
+  - secrets/revocation.secrets
+- name: scheduler-secrets
+  envs:
+  - secrets/scheduler.secrets
+- name: ssi-issuance-controller
+  envs:
+  - secrets/ssi-issuance.secrets
+- name: not-acapy
+  envs:
+  - secrets/not-acapy.secrets

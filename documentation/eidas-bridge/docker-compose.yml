@@ -1,0 +1,20 @@
+---
+version: "3"
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_PORT}"
+
+  ssi-eidas-bridge:
+    image: gaia-x/data-infrastructure-federation-services/not/notarization-service/ssi-eidas-bridge:${EIDAS_BRIDGE_COMMIT}
+    depends_on:
+      - "redis"
+    ports:
+      - "9002:9002"
+    environment:
+      - BRIDGE_ENV=production
+      - REDIS_URL=redis
+      - REDIS_PORT=6379
+      - BRIDGE_API_EXTERNAL_URL=http://127.0.0.1:9002
+      - DSS_URL=https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/

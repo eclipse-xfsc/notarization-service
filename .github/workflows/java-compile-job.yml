@@ -1,0 +1,42 @@
+name: Compile Services
+
+on:
+  workflow_call:
+    inputs:
+      java-cache-key:
+        required: true
+        type: string
+      java-tmp-cache-key:
+        required: true
+        type: string
+    secrets:
+      inherit: true
+jobs:
+  compile:
+    name: Compile Services
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'  # Anpassen, je nach verwendeter Java-Version
+      - name: Set JAVA Cache Variables
+        run: |
+          echo "JAVA_CACHE_KEY=${{ inputs.java-cache-key }}" >> $GITHUB_ENV
+          echo "JAVA_TMP_CACHE_KEY=${{ inputs.java-tmp-cache-key }}" >> $GITHUB_ENV
+
+      - name: Build with Gradle
+        run: ./gradlew assemble
+
+      - name: Upload OpenAPI Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-files
+          path: |
+            services/**/deploy/**/openapi.yaml
+            services/**/deploy/**/openapi.json

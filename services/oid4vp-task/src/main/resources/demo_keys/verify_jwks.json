@@ -1,0 +1,15 @@
+{
+  "keys": [
+    {
+      "kid": "s_es256",
+      "alg": "ECDH-ES+A256KW",
+      "crv": "P-521",
+      "key_ops": [
+        "verify"
+      ],
+      "kty": "EC",
+      "x": "Ac9bXXoxY7eq5TB_OtZRO09x8s0hK4DUwDR0kruIrchPYqj2ghmNZCqIvCmHwxWs9TBjMLqsPvTQ253aBeVw-_mk",
+      "y": "AA_p84GtyBfb0ZPTfeaK8rYZGvPiQHyiR3FZX3CBJJqeGIk2zrzwkCF09CWHrHuNyKgj08aLNDeAvrFze24HqefA"
+    }
+  ]
+}

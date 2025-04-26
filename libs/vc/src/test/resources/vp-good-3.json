@@ -1,0 +1,42 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/security/bbs/v1"
+  ],
+  "type": [
+    "VerifiablePresentation"
+  ],
+  "holder": "did:key:zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf",
+  "verifiableCredential": [
+    {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/bbs/v1"
+      ],
+      "id": "urn:uuid:85e85a75-1bd0-4a60-919a-a726fbd2eb95",
+      "type": [
+        "VerifiableCredential"
+      ],
+      "issuer": "did:key:zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf",
+      "issuanceDate": "2010-01-01T19:23:24Z",
+      "credentialSubject": {
+        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+      },
+      "proof": {
+        "type": "BbsBlsSignature2020",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "did:key:zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf#zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf",
+        "created": "2024-03-15T07:39:11+00:00",
+        "proofValue": "gqn3S5OboKyqRKPZ8jovMhIn1IQY/rCbKhF/U6h+fAcOfLWCD+PSmjAsVU5w5atjDVRY2DRU8ScTe7RPl6xXQLKgFj0FwbEBBU3tV3IrA2ISI5SVEAXUya0Xb4q60kf4LyS1DBVbIKSer9cvTdM7Kw=="
+      }
+    }
+  ],
+  "proof": {
+    "type": "BbsBlsSignature2020",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:key:zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf#zUC74cyhrp3srAzeNs76v6USRSayjhVKQvF8gRsZkjT2t1XYtSNkJidyLUyyTPJEk9Et1pqMRf3TF7RKBqNwPvPAAF5n85J3gLgmai7vf81TDg6ngMis7n8C186Zg8QS44wmTyf",
+    "created": "2024-03-15T07:41:18+00:00",
+    "challenge": "2f1983ef-15de-4c40-8611-576b7c02612e",
+    "proofValue": "mFa2onjDmlBipEiCaMWrw1iob08BOnEZPuTPDGDb8Sdo/jtHQXIR2EYo5GJfUvwuL/IPVF96wYNpokyld3WmP1PsZXVfGUbORjK6tvXElwsN19CdRhPJ6IcRo1njXFGubnfT2D60HcZF6lPQCP3U/Q=="
+  }
+}

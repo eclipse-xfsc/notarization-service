@@ -1,0 +1,165 @@
+gaia-x:
+    profile:
+        config:
+            - name: Simple Profile without tasks
+              aip: "2.0"
+              id: demo-vc-issuance-01-simple-without-tasks
+              description: This credential is a minimal VC. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                # Private key:
+                # {
+                #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                # }
+                # public key:
+                - jwk: >
+                    {
+                        "kty": "EC",
+                        "use": "enc",
+                        "crv": "P-384",
+                        "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                        "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                        "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                        "alg": "ECDH-ES+A256KW"
+                    }
+              valid-for: P100Y
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://www.w3.org/2018/credentials/examples/v1"
+                  ],
+                  "type": ["VerifiableCredential", "AlumniCredential"],
+                  "credentialSubject": {}
+                }
+            - name: Simple Profile with eID task
+              aip: "2.0"
+              id: demo-vc-issuance-01-simple-with-eid-task
+              description: This credential is a minimal VC without chained proofs. As data this credential should contain something well known such as https://schema.org/Person.
+              notaries:
+                    # Private key:
+                    # {
+                    #     "d": "W9ojMWb5kDpqfmC4K9mcIleVrNexnn3on3aJb-5paB38S5i2CusSRbes0wgwSyPu"
+                    # }
+                    # public key:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              valid-for: P100Y
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        }
+                    ]
+              tasks: >
+                {}
+              precondition-tasks: >
+                {
+                  "taskName" : "eID-Validation"
+                }
+              template: >
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://w3id.org/citizenship/v1"
+                  ],
+                  "type": ["VerifiableCredential", "PermanentResidentCard"],
+                  "credentialSubject": {
+                    "type": "PermanentResident"
+                  }
+                }
+            - name: GAIA-X Employee Credential
+              aip: "1.0"
+              id: demo-gaia-x-employee-credential-v1
+              description: This credential represents a GAIA-X 
+              valid-for: P1Y
+              task-descriptions: >
+                []
+              tasks: >
+                {}
+              precondition-tasks: >
+                {}
+              template: >
+                {
+                    "attributes": [
+                            "FedName",
+                            "PrcId",
+                            "FedId",
+                            "PrcEmail",
+                            "PrcFName",
+                            "PrcLName",
+                            "Claims"
+                    ]
+                }
+            - name: Stricter GAIA-X Employee Credential
+              aip: "1.0"
+              id: demo-strict-gaia-x-employee-credential-v2
+              description: "Demo: a credential supported by documents."
+              valid-for: P1Y
+              notaries:
+                  - jwk: >
+                        {
+                            "kty": "EC",
+                            "use": "enc",
+                            "crv": "P-384",
+                            "kid": "CJVbr_T_rbgAWkP3TBqqbgTO2w27ZWfE_Gsky88odao",
+                            "x": "s9zwNWhaFk1S_Pm4Ec05wztC5iZ6W1QPemcywckgKk2fXx8IBFC9vTc2x0LatSTC",
+                            "y": "c9xoL-nBZmifO42GCWnU32uksdg1TF-YmldqxVf_apJ6Yi-bG_cAu0LP3yAqXijw",
+                            "alg": "ECDH-ES+A256KW"
+                        }
+              task-descriptions: >
+                    [
+                        {
+                            "name": "eID-Validation",
+                            "type": "browserIdentificationTask",
+                            "description": "Identification via browser using eID means."
+                        },
+                        {
+                            "name": "VC-Validation",
+                            "type": "vcIdentificationTask",
+                            "description": "Identification via presenting proof of VC."
+                        },
+                        {
+                            "name": "upload-evidence",
+                            "type": "fileProvisionTask",
+                            "description": "Upload documents containing evidence of authority and claims."
+                        }
+                    ]
+              tasks: >
+                {
+                  "taskName" : "upload-evidence"
+                }
+              precondition-tasks: >
+                {
+                  "oneOf": [
+                    { "taskName" : "eID-Validation" },
+                    { "taskName" : "VC-Validation" }
+                  ]
+                }
+              template: >
+                {
+                    "attributes": [
+                            "FedName",
+                            "PrcId",
+                            "FedId",
+                            "PrcEmail",
+                            "PrcFName",
+                            "PrcLName",
+                            "Claims"
+                    ]
+                }

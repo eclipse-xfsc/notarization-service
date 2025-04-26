@@ -1,0 +1,44 @@
+---
+replicaCount: 1
+
+image:
+  tag: "latest-dev"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Authorization $http_authorization;
+      proxy_set_header X-ORIGINAL-HOST not-accept.not-api.skidentity-test.de;
+      proxy_set_header X-ORIGINAL-PREFIX /oidc-identity-resolver;
+      proxy_set_header X-Forwarded-Prefix /oidc-identity-resolver;
+  hosts:
+    - host: CHANGEME
+      paths:
+        - path: "/oidc-identity-resolver/(.*)"
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: tls-secret-not-accept
+     hosts:
+       - CHANGEME
+
+config:
+  datasourceJdbcUrl: CHANGEME
+  datasourceReactiveUrl: CHANGEME
+  datasourceUsername: CHANGEME
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  # oidcAuthServerUrl: "https://service.skidentity-test.de/fs/oidc"
+  oidcAuthServerUrl: CHANGEME
+  oidcClientId: CHANGEME
+  oidcExistingSecret: "notarization-credentials"
+  oidcSecretKey: "skid-oidc-secret"
+  # oidcIdentityResolverExternalUrl: "https://oidc-identity-resolver.ecsec.services"
+  oidcIdentityResolverExternalUrl: CHANGEME
+  redirectLoginFailureUrl: CHANGEME
+  redirectLoginSuccessUrl: CHANGEME
+
+envConfig:
+  QUARKUS_LOG_LEVEL: INFO

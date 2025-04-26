@@ -1,0 +1,39 @@
+version: "3"
+
+# See here for more information: https://gitlab.com/gaia-x/data-infrastructure-federation-services/tsa/policy
+
+services:
+
+  tsa-policy:
+    image: node-654e3bca7fbeeed18f81d7c7.ps-xaas.io/tsa/policy:main
+    container_name: tsa-policy
+    ports:
+      - "8095:8095"
+    depends_on:
+      - nats
+    restart: on-failure
+    # Taken from https://gitlab.com/gaia-x/data-infrastructure-federation-services/tsa/policy-helm/-/blob/main/templates/deployment.yaml?ref_type=heads
+    environment:
+      POLICY_REPOSITORY_CLONE_URL: https://gitlab.eclipse.org/eclipse/xfsc/tsa/policies.git
+      HTTP_PORT: 8095
+      LOG_LEVEL: debug
+      NATS_ADDR: nats
+      NATS_SUBJECT: external
+      # Just a placeholder, it is not used
+      OCM_ADDR: http://ocm:8080
+    networks:
+      default:
+        aliases:
+          - tsa-policy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.10'
+
+  nats:
+    image: nats:2.9.25
+    restart: always

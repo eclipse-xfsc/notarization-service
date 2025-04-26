@@ -1,0 +1,15 @@
+---
+# https://github.com/jaegertracing/helm-charts/tree/main/charts/jaeger#all-in-one-in-memory-configuration
+allInOne:
+  enabled: true
+  replicas: 2
+provisionDataStore:
+  cassandra: false
+storage:
+  type: memory
+agent:
+  enabled: false
+collector:
+  enabled: false
+query:
+  enabled: false

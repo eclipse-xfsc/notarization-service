@@ -1,0 +1,37 @@
+---
+# Documentation:
+# https://github.com/bitnami/charts/tree/master/bitnami/keycloak/#installing-the-chart
+
+replicaCount: 1
+
+auth:
+  adminUser: kcadmin
+  existingSecret: "notarization-credentials"
+  passwordSecretKey: "keycloak-admin-password"
+
+externalDatabase:
+  host: CHANGEME
+  user: not_accept
+  database: not_keycloak
+  existingSecret: "notarization-credentials"
+  existingSecretPasswordKey: "postgresql-not-api-password"
+  port: 5432
+
+# No internal database.
+postgresql:
+  enabled: false
+
+# Needed to prevent spinning wheel "Loading the Admin UI" in newer Keycloak versions.
+proxy: reencrypt
+
+# Optional
+extraEnvVars:
+  - name: KEYCLOAK_LOG_LEVEL
+    value: INFO
+
+ingress:
+  enabled: true
+  hostname: CHANGEME
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  tls: true

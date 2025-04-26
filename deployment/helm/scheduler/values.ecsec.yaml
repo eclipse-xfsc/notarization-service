@@ -1,0 +1,15 @@
+---
+replicaCount: 1
+
+image:
+  tag: "latest-dev"
+
+config:
+  datasourceJdbcUrl: CHANGEME
+  datasourceUsername: CHANGEME
+  datasourceExistingSecret: "notarization-credentials"
+  datasourceSecretKey: "postgresql-not-api-password"
+  otelConnectorUrl: CHANGEME
+  restClientRevocationApiUrl: CHANGEME
+  restClientProfileApiUrl: CHANGEME
+  restClientRequestProcessingApiUrl: CHANGEME
