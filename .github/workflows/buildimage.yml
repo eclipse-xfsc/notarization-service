@@ -27,6 +27,7 @@ jobs:
       - name: Build and Push Container Image
         env:
           TAG: ${{ needs.setup.outputs.image_tag }}
+          HARBOR_CREDENTIALS: ${{ secrets.HARBOR_CREDENTIALS }}
         run: |
           echo "Building image for registry $IMAGE_REGISTRY/$IMAGE_REGISTRY_GROUP"
           git clone https://github.com/eclipse-xfsc/dev-ops.git devops
