@@ -1,10 +1,23 @@
 name: Build Image
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
-
+     inputs:
+      repo_name: 
+         description: "Final Repo name"
+         type: string
+         default: ''
+         required: false
 jobs:
+    setup:
+      uses: eclipse-xfsc/dev-ops/.github/workflows/build-context.yml@main
+      secrets: inherit
+      with:
+        repo_name: ${{ inputs.repo_name }}   
     image-build:
+      needs: setup
       runs-on: ubuntu-latest
       steps:
       - name: Checkout Repository
@@ -13,21 +26,18 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and Push Container Image
         env:
-          IMAGE_REGISTRY: ${{ secrets.HARBOR_HOST }}
-          IMAGE_REGISTRY_GROUP: ${{ secrets.HARBOR_PROJECT }}
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
-          TAG: ${{ github.sha }}
-          ADDITIONAL_TAGS: latest
+          TAG: ${{ needs.setup.outputs.image_tag }}
         run: |
           echo "Building image for registry $IMAGE_REGISTRY/$IMAGE_REGISTRY_GROUP"
-          
+          git clone https://github.com/eclipse-xfsc/dev-ops.git devops
+          chmod +x ./devops/scripts/harborconfig.sh
+          . ./devops/scripts/harborconfig.sh deployment/harbor.config
+
           ./gradlew imageBuild \
-            -Dquarkus.container-image.tag=$TAG \
-            -Dquarkus.container-image.additional-tags=$ADDITIONAL_TAGS \
+            -Dquarkus.container-image.tag=${{ needs.setup.outputs.image_tag }} \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.username=$HARBOR_USERNAME \
             -Dquarkus.container-image.password=$HARBOR_PASSWORD \
-            -Dquarkus.container-image.registry=$IMAGE_REGISTRY \
-            -Dquarkus.container-image.group=$IMAGE_REGISTRY_GROUP \
+            -Dquarkus.container-image.registry=${{ secrets.HARBOR_HOST }} \
+            -Dquarkus.container-image.group= $HARBOR_PROJECT \
             -x :services:ssi-issuance:imageBuild
