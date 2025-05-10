@@ -37,7 +37,7 @@ dependencies {
     implementation(libs.wiremock)
     testImplementation(quarkusModules.vertxTest)
 
-    implementation("commons-codec:commons-codec:1.16.1")
+    implementation("commons-codec:commons-codec:1.18.0")
     implementation(libs.parsson)
 //    implementation("org.bitbucket.b_c:jose4j:0.7.10")
 //    implementation("commons-io:commons-io:2.11.0")
